@@ -51,9 +51,23 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
 
   if (timeLeft.days > 7) {
     return (
-      <div className="flex items-center justify-center gap-2 py-3 px-4 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80 text-center">
-        <span className="text-sm font-bold text-sky-400 tracking-tight">{timeLeft.days}</span>
-        <span className="text-xs text-slate-300 font-semibold uppercase tracking-wider">Tage bis zum Event</span>
+      <div className="flex items-center justify-center py-2 px-3.5 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80 text-center">
+        <span className="text-xs font-extrabold text-sky-400 tracking-wide uppercase">in {timeLeft.days} Tagen</span>
+      </div>
+    );
+  }
+
+  if (timeLeft.days >= 2) {
+    return (
+      <div className="grid grid-cols-2 gap-1 text-center p-1.5 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80">
+        <div className="flex flex-col px-2.5 py-0.5">
+          <span className="text-sm font-bold text-sky-400 tracking-tight">{timeLeft.days}</span>
+          <span className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Tage</span>
+        </div>
+        <div className="flex flex-col border-l border-slate-800/80 px-2.5 py-0.5">
+          <span className="text-sm font-bold text-slate-200 tracking-tight">{timeLeft.hours}</span>
+          <span className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Std</span>
+        </div>
       </div>
     );
   }

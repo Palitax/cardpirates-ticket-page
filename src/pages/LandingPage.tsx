@@ -200,17 +200,17 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-transparent" />
-                  
-                  {featuredEvent.eventDate?.value && (
-                    <div className="absolute top-4 right-4 w-44 sm:w-48 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-                      <CountdownTimer targetDate={featuredEvent.eventDate.value} />
-                    </div>
-                  )}
                 </div>
 
                 {/* Event details and Call-To-Actions */}
-                <div className="flex flex-col h-full justify-center space-y-4">
-                  <div>
+                <div className="flex flex-col h-full justify-center space-y-4 relative">
+                  {featuredEvent.eventDate?.value && (
+                    <div className="absolute top-0 right-0 z-10" onClick={(e) => e.stopPropagation()}>
+                      <CountdownTimer targetDate={featuredEvent.eventDate.value} />
+                    </div>
+                  )}
+
+                  <div className="pr-28 sm:pr-32">
                     <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest">
                       Als nächstes im Fokus
                     </span>
