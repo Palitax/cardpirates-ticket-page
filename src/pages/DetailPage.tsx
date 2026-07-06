@@ -38,7 +38,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
         <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-slate-400 text-sm font-semibold">Retrieving event info...</p>
+        <p className="text-slate-400 text-sm font-semibold">Lade Event-Details...</p>
       </div>
     );
   }
@@ -46,12 +46,12 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
   if (!event) {
     return (
       <div className="text-center py-20 space-y-4">
-        <h2 className="text-xl font-bold text-white">Event not found</h2>
+        <h2 className="text-xl font-bold text-white">Event nicht gefunden</h2>
         <button
           onClick={() => navigate('/')}
           className="inline-flex items-center gap-2 py-2.5 px-5 bg-slate-800 text-white rounded-xl text-sm font-bold"
         >
-          <ArrowLeft size={16} /> Back to Schedule
+          <ArrowLeft size={16} /> Zurück zum Zeitplan
         </button>
       </div>
     );
@@ -77,7 +77,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
           className="flex items-center gap-1 hover:text-white transition-colors"
         >
           <ArrowLeft size={14} />
-          Schedule
+          Zeitplan
         </button>
         <ChevronRight size={12} className="text-slate-600" />
         <span className="text-slate-300 font-medium truncate">{event.title}</span>
@@ -127,8 +127,8 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                 <Video size={18} />
               </div>
               <div className="flex-1">
-                <h4 className="text-xs font-bold text-white">Promotional Video Available</h4>
-                <p className="text-[11px] text-slate-400">Click to watch event teasers and highlights.</p>
+                <h4 className="text-xs font-bold text-white">Promo-Video verfügbar</h4>
+                <p className="text-[11px] text-slate-400">Klicke hier, um Event-Teaser und Highlights anzusehen.</p>
               </div>
               <a
                 href={videoUrl}
@@ -136,7 +136,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                 rel="noopener noreferrer"
                 className="text-xs font-bold text-violet-400 hover:underline"
               >
-                Watch Now
+                Jetzt ansehen
               </a>
             </div>
           )}
@@ -150,7 +150,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             </h1>
             <div className="flex items-center gap-1.5 text-xs text-violet-400 font-bold uppercase tracking-wider">
               <Calendar size={13} />
-              Upcoming Event
+              Bevorstehendes Event
             </div>
           </div>
 
@@ -158,7 +158,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             <div className="flex items-start gap-3 text-sm">
               <Calendar size={18} className="text-slate-500 shrink-0 mt-0.5" />
               <div>
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Date & Time</span>
+                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Datum & Uhrzeit</span>
                 <span className="text-slate-200 font-semibold">{formattedDate}</span>
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             <div className="flex items-start gap-3 text-sm border-t border-slate-900 pt-3.5">
               <MapPin size={18} className="text-slate-500 shrink-0 mt-0.5" />
               <div>
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Location / Venue</span>
+                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Veranstaltungsort</span>
                 <span className="text-slate-200 font-semibold">{location}</span>
               </div>
             </div>
@@ -174,15 +174,15 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             <div className="flex items-start gap-3 text-sm border-t border-slate-900 pt-3.5">
               <CreditCard size={18} className="text-slate-500 shrink-0 mt-0.5" />
               <div>
-                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Ticket Access</span>
-                <span className="text-slate-200 font-semibold">Immediate digital delivery upon payment</span>
+                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Ticket-Zugang</span>
+                <span className="text-slate-200 font-semibold">Sofortige digitale Zustellung per E-Mail nach Zahlung</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
-              About this Event
+              Über dieses Event
             </h3>
             <div 
               className="text-slate-300 text-sm leading-relaxed space-y-3"
@@ -196,7 +196,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
       {/* Mobile Sticky Bottom CTA Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 p-4 pb-safe flex items-center justify-between max-w-4xl mx-auto sm:rounded-t-3xl sm:border-x">
         <div className="flex flex-col">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Price</span>
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Gesamtpreis</span>
           <span className="text-2xl font-extrabold text-white">
             {priceAmount} <span className="text-xs text-slate-400 font-semibold">{currency}</span>
           </span>
@@ -206,7 +206,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
           onClick={() => onQuickBuy(event)}
           className="py-3.5 px-8 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-violet-600/15 transition-all select-none active:scale-[0.98]"
         >
-          Secure Ticket Now
+          Jetzt Ticket sichern
         </button>
       </div>
 

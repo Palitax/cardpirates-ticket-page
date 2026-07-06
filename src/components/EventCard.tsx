@@ -66,7 +66,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
         <div className="mt-auto flex flex-col gap-3">
           {/* Price Tag */}
           <div className="flex justify-between items-center px-1">
-            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Ticket Price</span>
+            <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Ticketpreis</span>
             <span className="text-lg font-bold text-white">
               {priceAmount} <span className="text-xs text-slate-400 font-medium">{currency}</span>
             </span>
@@ -79,7 +79,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
               className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-slate-600 text-slate-200 text-sm font-semibold transition-all select-none active:scale-[0.98]"
             >
               <Info size={16} />
-              Details
+              Mehr Infos
             </button>
 
             {/* Quick Buy Trigger */}
@@ -88,7 +88,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
               className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-bold shadow-lg shadow-violet-600/15 transition-all select-none active:scale-[0.98]"
             >
               <ShoppingCart size={16} />
-              Quick Buy
+              Direkt kaufen
             </button>
           </div>
         </div>

@@ -255,10 +255,10 @@ function getMockEvents(): ShopifyProduct[] {
   return [
     {
       id: 'gid://shopify/Product/mock-1',
-      title: 'Grand Cardpirates Tournament 2026',
+      title: 'Großes Cardpirates Turnier 2026',
       handle: 'grand-cardpirates-tournament-2026',
-      description: 'The ultimate TCG event of the year. Face the best card pirates in Europe, secure exclusive promo cards, and compete for a massive cash prize pool.',
-      descriptionHtml: '<p>The ultimate TCG event of the year. Face the best card pirates in Europe, secure exclusive promo cards, and compete for a massive cash prize pool.</p>',
+      description: 'Das ultimative TCG-Event des Jahres. Tritt gegen die besten Cardpirates Europas an, sichere dir exklusive Promokarten und kämpfe um einen riesigen Preispool.',
+      descriptionHtml: '<p>Das ultimative TCG-Event des Jahres. Tritt gegen die besten Cardpirates Europas an, sichere dir exklusive Promokarten und kämpfe um einen riesigen Preispool.</p>',
       images: {
         nodes: [
           {
@@ -271,21 +271,21 @@ function getMockEvents(): ShopifyProduct[] {
         nodes: [
           {
             id: 'gid://shopify/ProductVariant/mock-var-1',
-            title: 'General Admission',
+            title: 'Standard-Ticket',
             price: { amount: '45.00', currencyCode: 'EUR' },
             availableForSale: true
           }
         ]
       },
       eventDate: { value: nextWeek.toISOString() },
-      eventLocation: { value: 'Halle 4, Cologne, Germany' }
+      eventLocation: { value: 'Halle 4, Köln, Deutschland' }
     },
     {
       id: 'gid://shopify/Product/mock-2',
       title: 'Retro Deck-building Masterclass',
       handle: 'retro-deckbuilding-masterclass',
-      description: 'Learn deck-building strategies from legendary players. Bring your old-school cards and discover secret card combos to dominate local tournaments.',
-      descriptionHtml: '<p>Learn deck-building strategies from legendary players. Bring your old-school cards and discover secret card combos to dominate local tournaments.</p>',
+      description: 'Lerne Deckbuilding-Strategien von legendären Spielern. Bringe deine Old-School-Karten mit und entdecke geheime Kartenkombinationen, um lokale Turniere zu dominieren.',
+      descriptionHtml: '<p>Lerne Deckbuilding-Strategien von legendären Spielern. Bringe deine Old-School-Karten mit und entdecke geheime Kartenkombinationen, um lokale Turniere zu dominieren.</p>',
       images: {
         nodes: [
           {
@@ -298,21 +298,21 @@ function getMockEvents(): ShopifyProduct[] {
         nodes: [
           {
             id: 'gid://shopify/ProductVariant/mock-var-2',
-            title: 'Masterclass Ticket',
+            title: 'Masterclass-Ticket',
             price: { amount: '25.00', currencyCode: 'EUR' },
             availableForSale: true
           }
         ]
       },
       eventDate: { value: inTwoWeeks.toISOString() },
-      eventLocation: { value: 'Pirates Hub, Hamburg, Germany' }
+      eventLocation: { value: 'Pirates Hub, Hamburg, Deutschland' }
     },
     {
       id: 'gid://shopify/Product/mock-3',
-      title: 'Card Trading & Networking Night',
+      title: 'Card Trading & Networking Nacht',
       handle: 'card-trading-networking-night',
-      description: 'Meet collectors, trade rare items, and test your new decks in casual play. Food and drinks are included in the ticket price.',
-      descriptionHtml: '<p>Meet collectors, trade rare items, and test your new decks in casual play. Food and drinks are included in the ticket price.</p>',
+      description: 'Triff Sammler, tausche seltene Karten und teste deine neuen Decks in lockeren Runden. Snacks und Getränke sind im Ticketpreis enthalten.',
+      descriptionHtml: '<p>Triff Sammler, tausche seltene Karten und teste deine neuen Decks in lockeren Runden. Snacks und Getränke sind im Ticketpreis enthalten.</p>',
       images: {
         nodes: [
           {
@@ -325,14 +325,14 @@ function getMockEvents(): ShopifyProduct[] {
         nodes: [
           {
             id: 'gid://shopify/ProductVariant/mock-var-3',
-            title: 'Casual Pass',
+            title: 'Community-Pass',
             price: { amount: '15.00', currencyCode: 'EUR' },
             availableForSale: true
           }
         ]
       },
       eventDate: { value: inThreeWeeks.toISOString() },
-      eventLocation: { value: 'Basecamp, Berlin, Germany' }
+      eventLocation: { value: 'Basecamp, Berlin, Deutschland' }
     }
   ];
 }

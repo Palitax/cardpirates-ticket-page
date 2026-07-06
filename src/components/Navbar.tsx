@@ -27,7 +27,7 @@ export default function Navbar({ onLoginTrigger }: NavbarProps) {
             className="flex items-center gap-2 py-2 px-4 bg-slate-900 hover:bg-slate-850 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold tracking-wide transition-all select-none active:scale-[0.98]"
           >
             <UserCheck size={14} className="text-violet-400" />
-            Login / Register
+            Anmelden / Registrieren
           </button>
         </div>
 

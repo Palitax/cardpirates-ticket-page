@@ -106,15 +106,15 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           <div>
             <h2 className="text-lg font-bold text-white tracking-tight">
               {event 
-                ? (isRegister ? 'Register & Buy' : 'Log In & Buy')
-                : (isRegister ? 'Create Account' : 'Account Login')
+                ? (isRegister ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
+                : (isRegister ? 'Konto erstellen' : 'Konto-Login')
               }
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
               {event ? (
-                <>To purchase tickets for <span className="text-violet-400 font-semibold">{event.title}</span></>
+                <>Um Tickets zu kaufen für <span className="text-violet-400 font-semibold">{event.title}</span></>
               ) : (
-                'Access your card battles and account profile'
+                'Greife auf deine Cardpirates-Kämpfe und dein Profil zu'
               )}
             </p>
           </div>
@@ -141,21 +141,21 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               onClick={() => setIsRegister(true)}
               className={`py-2 text-xs font-bold rounded-lg transition-all ${isRegister ? 'bg-slate-850 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
             >
-              Sign Up
+              Registrieren
             </button>
             <button
               type="button"
               onClick={() => setIsRegister(false)}
               className={`py-2 text-xs font-bold rounded-lg transition-all ${!isRegister ? 'bg-slate-850 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
             >
-              Log In
+              Einloggen
             </button>
           </div>
 
           {/* User Type Selection (Signup only) */}
           {isRegister && (
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Account Type</label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Kontotyp</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
@@ -163,7 +163,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'private' ? 'bg-violet-600/10 border-violet-500 text-violet-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
                 >
                   <User size={16} />
-                  Private Person
+                  Privatperson
                 </button>
                 <button
                   type="button"
@@ -171,7 +171,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'business' ? 'bg-violet-600/10 border-violet-500 text-violet-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
                 >
                   <Building2 size={16} />
-                  Business
+                  Unternehmen
                 </button>
               </div>
             </div>
@@ -181,11 +181,11 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           <div className="space-y-3.5">
             <div className="grid grid-cols-1 gap-3.5">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Email Address</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">E-Mail-Adresse</label>
                 <input
                   type="email"
                   required
-                  placeholder="name@company.com"
+                  placeholder="name@firma.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
@@ -193,7 +193,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               </div>
               
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Password</label>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Passwort</label>
                 <input
                   type="password"
                   required
@@ -210,7 +210,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 {/* Names */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">First Name</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Vorname</label>
                     <input
                       type="text"
                       required
@@ -221,7 +221,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Last Name</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nachname</label>
                     <input
                       type="text"
                       required
@@ -237,21 +237,21 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 {userType === 'business' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 p-4 bg-slate-950 rounded-2xl border border-slate-800/80">
                     <div className="sm:col-span-2">
-                      <h4 className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-2">Company Details</h4>
+                      <h4 className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-2">Unternehmensdaten</h4>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Company Name</label>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Firmenname</label>
                       <input
                         type="text"
                         required={userType === 'business'}
-                        placeholder="Acme Corp GmbH"
+                        placeholder="Muster GmbH"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">VAT Number (USt-IdNr.)</label>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">USt-IdNr. (Mehrwertsteuer)</label>
                       <input
                         type="text"
                         required={userType === 'business'}
@@ -266,10 +266,10 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
                 {/* Checkout Address Details */}
                 <div className="space-y-3.5 border-t border-slate-800 pt-5">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Shipping / Billing Address</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Rechnungs- & Lieferadresse</h4>
                   
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Street Address</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Straße & Hausnummer</label>
                     <input
                       type="text"
                       required
@@ -281,10 +281,10 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Address Line 2 (Optional)</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Adresszusatz (Optional)</label>
                     <input
                       type="text"
-                      placeholder="Apartment, suite, etc."
+                      placeholder="Wohnung, Etage, etc."
                       value={address2}
                       onChange={(e) => setAddress2(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
@@ -293,7 +293,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Postal Code</label>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Postleitzahl</label>
                       <input
                         type="text"
                         required
@@ -304,7 +304,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">City</label>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Stadt</label>
                       <input
                         type="text"
                         required
@@ -318,7 +318,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Country Code</label>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Länderkürzel</label>
                       <input
                         type="text"
                         required
@@ -330,7 +330,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Phone Number</label>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Telefonnummer</label>
                       <input
                         type="tel"
                         required
@@ -357,11 +357,11 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             {loading ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                {event ? 'Preparing Secure Checkout...' : 'Authenticating...'}
+                {event ? 'Sichere Kasse wird geladen...' : 'Authentifizierung...'}
               </>
             ) : (
               <>
-                {event ? 'Proceed to PayPal Checkout' : (isRegister ? 'Register Account' : 'Sign In')}
+                {event ? 'Weiter zur PayPal-Zahlung' : (isRegister ? 'Konto registrieren' : 'Einloggen')}
                 <ArrowRight size={16} />
               </>
             )}

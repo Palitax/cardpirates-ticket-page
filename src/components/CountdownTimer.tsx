@@ -44,7 +44,7 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
     return (
       <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-full text-xs font-semibold tracking-wide uppercase">
         <span className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse" />
-        Event Started
+        Event gestartet
       </div>
     );
   }
@@ -53,11 +53,11 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
     <div className="grid grid-cols-4 gap-2 text-center p-2.5 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80">
       <div className="flex flex-col">
         <span className="text-sm font-bold text-violet-400 tracking-tight">{String(timeLeft.days).padStart(2, '0')}</span>
-        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Days</span>
+        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Tage</span>
       </div>
       <div className="flex flex-col border-l border-slate-800/80">
         <span className="text-sm font-bold text-slate-200 tracking-tight">{String(timeLeft.hours).padStart(2, '0')}</span>
-        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Hrs</span>
+        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Std</span>
       </div>
       <div className="flex flex-col border-l border-slate-800/80">
         <span className="text-sm font-bold text-slate-200 tracking-tight">{String(timeLeft.minutes).padStart(2, '0')}</span>
@@ -65,7 +65,7 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
       </div>
       <div className="flex flex-col border-l border-slate-800/80">
         <span className="text-sm font-bold text-rose-400 tracking-tight animate-pulse">{String(timeLeft.seconds).padStart(2, '0')}</span>
-        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Sec</span>
+        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Sek</span>
       </div>
     </div>
   );
