@@ -30,7 +30,7 @@
   {{ content_for_layout }}
 
   <!-- Load Compiled React App JavaScript Bundle -->
-  {{ 'theme-app.js' | asset_url | script_tag }}
+  <script src="{{ 'theme-app.js' | asset_url }}" type="module" defer="defer"></script>
 
 </body>
 </html>
