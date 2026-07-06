@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { TouchEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CalendarDays } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { shopifyService } from '../services/shopify';
@@ -12,6 +13,7 @@ interface LandingPageProps {
 }
 
 export default function LandingPage({ onQuickBuy }: LandingPageProps) {
+  const navigate = useNavigate();
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [featuredIndex, setFeaturedIndex] = useState(0);
@@ -125,7 +127,10 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
               
               {/* Photo & Timer Overlay on Top-Right */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden group">
+              <div 
+                onClick={() => navigate(`/events/${featuredEvent.handle}`)}
+                className="relative aspect-video rounded-2xl overflow-hidden group cursor-pointer"
+              >
                 <img 
                   src={featuredEvent.images.nodes[0]?.url} 
                   alt={featuredEvent.title}
@@ -134,7 +139,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-transparent" />
                 
                 {featuredEvent.eventDate?.value && (
-                  <div className="absolute top-4 right-4 w-44 sm:w-48 shadow-2xl">
+                  <div className="absolute top-4 right-4 w-44 sm:w-48 shadow-2xl" onClick={(e) => e.stopPropagation()}>
                     <CountdownTimer targetDate={featuredEvent.eventDate.value} />
                   </div>
                 )}
@@ -146,7 +151,10 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                   <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest">
                     Als nächstes im Fokus
                   </span>
-                  <h3 className="text-2xl font-bold text-white tracking-tight mt-1">
+                  <h3 
+                    onClick={() => navigate(`/events/${featuredEvent.handle}`)}
+                    className="text-2xl font-bold text-white tracking-tight mt-1 hover:text-sky-400 cursor-pointer transition-colors"
+                  >
                     {featuredEvent.title}
                   </h3>
                 </div>
@@ -155,7 +163,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                   {featuredEvent.description}
                 </p>
 
-                <div className="pt-2 border-t border-slate-900 flex flex-wrap gap-4 items-center justify-between">
+                <div className="pt-4 border-t border-slate-900 flex flex-wrap gap-4 items-center justify-between">
                   <div>
                     <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Eintrittsticket</span>
                     <span className="text-xl font-extrabold text-white">
@@ -163,13 +171,23 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                     </span>
                   </div>
 
-                  <Button
-                    variant="primary"
-                    onPress={() => onQuickBuy(featuredEvent)}
-                    className="py-3 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-sky-500/10 hover:brightness-105 transition-all select-none active:scale-[0.98]"
-                  >
-                    Direktkauf Ticket
-                  </Button>
+                  <div className="flex gap-2.5">
+                    <Button
+                      variant="outline"
+                      onPress={() => navigate(`/events/${featuredEvent.handle}`)}
+                      className="py-3.5 px-5 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 text-xs font-bold transition-all"
+                    >
+                      Mehr Infos
+                    </Button>
+
+                    <Button
+                      variant="primary"
+                      onPress={() => onQuickBuy(featuredEvent)}
+                      className="py-3.5 px-5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-sky-500/10 hover:brightness-105 transition-all select-none active:scale-[0.98]"
+                    >
+                      Direktkauf Ticket
+                    </Button>
+                  </div>
                 </div>
               </div>
 
