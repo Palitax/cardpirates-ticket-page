@@ -1,4 +1,4 @@
-// Shopify Storefront API Client
+import event1Img from '../assets/event1.jpg';
 
 const getShopifyConfig = () => {
   const globalConfig = (window as any).ShopifyStorefrontConfig || {};
@@ -262,7 +262,7 @@ function getMockEvents(): ShopifyProduct[] {
       images: {
         nodes: [
           {
-            url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=1200',
+            url: (window as any).ShopifyAssets?.event1Url || event1Img,
             altText: 'Gaming Area'
           }
         ]

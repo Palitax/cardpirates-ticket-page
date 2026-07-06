@@ -70,35 +70,35 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
           </div>
 
           {/* Buy/Details Actions */}
-          <div className="space-y-4">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
             {/* Price Tag */}
-            <div className="flex justify-between items-center px-1">
-              <span className="text-xs text-slate-500 font-bold uppercase tracking-wider font-sans">Ticketpreis</span>
-              <span className="text-lg font-bold text-white">
+            <div className="flex flex-col">
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Ticketpreis</span>
+              <span className="text-lg font-bold text-white leading-tight">
                 {priceAmount} <span className="text-xs text-slate-400 font-medium">{currency}</span>
               </span>
             </div>
 
-            {/* Stops propagation so clicking buttons doesn't trigger card navigation */}
-            <div className="grid grid-cols-2 gap-2.5" onClick={(e) => e.stopPropagation()}>
+            {/* Buttons Row */}
+            <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
               {/* More Info Button */}
               <Button
                 variant="outline"
                 onPress={() => navigate(`/events/${event.handle}`)}
-                className="py-3.5 px-4 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 text-xs font-bold flex items-center gap-1.5 justify-center"
+                className="w-10 h-10 min-w-0 p-0 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
+                aria-label="Mehr Infos"
               >
-                <Info size={15} />
-                <span>Mehr Infos</span>
+                <Info size={16} />
               </Button>
 
               {/* Quick Buy Trigger */}
               <Button
                 variant="primary"
                 onPress={() => onQuickBuy(event)}
-                className="py-3.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-sky-500/10 hover:brightness-105 transition-all flex items-center gap-1.5 justify-center"
+                className="w-10 h-10 min-w-0 p-0 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 shadow-lg shadow-sky-500/10 hover:brightness-105 flex items-center justify-center transition-all cursor-pointer"
+                aria-label="Direkt kaufen"
               >
-                <ShoppingCart size={15} />
-                <span>Direkt kaufen</span>
+                <ShoppingCart size={16} />
               </Button>
             </div>
           </div>

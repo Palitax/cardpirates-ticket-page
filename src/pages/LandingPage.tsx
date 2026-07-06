@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { TouchEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Info, ShoppingCart } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
@@ -180,7 +180,8 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 p-5 sm:p-6 shadow-2xl touch-pan-y"
+            onClick={() => navigate(`/events/${featuredEvent.handle}`)}
+            className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 p-5 sm:p-6 shadow-2xl touch-pan-y cursor-pointer hover:border-sky-500/35 transition-colors duration-300"
           >
             <AnimatePresence mode="wait">
               <motion.div
@@ -192,10 +193,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center"
               >
                 {/* Photo & Timer Overlay on Top-Right */}
-                <div 
-                  onClick={() => navigate(`/events/${featuredEvent.handle}`)}
-                  className="relative aspect-video rounded-2xl overflow-hidden group cursor-pointer"
-                >
+                <div className="relative aspect-video rounded-2xl overflow-hidden group">
                   <img 
                     src={featuredEvent.images.nodes[0]?.url} 
                     alt={featuredEvent.title}
@@ -216,10 +214,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                     <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest">
                       Als nächstes im Fokus
                     </span>
-                    <h3 
-                      onClick={() => navigate(`/events/${featuredEvent.handle}`)}
-                      className="text-2xl font-bold text-white tracking-tight mt-1 hover:text-sky-400 cursor-pointer transition-colors"
-                    >
+                    <h3 className="text-2xl font-bold text-white tracking-tight mt-1 hover:text-sky-400 transition-colors">
                       {featuredEvent.title}
                     </h3>
                   </div>
@@ -236,21 +231,23 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                       </span>
                     </div>
 
-                    <div className="flex gap-2.5">
+                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button
                         variant="outline"
                         onPress={() => navigate(`/events/${featuredEvent.handle}`)}
-                        className="py-3.5 px-5 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 text-xs font-bold transition-all"
+                        className="w-10 h-10 min-w-0 p-0 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
+                        aria-label="Mehr Infos"
                       >
-                        Mehr Infos
+                        <Info size={16} />
                       </Button>
 
                       <Button
                         variant="primary"
                         onPress={() => onQuickBuy(featuredEvent)}
-                        className="py-3.5 px-5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-sky-500/10 hover:brightness-105 transition-all select-none active:scale-[0.98]"
+                        className="w-10 h-10 min-w-0 p-0 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 shadow-lg shadow-sky-500/10 hover:brightness-105 flex items-center justify-center transition-all cursor-pointer"
+                        aria-label="Direktkauf Ticket"
                       >
-                        Direktkauf Ticket
+                        <ShoppingCart size={16} />
                       </Button>
                     </div>
                   </div>
