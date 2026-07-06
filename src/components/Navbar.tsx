@@ -8,6 +8,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onLoginTrigger }: NavbarProps) {
+  const logoUrl = (window as any).ShopifyAssets?.logoUrl || logoImg;
+
   return (
     <nav className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-6 py-4">
       <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -15,7 +17,7 @@ export default function Navbar({ onLoginTrigger }: NavbarProps) {
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2.5 group select-none">
           <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-sky-500/10 group-hover:scale-105 transition-transform duration-300">
-            <img src={logoImg} alt="Cardpirates Logo" className="w-full h-full object-cover" />
+            <img src={logoUrl} alt="Cardpirates Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-3xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
             Cardpirates
