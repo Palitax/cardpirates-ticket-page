@@ -149,28 +149,69 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             onClick={() => navigate(`/events/${featuredEvent.handle}`)}
             className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 p-5 sm:p-6 shadow-2xl touch-pan-y cursor-pointer hover:border-sky-500/35 transition-colors duration-300"
           >
+            {isInitialMount && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 2.6, times: [0, 0.1, 0.9, 1], ease: "easeInOut" }}
+                className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/65 backdrop-blur-[2px] rounded-3xl pointer-events-none"
+              >
+                <div className="relative flex items-center justify-center w-36 h-36">
+                  {/* Left Arrow */}
+                  <motion.div
+                    animate={{ x: [0, -12, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
+                    className="absolute left-1 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                  >
+                    <svg className="w-8 h-8 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m15 18-6-6 6-6" />
+                    </svg>
+                  </motion.div>
+
+                  {/* Finger Component */}
+                  <motion.div
+                    animate={{
+                      x: [0, -25, 25, 0],
+                      scale: [1, 0.93, 0.93, 1]
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1.5,
+                      times: [0, 0.35, 0.7, 1],
+                      ease: "easeInOut"
+                    }}
+                    className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                  >
+                    <svg className="w-12 h-12 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 11V4a1.5 1.5 0 0 0-3 0v7M9 11V9a1.5 1.5 0 0 0-3 0v2M6 11V10a1.5 1.5 0 0 0-3 0v5a7 7 0 0 0 14 0v-4a1.5 1.5 0 0 0-3 0v3M15 11v-1a1.5 1.5 0 0 0-3 0v3" />
+                    </svg>
+                  </motion.div>
+
+                  {/* Right Arrow */}
+                  <motion.div
+                    animate={{ x: [0, 12, 0], opacity: [0.4, 1, 0.4] }}
+                    transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
+                    className="absolute right-1 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                  >
+                    <svg className="w-8 h-8 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m9 18 6-6-6-6" />
+                    </svg>
+                  </motion.div>
+                </div>
+                
+                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mt-1">
+                  Wischen zum Blättern
+                </span>
+              </motion.div>
+            )}
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={featuredIndex}
-                initial={{ opacity: 0, x: isInitialMount ? 0 : 40, filter: 'blur(6px)' }}
-                animate={isInitialMount ? {
-                  opacity: 1,
-                  filter: 'blur(0px)',
-                  x: [0, -60, 15, 0],
-                } : {
-                  opacity: 1,
-                  filter: 'blur(0px)',
-                  x: 0,
-                }}
+                initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
                 exit={{ opacity: 0, x: -40, filter: 'blur(6px)' }}
-                transition={isInitialMount ? {
-                  duration: 1.5,
-                  times: [0, 0.35, 0.7, 1],
-                  ease: "easeInOut"
-                } : {
-                  duration: 0.45,
-                  ease: [0.16, 1, 0.3, 1]
-                }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center"
               >
                 {/* Photo & Timer Overlay on Top-Right */}
