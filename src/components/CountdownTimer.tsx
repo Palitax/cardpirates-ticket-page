@@ -51,44 +51,44 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
 
   if (timeLeft.days > 7) {
     return (
-      <div className="flex items-center justify-center py-2 px-3.5 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80 text-center">
-        <span className="text-xs font-extrabold text-sky-400 tracking-wide uppercase">in {timeLeft.days} Tagen</span>
+      <div className="flex items-center justify-center py-2 px-3.5 bg-slate-950/80 backdrop-blur-md rounded-xl border border-slate-800/80 text-center shadow-lg shadow-white/5 animate-pulse">
+        <span className="text-xs font-extrabold text-white tracking-wide uppercase drop-shadow-[0_0_6px_rgba(255,255,255,0.65)]">in {timeLeft.days} Tagen</span>
       </div>
     );
   }
 
   if (timeLeft.days >= 2) {
     return (
-      <div className="grid grid-cols-2 gap-1 text-center p-1.5 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80">
+      <div className="grid grid-cols-2 gap-1 text-center p-1.5 bg-slate-950/80 backdrop-blur-md rounded-xl border border-slate-800/80 shadow-lg shadow-white/5 animate-pulse">
         <div className="flex flex-col px-2.5 py-0.5">
-          <span className="text-sm font-bold text-sky-400 tracking-tight">{timeLeft.days}</span>
-          <span className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Tage</span>
+          <span className="text-base font-bold text-white tracking-tight drop-shadow-[0_0_5px_rgba(255,255,255,0.6)]">{timeLeft.days}</span>
+          <span className="text-[8px] text-slate-400 uppercase tracking-widest font-semibold">Tage</span>
         </div>
         <div className="flex flex-col border-l border-slate-800/80 px-2.5 py-0.5">
-          <span className="text-sm font-bold text-slate-200 tracking-tight">{timeLeft.hours}</span>
-          <span className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Std</span>
+          <span className="text-base font-bold text-white tracking-tight drop-shadow-[0_0_5px_rgba(255,255,255,0.6)]">{timeLeft.hours}</span>
+          <span className="text-[8px] text-slate-400 uppercase tracking-widest font-semibold">Std</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-4 gap-2 text-center p-2.5 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80">
-      <div className="flex flex-col">
-        <span className="text-sm font-bold text-sky-400 tracking-tight">{String(timeLeft.days).padStart(2, '0')}</span>
-        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Tage</span>
+    <div className="grid grid-cols-4 gap-1 text-center p-1.5 bg-slate-950/80 backdrop-blur-md rounded-xl border border-slate-800/80 shadow-lg shadow-white/5 animate-pulse">
+      <div className="flex flex-col px-1.5 py-0.5">
+        <span className="text-sm font-bold text-white tracking-tight drop-shadow-[0_0_5px_rgba(255,255,255,0.6)]">{String(timeLeft.days).padStart(2, '0')}</span>
+        <span className="text-[8px] text-slate-400 uppercase tracking-widest font-semibold">Tage</span>
       </div>
-      <div className="flex flex-col border-l border-slate-800/80">
-        <span className="text-sm font-bold text-slate-200 tracking-tight">{String(timeLeft.hours).padStart(2, '0')}</span>
-        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Std</span>
+      <div className="flex flex-col border-l border-slate-800/80 px-1.5 py-0.5">
+        <span className="text-sm font-bold text-white tracking-tight drop-shadow-[0_0_5px_rgba(255,255,255,0.6)]">{String(timeLeft.hours).padStart(2, '0')}</span>
+        <span className="text-[8px] text-slate-400 uppercase tracking-widest font-semibold">Std</span>
       </div>
-      <div className="flex flex-col border-l border-slate-800/80">
-        <span className="text-sm font-bold text-slate-200 tracking-tight">{String(timeLeft.minutes).padStart(2, '0')}</span>
-        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Min</span>
+      <div className="flex flex-col border-l border-slate-800/80 px-1.5 py-0.5">
+        <span className="text-sm font-bold text-white tracking-tight drop-shadow-[0_0_5px_rgba(255,255,255,0.6)]">{String(timeLeft.minutes).padStart(2, '0')}</span>
+        <span className="text-[8px] text-slate-400 uppercase tracking-widest font-semibold">Min</span>
       </div>
-      <div className="flex flex-col border-l border-slate-800/80">
-        <span className="text-sm font-bold text-rose-400 tracking-tight animate-pulse">{String(timeLeft.seconds).padStart(2, '0')}</span>
-        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Sek</span>
+      <div className="flex flex-col border-l border-slate-800/80 px-1.5 py-0.5">
+        <span className="text-sm font-bold text-white tracking-tight drop-shadow-[0_0_5px_rgba(255,255,255,0.7)]">{String(timeLeft.seconds).padStart(2, '0')}</span>
+        <span className="text-[8px] text-slate-400 uppercase tracking-widest font-semibold">Sek</span>
       </div>
     </div>
   );
