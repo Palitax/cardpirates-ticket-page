@@ -44,7 +44,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   useEffect(() => {
     const tutorialTimer = setTimeout(() => {
       setIsInitialMount(false);
-    }, 1800);
+    }, 5200);
 
     async function loadEvents() {
       try {
@@ -75,6 +75,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   // Swipe Handlers
   const handleTouchStart = (e: TouchEvent) => {
     setTouchStart(e.targetTouches[0].clientX);
+    setIsInitialMount(false);
   };
 
   const handleTouchMove = (e: TouchEvent) => {
@@ -153,7 +154,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{ duration: 2.6, times: [0, 0.1, 0.9, 1], ease: "easeInOut" }}
+                transition={{ duration: 5.2, times: [0, 0.05, 0.95, 1], ease: "easeInOut" }}
                 className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/65 backdrop-blur-[2px] rounded-3xl pointer-events-none"
               >
                 <div className="relative flex items-center justify-center w-36 h-36">
