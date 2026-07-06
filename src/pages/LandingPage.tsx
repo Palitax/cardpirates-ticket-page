@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { TouchEvent } from 'react';
 import { CalendarDays } from 'lucide-react';
+import { Button } from '@heroui/react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
@@ -162,12 +163,13 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                     </span>
                   </div>
 
-                  <button
-                    onClick={() => onQuickBuy(featuredEvent)}
-                    className="py-3.5 px-6 rounded-xl bg-sky-500 hover:bg-sky-500 text-white text-sm font-bold shadow-lg shadow-sky-500/20 transition-all select-none active:scale-[0.98]"
+                  <Button
+                    variant="primary"
+                    onPress={() => onQuickBuy(featuredEvent)}
+                    className="py-3 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-sky-500/10 hover:brightness-105 transition-all select-none active:scale-[0.98]"
                   >
                     Direktkauf Ticket
-                  </button>
+                  </Button>
                 </div>
               </div>
 

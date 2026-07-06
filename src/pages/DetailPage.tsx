@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Calendar, CreditCard, ChevronRight, Video } from 'lu
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
+import { Button } from '@heroui/react';
 
 interface DetailPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -202,12 +203,13 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
           </span>
         </div>
 
-        <button
-          onClick={() => onQuickBuy(event)}
-          className="py-3.5 px-8 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold text-sm shadow-lg shadow-sky-500/15 transition-all select-none active:scale-[0.98]"
+        <Button
+          variant="primary"
+          onPress={() => onQuickBuy(event)}
+          className="py-3 px-8 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-sky-500/15 transition-all select-none active:scale-[0.98]"
         >
           Jetzt Ticket sichern
-        </button>
+        </Button>
       </div>
 
     </div>

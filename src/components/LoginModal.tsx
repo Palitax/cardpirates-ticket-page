@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { X, Building2, User, Loader2, ArrowRight } from 'lucide-react';
+import { 
+  Modal, 
+  Tabs, 
+  TextField, 
+  Label, 
+  Input, 
+  Button 
+} from '@heroui/react';
+import { ArrowRight, X } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import { profileService } from '../services/supabase';
@@ -13,7 +21,7 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginModalProps) {
-  const [isRegister, setIsRegister] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>('register');
   const [userType, setUserType] = useState<'private' | 'business'>('private');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,343 +40,344 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [zip, setZip] = useState('');
   const [country, setCountry] = useState('DE');
 
-  if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // 1. Simulate authentication / profile creation
-      // In production, you would authenticate via Supabase Auth here:
-      // await supabase.auth.signUp({ email, password })
-      
       const mockCustomerId = `shopify-cust-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
 
       const profileData: CustomerProfile = {
         shopify_customer_id: mockCustomerId,
         user_type: userType,
-        first_name: firstName || 'Guest',
-        last_name: lastName || 'User',
-        phone: phone || '',
-        address_line_1: address1 || '',
-        address_line_2: address2 || '',
-        city: city || '',
-        zip_code: zip || '',
-        country: country || 'DE',
-        company_name: userType === 'business' ? companyName : undefined,
-        vat_number: userType === 'business' ? vatNumber : undefined,
+        first_name: activeTab === 'register' ? (firstName || 'Gast') : 'Wiederkehrender',
+        last_name: activeTab === 'register' ? (lastName || 'User') : 'Kunde',
+        phone: activeTab === 'register' ? phone : '',
+        address_line_1: activeTab === 'register' ? address1 : '',
+        address_line_2: activeTab === 'register' ? address2 : '',
+        city: activeTab === 'register' ? city : '',
+        zip_code: activeTab === 'register' ? zip : '',
+        country: activeTab === 'register' ? country : 'DE',
+        company_name: activeTab === 'register' && userType === 'business' ? companyName : undefined,
+        vat_number: activeTab === 'register' && userType === 'business' ? vatNumber : undefined,
       };
 
-      // 2. Save customer metadata in database (Supabase / LocalStorage)
+      // 1. Save profile metadata
       await profileService.saveProfile(profileData);
 
-      // 3. Create Shopify Cart and pre-fill checkout via Storefront API
+      // 2. Checkout link generation
       if (event) {
         const variantId = event.variants.nodes[0]?.id;
         if (!variantId) {
-          throw new Error('Ticket variant not found for this event.');
+          throw new Error('Ticket-Variante für dieses Event nicht gefunden.');
         }
 
         const checkoutUrl = await shopifyService.createCheckoutLink(variantId, email, {
           firstName: profileData.first_name,
           lastName: profileData.last_name,
-          address1: profileData.address_line_1,
-          city: profileData.city,
-          zip: profileData.zip_code,
-          country: profileData.country,
-          company: userType === 'business' ? companyName : undefined,
+          address1: profileData.address_line_1 || 'Hauptstraße 1',
+          city: profileData.city || 'Berlin',
+          zip: profileData.zip_code || '10115',
+          country: profileData.country || 'DE',
+          company: profileData.company_name,
         });
 
         if (checkoutUrl) {
           onSuccess(checkoutUrl);
         } else {
-          throw new Error('Failed to generate a checkout link.');
+          throw new Error('Fehler beim Erstellen der Kasse.');
         }
       } else {
-        // No event, just successful signup/login
         onSuccess('');
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred during submission.');
+      setError(err.message || 'Ein Fehler ist aufgetreten.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="w-full sm:max-w-lg bg-slate-900 border-t sm:border border-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[90vh] overflow-hidden">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center px-6 py-5 border-b border-slate-800 shrink-0">
-          <div>
-            <h2 className="text-lg font-bold text-white tracking-tight">
+    <Modal isOpen={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <Modal.Backdrop className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in" />
+      <Modal.Container className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <Modal.Dialog className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative animate-scale-up">
+          
+          {/* Close button */}
+          <Modal.CloseTrigger 
+            onClick={onClose}
+            className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 hover:bg-slate-850 rounded-lg transition-colors cursor-pointer z-10"
+          >
+            <X size={18} />
+          </Modal.CloseTrigger>
+
+          {/* Header */}
+          <Modal.Header className="border-b border-slate-800/80 px-6 py-5">
+            <Modal.Heading className="text-lg font-bold text-white tracking-tight">
               {event 
-                ? (isRegister ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
-                : (isRegister ? 'Konto erstellen' : 'Konto-Login')
+                ? (activeTab === 'register' ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
+                : (activeTab === 'register' ? 'Konto erstellen' : 'Konto-Login')
               }
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">
+            </Modal.Heading>
+            <p className="text-xs text-slate-400 font-normal mt-1">
               {event ? (
                 <>Um Tickets zu kaufen für <span className="text-sky-400 font-semibold">{event.title}</span></>
               ) : (
                 'Greife auf deine Cardpirates-Kämpfe und dein Profil zu'
               )}
             </p>
-          </div>
-          <button 
-            onClick={onClose}
-            className="p-1.5 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white rounded-lg transition-all"
-          >
-            <X size={18} />
-          </button>
-        </div>
+          </Modal.Header>
 
-        {/* Form Container */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-          {error && (
-            <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm rounded-xl font-medium">
-              {error}
-            </div>
-          )}
-
-          {/* Tab Selector */}
-          <div className="grid grid-cols-2 p-1 bg-slate-950 rounded-xl border border-slate-800/80">
-            <button
-              type="button"
-              onClick={() => setIsRegister(true)}
-              className={`py-2 text-xs font-bold rounded-lg transition-all ${isRegister ? 'bg-slate-850 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
-            >
-              Registrieren
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsRegister(false)}
-              className={`py-2 text-xs font-bold rounded-lg transition-all ${!isRegister ? 'bg-slate-850 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
-            >
-              Einloggen
-            </button>
-          </div>
-
-          {/* User Type Selection (Signup only) */}
-          {isRegister && (
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Kontotyp</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setUserType('private')}
-                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'private' ? 'bg-sky-500/10 border-sky-500 text-sky-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
-                >
-                  <User size={16} />
-                  Privatperson
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUserType('business')}
-                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'business' ? 'bg-sky-500/10 border-sky-500 text-sky-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
-                >
-                  <Building2 size={16} />
-                  Unternehmen
-                </button>
+          {/* Scrollable Body */}
+          <Modal.Body className="px-6 py-5 overflow-y-auto space-y-6 flex-1">
+            {error && (
+              <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm rounded-xl font-medium">
+                {error}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Basic Fields */}
-          <div className="space-y-3.5">
-            <div className="grid grid-cols-1 gap-3.5">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">E-Mail-Adresse</label>
-                <input
+            {/* Controlled Tabs */}
+            <Tabs 
+              selectedKey={activeTab} 
+              onSelectionChange={(key) => setActiveTab(key as string)}
+            >
+              <Tabs.ListContainer className="w-full">
+                <Tabs.List className="w-full flex bg-slate-950 border border-slate-800 rounded-xl p-1">
+                  <Tabs.Tab 
+                    id="register" 
+                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    Registrieren
+                  </Tabs.Tab>
+                  <Tabs.Tab 
+                    id="login" 
+                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    Einloggen
+                  </Tabs.Tab>
+                </Tabs.List>
+              </Tabs.ListContainer>
+
+              <Tabs.Panel id="register" className="space-y-5 pt-4">
+                {/* Account Type Toggle */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Kontotyp</label>
+                  <Tabs 
+                    selectedKey={userType} 
+                    onSelectionChange={(key) => setUserType(key as 'private' | 'business')}
+                  >
+                    <Tabs.ListContainer className="w-full">
+                      <Tabs.List className="w-full flex bg-slate-950 p-1 border border-slate-800 rounded-xl">
+                        <Tabs.Tab 
+                          id="private" 
+                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-slate-800 text-sky-400' : 'text-slate-400 hover:text-white'}`}
+                        >
+                          Privatperson
+                        </Tabs.Tab>
+                        <Tabs.Tab 
+                          id="business" 
+                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-slate-800 text-sky-400' : 'text-slate-400 hover:text-white'}`}
+                        >
+                          Unternehmen
+                        </Tabs.Tab>
+                      </Tabs.List>
+                    </Tabs.ListContainer>
+                    <Tabs.Panel id="private" className="hidden"><div /></Tabs.Panel>
+                    <Tabs.Panel id="business" className="hidden"><div /></Tabs.Panel>
+                  </Tabs>
+                </div>
+              </Tabs.Panel>
+
+              <Tabs.Panel id="login" className="pt-2">
+                <div />
+              </Tabs.Panel>
+            </Tabs>
+
+            {/* Input Form Fields */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <TextField name="email" className="space-y-1.5 w-full">
+                <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">E-Mail-Adresse</Label>
+                <Input
                   type="email"
-                  required
                   placeholder="name@firma.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                   className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                 />
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Passwort</label>
-                <input
+              </TextField>
+
+              <TextField name="password" className="space-y-1.5 w-full">
+                <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Passwort</Label>
+                <Input
                   type="password"
-                  required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                   className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                 />
-              </div>
-            </div>
+              </TextField>
 
-            {isRegister && (
-              <>
-                {/* Names */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Vorname</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Max"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nachname</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Mustermann"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Business specific fields */}
-                {userType === 'business' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 p-4 bg-slate-950 rounded-2xl border border-slate-800/80">
-                    <div className="sm:col-span-2">
-                      <h4 className="text-xs font-bold text-sky-400 uppercase tracking-widest mb-2">Unternehmensdaten</h4>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Firmenname</label>
-                      <input
+              {activeTab === 'register' && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="grid grid-cols-2 gap-4">
+                    <TextField name="firstName" className="space-y-1.5">
+                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Vorname</Label>
+                      <Input
                         type="text"
-                        required={userType === 'business'}
-                        placeholder="Muster GmbH"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">USt-IdNr. (Mehrwertsteuer)</label>
-                      <input
-                        type="text"
-                        required={userType === 'business'}
-                        placeholder="DE123456789"
-                        value={vatNumber}
-                        onChange={(e) => setVatNumber(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Checkout Address Details */}
-                <div className="space-y-3.5 border-t border-slate-800 pt-5">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Rechnungs- & Lieferadresse</h4>
-                  
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Straße & Hausnummer</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Musterstraße 12"
-                      value={address1}
-                      onChange={(e) => setAddress1(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Adresszusatz (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="Wohnung, Etage, etc."
-                      value={address2}
-                      onChange={(e) => setAddress2(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Postleitzahl</label>
-                      <input
-                        type="text"
+                        placeholder="Max"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
                         required
-                        placeholder="10115"
-                        value={zip}
-                        onChange={(e) => setZip(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Stadt</label>
-                      <input
+                    </TextField>
+                    <TextField name="lastName" className="space-y-1.5">
+                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Nachname</Label>
+                      <Input
                         type="text"
+                        placeholder="Mustermann"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
                         required
-                        placeholder="Berlin"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
-                    </div>
+                    </TextField>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Länderkürzel</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="DE"
-                        value={country}
-                        onChange={(e) => setCountry(e.target.value.toUpperCase())}
-                        maxLength={2}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
-                      />
+                  {userType === 'business' && (
+                    <div className="space-y-4 p-4 bg-slate-950 rounded-2xl border border-slate-800/80 animate-slide-down">
+                      <h4 className="text-xs font-bold text-sky-400 uppercase tracking-widest">Unternehmensdaten</h4>
+                      
+                      <TextField name="companyName" className="space-y-1.5">
+                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Firmenname</Label>
+                        <Input
+                          type="text"
+                          placeholder="Muster GmbH"
+                          value={companyName}
+                          onChange={(e) => setCompanyName(e.target.value)}
+                          required={userType === 'business'}
+                          className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        />
+                      </TextField>
+                      
+                      <TextField name="vatNumber" className="space-y-1.5">
+                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">USt-IdNr. (Mehrwertsteuer)</Label>
+                        <Input
+                          type="text"
+                          placeholder="DE123456789"
+                          value={vatNumber}
+                          onChange={(e) => setVatNumber(e.target.value)}
+                          required={userType === 'business'}
+                          className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        />
+                      </TextField>
                     </div>
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Telefonnummer</label>
-                      <input
-                        type="tel"
+                  )}
+
+                  <div className="space-y-4 border-t border-slate-850 pt-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Rechnungs- & Lieferadresse</h4>
+                    
+                    <TextField name="address1" className="space-y-1.5">
+                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Straße & Hausnummer</Label>
+                      <Input
+                        type="text"
+                        placeholder="Musterstraße 12"
+                        value={address1}
+                        onChange={(e) => setAddress1(e.target.value)}
                         required
-                        placeholder="+49 170 1234567"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
                         className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
+                    </TextField>
+
+                    <TextField name="address2" className="space-y-1.5">
+                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Adresszusatz (Optional)</Label>
+                      <Input
+                        type="text"
+                        placeholder="Wohnung, Etage, etc."
+                        value={address2}
+                        onChange={(e) => setAddress2(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                      />
+                    </TextField>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <TextField name="zip" className="space-y-1.5">
+                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Postleitzahl</Label>
+                        <Input
+                          type="text"
+                          placeholder="10115"
+                          value={zip}
+                          onChange={(e) => setZip(e.target.value)}
+                          required
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        />
+                      </TextField>
+                      <TextField name="city" className="space-y-1.5">
+                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Stadt</Label>
+                        <Input
+                          type="text"
+                          placeholder="Berlin"
+                          value={city}
+                          onChange={(e) => setCity(e.target.value)}
+                          required
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        />
+                      </TextField>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <TextField name="country" className="space-y-1.5">
+                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Länderkürzel</Label>
+                        <Input
+                          type="text"
+                          placeholder="DE"
+                          value={country}
+                          onChange={(e) => setCountry(e.target.value)}
+                          maxLength={2}
+                          required
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        />
+                      </TextField>
+                      <TextField name="phone" className="space-y-1.5">
+                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Telefonnummer</Label>
+                        <Input
+                          type="tel"
+                          placeholder="+49 170 1234567"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          required
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        />
+                      </TextField>
                     </div>
                   </div>
                 </div>
-              </>
-            )}
-          </div>
-        </form>
+              )}
+            </form>
+          </Modal.Body>
 
-        {/* Footer Actions */}
-        <div className="p-6 border-t border-slate-800 bg-slate-950/60 shrink-0">
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold text-sm shadow-xl shadow-sky-500/10 disabled:opacity-75 transition-all select-none active:scale-[0.99]"
-          >
-            {loading ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                {event ? 'Sichere Kasse wird geladen...' : 'Authentifizierung...'}
-              </>
-            ) : (
-              <>
-                {event ? 'Weiter zur PayPal-Zahlung' : (isRegister ? 'Konto registrieren' : 'Einloggen')}
-                <ArrowRight size={16} />
-              </>
-            )}
-          </button>
-        </div>
-
-      </div>
-    </div>
+          {/* Footer */}
+          <Modal.Footer className="border-t border-slate-800 bg-slate-950/60 p-6 flex justify-end">
+            <Button
+              onPress={() => handleSubmit()}
+              className="w-full py-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-xl shadow-sky-500/10 hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <span>Sichere Kasse wird geladen...</span>
+              ) : (
+                <>
+                  <span>{event ? 'Weiter zur PayPal-Zahlung' : (activeTab === 'register' ? 'Konto registrieren' : 'Einloggen')}</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </Button>
+          </Modal.Footer>
+          
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal>
   );
 }

@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
+@import "@heroui/styles";
 
 @theme {
   --font-sans: 'Outfit', system-ui, sans-serif;
@@ -9,7 +10,7 @@
 
 html, body {
   font-family: var(--font-sans);
-  background-color: #0b0f19; /* Sleek dark background */
+  background-color: #060b13; /* Deep Abyss Dark Background */
   color: #f3f4f6;
   scroll-behavior: smooth;
   margin: 0;
