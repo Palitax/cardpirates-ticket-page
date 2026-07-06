@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { TouchEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, Info, ShoppingCart } from 'lucide-react';
+import { CalendarDays, Info, ShoppingCart, MapPin } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
@@ -161,7 +161,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
               <CalendarDays size={14} className="text-sky-500" />
-              Highlight-Event (Wische zum Blättern)
+              Nächstes Event (Wische zum Blättern)
             </h2>
             <div className="flex gap-1">
               {events.map((_, idx) => (
@@ -217,6 +217,11 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                     <h3 className="text-2xl font-bold text-white tracking-tight mt-1 hover:text-sky-400 transition-colors">
                       {featuredEvent.title}
                     </h3>
+                    
+                    <div className="flex items-center gap-1.5 text-slate-400 text-xs mt-2" onClick={(e) => e.stopPropagation()}>
+                      <MapPin size={14} className="text-slate-500 shrink-0" />
+                      <span>{featuredEvent.eventLocation?.value || 'TBA'}</span>
+                    </div>
                   </div>
 
                   <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">

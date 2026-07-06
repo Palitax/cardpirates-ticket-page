@@ -1,4 +1,6 @@
 import event1Img from '../assets/event1.jpg';
+import event2Img from '../assets/event2.jpg';
+import event3Img from '../assets/event3.jpg';
 
 const getShopifyConfig = () => {
   const globalConfig = (window as any).ShopifyStorefrontConfig || {};
@@ -282,15 +284,15 @@ function getMockEvents(): ShopifyProduct[] {
     },
     {
       id: 'gid://shopify/Product/mock-2',
-      title: 'Retro Deck-building Masterclass',
-      handle: 'retro-deckbuilding-masterclass',
-      description: 'Lerne Deckbuilding-Strategien von legendären Spielern. Bringe deine Old-School-Karten mit und entdecke geheime Kartenkombinationen, um lokale Turniere zu dominieren.',
-      descriptionHtml: '<p>Lerne Deckbuilding-Strategien von legendären Spielern. Bringe deine Old-School-Karten mit und entdecke geheime Kartenkombinationen, um lokale Turniere zu dominieren.</p>',
+      title: 'Cardpirates Community Meetup',
+      handle: 'cardpirates-community-meetup',
+      description: 'Triff die Crew und andere TCG-Sammler bei unserem entspannten Community Meetup. Tausche Karten, fachsimple über die neuesten Sets und verbringe einen coolen Nachmittag unter Gleichgesinnten.',
+      descriptionHtml: '<p>Triff die Crew und andere TCG-Sammler bei unserem entspannten Community Meetup. Tausche Karten, fachsimple über die neuesten Sets und verbringe einen coolen Nachmittag unter Gleichgesinnten.</p>',
       images: {
         nodes: [
           {
-            url: 'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&q=80&w=1200',
-            altText: 'Cards layout'
+            url: (window as any).ShopifyAssets?.event2Url || event2Img,
+            altText: 'Community Meetup'
           }
         ]
       },
@@ -298,7 +300,7 @@ function getMockEvents(): ShopifyProduct[] {
         nodes: [
           {
             id: 'gid://shopify/ProductVariant/mock-var-2',
-            title: 'Masterclass-Ticket',
+            title: 'Meetup-Ticket',
             price: { amount: '25.00', currencyCode: 'EUR' },
             availableForSale: true
           }
@@ -309,15 +311,15 @@ function getMockEvents(): ShopifyProduct[] {
     },
     {
       id: 'gid://shopify/Product/mock-3',
-      title: 'Card Trading & Networking Nacht',
-      handle: 'card-trading-networking-night',
-      description: 'Triff Sammler, tausche seltene Karten und teste deine neuen Decks in lockeren Runden. Snacks und Getränke sind im Ticketpreis enthalten.',
-      descriptionHtml: '<p>Triff Sammler, tausche seltene Karten und teste deine neuen Decks in lockeren Runden. Snacks und Getränke sind im Ticketpreis enthalten.</p>',
+      title: 'Cardpirates TCG Trade Night',
+      handle: 'cardpirates-tcg-trade-night',
+      description: 'Bringe deine Ordner mit und mach dich bereit für die ultimative TCG Trade Night. Tausche Pokémon, One Piece und Magic: The Gathering Karten mit Sammlern aus der gesamten Community.',
+      descriptionHtml: '<p>Bringe deine Ordner mit und mach dich bereit für die ultimative TCG Trade Night. Tausche Pokémon, One Piece und Magic: The Gathering Karten mit Sammlern aus der gesamten Community.</p>',
       images: {
         nodes: [
           {
-            url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=1200',
-            altText: 'E-Sports Event'
+            url: (window as any).ShopifyAssets?.event3Url || event3Img,
+            altText: 'Trade Night'
           }
         ]
       },
