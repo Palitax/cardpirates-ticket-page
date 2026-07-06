@@ -112,7 +112,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
               {event ? (
-                <>Um Tickets zu kaufen für <span className="text-violet-400 font-semibold">{event.title}</span></>
+                <>Um Tickets zu kaufen für <span className="text-sky-400 font-semibold">{event.title}</span></>
               ) : (
                 'Greife auf deine Cardpirates-Kämpfe und dein Profil zu'
               )}
@@ -160,7 +160,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 <button
                   type="button"
                   onClick={() => setUserType('private')}
-                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'private' ? 'bg-violet-600/10 border-violet-500 text-violet-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
+                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'private' ? 'bg-sky-500/10 border-sky-500 text-sky-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
                 >
                   <User size={16} />
                   Privatperson
@@ -168,7 +168,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 <button
                   type="button"
                   onClick={() => setUserType('business')}
-                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'business' ? 'bg-violet-600/10 border-violet-500 text-violet-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
+                  className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-bold transition-all ${userType === 'business' ? 'bg-sky-500/10 border-sky-500 text-sky-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-300'}`}
                 >
                   <Building2 size={16} />
                   Unternehmen
@@ -188,7 +188,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   placeholder="name@firma.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                 />
               </div>
               
@@ -200,7 +200,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                 />
               </div>
             </div>
@@ -217,7 +217,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       placeholder="Max"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -228,7 +228,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       placeholder="Mustermann"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                     />
                   </div>
                 </div>
@@ -237,7 +237,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 {userType === 'business' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 p-4 bg-slate-950 rounded-2xl border border-slate-800/80">
                     <div className="sm:col-span-2">
-                      <h4 className="text-xs font-bold text-violet-400 uppercase tracking-widest mb-2">Unternehmensdaten</h4>
+                      <h4 className="text-xs font-bold text-sky-400 uppercase tracking-widest mb-2">Unternehmensdaten</h4>
                     </div>
                     <div>
                       <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Firmenname</label>
@@ -247,7 +247,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         placeholder="Muster GmbH"
                         value={companyName}
                         onChange={(e) => setCompanyName(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -258,7 +258,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         placeholder="DE123456789"
                         value={vatNumber}
                         onChange={(e) => setVatNumber(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       placeholder="Musterstraße 12"
                       value={address1}
                       onChange={(e) => setAddress1(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                     />
                   </div>
 
@@ -287,7 +287,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       placeholder="Wohnung, Etage, etc."
                       value={address2}
                       onChange={(e) => setAddress2(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                     />
                   </div>
 
@@ -300,7 +300,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         placeholder="10115"
                         value={zip}
                         onChange={(e) => setZip(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -311,7 +311,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         placeholder="Berlin"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         value={country}
                         onChange={(e) => setCountry(e.target.value.toUpperCase())}
                         maxLength={2}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -337,7 +337,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         placeholder="+49 170 1234567"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-violet-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </div>
                   </div>
@@ -352,7 +352,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-violet-600/10 disabled:opacity-75 transition-all select-none active:scale-[0.99]"
+            className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold text-sm shadow-xl shadow-sky-500/10 disabled:opacity-75 transition-all select-none active:scale-[0.99]"
           >
             {loading ? (
               <>

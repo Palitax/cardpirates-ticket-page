@@ -73,7 +73,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-slate-400 text-sm font-semibold">Lade anstehende Events...</p>
       </div>
     );
@@ -99,7 +99,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
         <section className="space-y-4">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
-              <CalendarDays size={14} className="text-violet-500" />
+              <CalendarDays size={14} className="text-sky-500" />
               Highlight-Event (Wische zum Blättern)
             </h2>
             <div className="flex gap-1">
@@ -107,7 +107,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                 <button
                   key={idx}
                   onClick={() => setFeaturedIndex(idx)}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === featuredIndex ? 'w-4 bg-violet-500' : 'bg-slate-700'}`}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === featuredIndex ? 'w-4 bg-sky-500' : 'bg-slate-700'}`}
                   aria-label={`Zeige Highlight-Event ${idx + 1}`}
                 />
               ))}
@@ -142,7 +142,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
               {/* Event details and Call-To-Actions */}
               <div className="flex flex-col h-full justify-center space-y-4">
                 <div>
-                  <span className="text-xs font-semibold text-violet-400 uppercase tracking-widest">
+                  <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest">
                     Als nächstes im Fokus
                   </span>
                   <h3 className="text-2xl font-bold text-white tracking-tight mt-1">
@@ -164,7 +164,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
 
                   <button
                     onClick={() => onQuickBuy(featuredEvent)}
-                    className="py-3.5 px-6 rounded-xl bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold shadow-lg shadow-violet-600/20 transition-all select-none active:scale-[0.98]"
+                    className="py-3.5 px-6 rounded-xl bg-sky-500 hover:bg-sky-500 text-white text-sm font-bold shadow-lg shadow-sky-500/20 transition-all select-none active:scale-[0.98]"
                   >
                     Direktkauf Ticket
                   </button>

@@ -34,7 +34,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
         />
         
         {/* Date Badge */}
-        <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-950/80 backdrop-blur-md rounded-full text-xs font-semibold text-violet-400 border border-slate-800/80">
+        <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-950/80 backdrop-blur-md rounded-full text-xs font-semibold text-sky-400 border border-slate-800/80">
           <Calendar size={13} />
           {formattedDate}
         </div>
@@ -85,7 +85,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
             {/* Quick Buy Trigger */}
             <button
               onClick={() => onQuickBuy(event)}
-              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-bold shadow-lg shadow-violet-600/15 transition-all select-none active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-400 hover:to-cyan-400 text-white text-sm font-bold shadow-lg shadow-sky-500/15 transition-all select-none active:scale-[0.98]"
             >
               <ShoppingCart size={16} />
               Direkt kaufen

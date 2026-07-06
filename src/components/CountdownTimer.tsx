@@ -52,7 +52,7 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
   return (
     <div className="grid grid-cols-4 gap-2 text-center p-2.5 bg-slate-900/60 backdrop-blur-md rounded-xl border border-slate-800/80">
       <div className="flex flex-col">
-        <span className="text-sm font-bold text-violet-400 tracking-tight">{String(timeLeft.days).padStart(2, '0')}</span>
+        <span className="text-sm font-bold text-sky-400 tracking-tight">{String(timeLeft.days).padStart(2, '0')}</span>
         <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Tage</span>
       </div>
       <div className="flex flex-col border-l border-slate-800/80">

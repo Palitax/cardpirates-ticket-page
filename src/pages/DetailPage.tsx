@@ -37,7 +37,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-slate-400 text-sm font-semibold">Lade Event-Details...</p>
       </div>
     );
@@ -112,7 +112,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                 <button
                   key={idx}
                   onClick={() => setActiveImage(img.url)}
-                  className={`w-20 aspect-video rounded-xl overflow-hidden border-2 shrink-0 transition-all ${activeImage === img.url ? 'border-violet-500' : 'border-slate-800 hover:border-slate-700'}`}
+                  className={`w-20 aspect-video rounded-xl overflow-hidden border-2 shrink-0 transition-all ${activeImage === img.url ? 'border-sky-500' : 'border-slate-800 hover:border-slate-700'}`}
                 >
                   <img src={img.url} className="w-full h-full object-cover" alt="" />
                 </button>
@@ -134,7 +134,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                 href={videoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-bold text-violet-400 hover:underline"
+                className="text-xs font-bold text-sky-400 hover:underline"
               >
                 Jetzt ansehen
               </a>
@@ -148,7 +148,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
               {event.title}
             </h1>
-            <div className="flex items-center gap-1.5 text-xs text-violet-400 font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-1.5 text-xs text-sky-400 font-bold uppercase tracking-wider">
               <Calendar size={13} />
               Bevorstehendes Event
             </div>
@@ -204,7 +204,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
 
         <button
           onClick={() => onQuickBuy(event)}
-          className="py-3.5 px-8 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-violet-600/15 transition-all select-none active:scale-[0.98]"
+          className="py-3.5 px-8 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white font-bold text-sm shadow-lg shadow-sky-500/15 transition-all select-none active:scale-[0.98]"
         >
           Jetzt Ticket sichern
         </button>
