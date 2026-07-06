@@ -18,7 +18,7 @@ export default function Navbar({ onLoginTrigger }: NavbarProps) {
             <img src={logoImg} alt="Cardpirates Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-3xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
-            Card<span className="text-sky-400">pirates</span>
+            Cardpirates
           </span>
         </Link>
 
