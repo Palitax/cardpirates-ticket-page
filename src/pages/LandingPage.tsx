@@ -3,6 +3,7 @@ import type { TouchEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CalendarDays } from 'lucide-react';
 import { Button } from '@heroui/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
@@ -124,74 +125,81 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             onTouchEnd={handleTouchEnd}
             className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 p-5 sm:p-6 shadow-2xl touch-pan-y"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-              
-              {/* Photo & Timer Overlay on Top-Right */}
-              <div 
-                onClick={() => navigate(`/events/${featuredEvent.handle}`)}
-                className="relative aspect-video rounded-2xl overflow-hidden group cursor-pointer"
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={featuredIndex}
+                initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
+                animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                exit={{ opacity: 0, x: -40, filter: 'blur(6px)' }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center"
               >
-                <img 
-                  src={featuredEvent.images.nodes[0]?.url} 
-                  alt={featuredEvent.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-transparent" />
-                
-                {featuredEvent.eventDate?.value && (
-                  <div className="absolute top-4 right-4 w-44 sm:w-48 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-                    <CountdownTimer targetDate={featuredEvent.eventDate.value} />
-                  </div>
-                )}
-              </div>
-
-              {/* Event details and Call-To-Actions */}
-              <div className="flex flex-col h-full justify-center space-y-4">
-                <div>
-                  <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest">
-                    Als nächstes im Fokus
-                  </span>
-                  <h3 
-                    onClick={() => navigate(`/events/${featuredEvent.handle}`)}
-                    className="text-2xl font-bold text-white tracking-tight mt-1 hover:text-sky-400 cursor-pointer transition-colors"
-                  >
-                    {featuredEvent.title}
-                  </h3>
+                {/* Photo & Timer Overlay on Top-Right */}
+                <div 
+                  onClick={() => navigate(`/events/${featuredEvent.handle}`)}
+                  className="relative aspect-video rounded-2xl overflow-hidden group cursor-pointer"
+                >
+                  <img 
+                    src={featuredEvent.images.nodes[0]?.url} 
+                    alt={featuredEvent.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-transparent" />
+                  
+                  {featuredEvent.eventDate?.value && (
+                    <div className="absolute top-4 right-4 w-44 sm:w-48 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                      <CountdownTimer targetDate={featuredEvent.eventDate.value} />
+                    </div>
+                  )}
                 </div>
 
-                <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
-                  {featuredEvent.description}
-                </p>
-
-                <div className="pt-4 border-t border-slate-900 flex flex-wrap gap-4 items-center justify-between">
+                {/* Event details and Call-To-Actions */}
+                <div className="flex flex-col h-full justify-center space-y-4">
                   <div>
-                    <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Eintrittsticket</span>
-                    <span className="text-xl font-extrabold text-white">
-                      {featuredEvent.variants.nodes[0]?.price.amount} {featuredEvent.variants.nodes[0]?.price.currencyCode}
+                    <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest">
+                      Als nächstes im Fokus
                     </span>
+                    <h3 
+                      onClick={() => navigate(`/events/${featuredEvent.handle}`)}
+                      className="text-2xl font-bold text-white tracking-tight mt-1 hover:text-sky-400 cursor-pointer transition-colors"
+                    >
+                      {featuredEvent.title}
+                    </h3>
                   </div>
 
-                  <div className="flex gap-2.5">
-                    <Button
-                      variant="outline"
-                      onPress={() => navigate(`/events/${featuredEvent.handle}`)}
-                      className="py-3.5 px-5 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 text-xs font-bold transition-all"
-                    >
-                      Mehr Infos
-                    </Button>
+                  <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
+                    {featuredEvent.description}
+                  </p>
 
-                    <Button
-                      variant="primary"
-                      onPress={() => onQuickBuy(featuredEvent)}
-                      className="py-3.5 px-5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-sky-500/10 hover:brightness-105 transition-all select-none active:scale-[0.98]"
-                    >
-                      Direktkauf Ticket
-                    </Button>
+                  <div className="pt-4 border-t border-slate-900 flex flex-wrap gap-4 items-center justify-between">
+                    <div>
+                      <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Eintrittsticket</span>
+                      <span className="text-xl font-extrabold text-white">
+                        {featuredEvent.variants.nodes[0]?.price.amount} {featuredEvent.variants.nodes[0]?.price.currencyCode}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2.5">
+                      <Button
+                        variant="outline"
+                        onPress={() => navigate(`/events/${featuredEvent.handle}`)}
+                        className="py-3.5 px-5 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 text-xs font-bold transition-all"
+                      >
+                        Mehr Infos
+                      </Button>
+
+                      <Button
+                        variant="primary"
+                        onPress={() => onQuickBuy(featuredEvent)}
+                        className="py-3.5 px-5 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-lg shadow-sky-500/10 hover:brightness-105 transition-all select-none active:scale-[0.98]"
+                      >
+                        Direktkauf Ticket
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </section>
       )}

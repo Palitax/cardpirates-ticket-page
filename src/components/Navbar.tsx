@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Skull, UserCheck } from 'lucide-react';
+import { UserCheck } from 'lucide-react';
 import { Button } from '@heroui/react';
+import logoImg from '../assets/logo.png';
 
 interface NavbarProps {
   onLoginTrigger: () => void;
@@ -12,12 +13,12 @@ export default function Navbar({ onLoginTrigger }: NavbarProps) {
       <div className="max-w-4xl mx-auto flex items-center justify-between">
         
         {/* Brand Logo */}
-        <Link to="/" className="flex items-center gap-2 group select-none">
-          <div className="p-2 bg-gradient-to-tr from-sky-500 to-cyan-500 text-white rounded-xl shadow-lg shadow-sky-500/10 group-hover:scale-105 transition-transform duration-300">
-            <Skull size={18} />
+        <Link to="/" className="flex items-center gap-2.5 group select-none">
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-lg shadow-sky-500/10 group-hover:scale-105 transition-transform duration-300">
+            <img src={logoImg} alt="Cardpirates Logo" className="w-full h-full object-cover" />
           </div>
-          <span className="text-md font-black tracking-wider text-white uppercase font-sans">
-            Card<span className="text-sky-500">pirates</span>
+          <span className="text-3xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
+            Card<span className="text-sky-400">pirates</span>
           </span>
         </Link>
 
