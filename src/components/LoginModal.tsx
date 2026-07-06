@@ -21,6 +21,8 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginModalProps) {
+  if (!isOpen) return null;
+
   const [activeTab, setActiveTab] = useState<string>('register');
   const [userType, setUserType] = useState<'private' | 'business'>('private');
   const [loading, setLoading] = useState(false);
@@ -204,7 +206,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                 />
               </TextField>
 
@@ -216,13 +218,13 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                 />
               </TextField>
 
               {activeTab === 'register' && (
                 <div className="space-y-5 animate-fade-in">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <TextField name="firstName" className="space-y-1.5">
                       <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Vorname</Label>
                       <Input
@@ -231,7 +233,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
                     <TextField name="lastName" className="space-y-1.5">
@@ -242,7 +244,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
                   </div>
@@ -259,7 +261,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
                           required={userType === 'business'}
-                          className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-905 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                       
@@ -271,7 +273,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={vatNumber}
                           onChange={(e) => setVatNumber(e.target.value)}
                           required={userType === 'business'}
-                          className="w-full bg-slate-900 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-905 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                     </div>
@@ -288,7 +290,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         value={address1}
                         onChange={(e) => setAddress1(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
 
@@ -299,11 +301,11 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         placeholder="Wohnung, Etage, etc."
                         value={address2}
                         onChange={(e) => setAddress2(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <TextField name="zip" className="space-y-1.5">
                         <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Postleitzahl</Label>
                         <Input
@@ -312,7 +314,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={zip}
                           onChange={(e) => setZip(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                       <TextField name="city" className="space-y-1.5">
@@ -323,12 +325,12 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <TextField name="country" className="space-y-1.5">
                         <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Länderkürzel</Label>
                         <Input
@@ -338,7 +340,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           onChange={(e) => setCountry(e.target.value)}
                           maxLength={2}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                       <TextField name="phone" className="space-y-1.5">
@@ -349,7 +351,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                     </div>

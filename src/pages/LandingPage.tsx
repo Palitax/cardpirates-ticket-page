@@ -28,6 +28,9 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
 
+  // Swipe Tutorial state
+  const [isInitialMount, setIsInitialMount] = useState(true);
+
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newsletterEmail) return;
@@ -39,6 +42,10 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   };
 
   useEffect(() => {
+    const tutorialTimer = setTimeout(() => {
+      setIsInitialMount(false);
+    }, 1800);
+
     async function loadEvents() {
       try {
         const products = await shopifyService.getEvents();
@@ -50,6 +57,8 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
       }
     }
     loadEvents();
+
+    return () => clearTimeout(tutorialTimer);
   }, []);
 
   // Shuffle/cycle through featured events at the top every 8 seconds
@@ -161,7 +170,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
               <CalendarDays size={14} className="text-sky-500" />
-              Nächstes Event (Wische zum Blättern)
+              Nächstes Event
             </h2>
             <div className="flex gap-1">
               {events.map((_, idx) => (
@@ -186,10 +195,25 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={featuredIndex}
-                initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
-                animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
+                initial={{ opacity: 0, x: isInitialMount ? 0 : 40, filter: 'blur(6px)' }}
+                animate={isInitialMount ? {
+                  opacity: 1,
+                  filter: 'blur(0px)',
+                  x: [0, -60, 15, 0],
+                } : {
+                  opacity: 1,
+                  filter: 'blur(0px)',
+                  x: 0,
+                }}
                 exit={{ opacity: 0, x: -40, filter: 'blur(6px)' }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                transition={isInitialMount ? {
+                  duration: 1.5,
+                  times: [0, 0.35, 0.7, 1],
+                  ease: "easeInOut"
+                } : {
+                  duration: 0.45,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center"
               >
                 {/* Photo & Timer Overlay on Top-Right */}
