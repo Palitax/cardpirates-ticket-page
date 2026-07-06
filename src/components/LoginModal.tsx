@@ -32,7 +32,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [zip, setZip] = useState('');
   const [country, setCountry] = useState('DE');
 
-  if (!isOpen || !event) return null;
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,25 +65,30 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
       await profileService.saveProfile(profileData);
 
       // 3. Create Shopify Cart and pre-fill checkout via Storefront API
-      const variantId = event.variants.nodes[0]?.id;
-      if (!variantId) {
-        throw new Error('Ticket variant not found for this event.');
-      }
+      if (event) {
+        const variantId = event.variants.nodes[0]?.id;
+        if (!variantId) {
+          throw new Error('Ticket variant not found for this event.');
+        }
 
-      const checkoutUrl = await shopifyService.createCheckoutLink(variantId, email, {
-        firstName: profileData.first_name,
-        lastName: profileData.last_name,
-        address1: profileData.address_line_1,
-        city: profileData.city,
-        zip: profileData.zip_code,
-        country: profileData.country,
-        company: userType === 'business' ? companyName : undefined,
-      });
+        const checkoutUrl = await shopifyService.createCheckoutLink(variantId, email, {
+          firstName: profileData.first_name,
+          lastName: profileData.last_name,
+          address1: profileData.address_line_1,
+          city: profileData.city,
+          zip: profileData.zip_code,
+          country: profileData.country,
+          company: userType === 'business' ? companyName : undefined,
+        });
 
-      if (checkoutUrl) {
-        onSuccess(checkoutUrl);
+        if (checkoutUrl) {
+          onSuccess(checkoutUrl);
+        } else {
+          throw new Error('Failed to generate a checkout link.');
+        }
       } else {
-        throw new Error('Failed to generate a checkout link.');
+        // No event, just successful signup/login
+        onSuccess('');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during submission.');
@@ -100,10 +105,17 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         <div className="flex justify-between items-center px-6 py-5 border-b border-slate-800 shrink-0">
           <div>
             <h2 className="text-lg font-bold text-white tracking-tight">
-              {isRegister ? 'Register & Buy' : 'Log In & Buy'}
+              {event 
+                ? (isRegister ? 'Register & Buy' : 'Log In & Buy')
+                : (isRegister ? 'Create Account' : 'Account Login')
+              }
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              To purchase tickets for <span className="text-violet-400 font-semibold">{event.title}</span>
+              {event ? (
+                <>To purchase tickets for <span className="text-violet-400 font-semibold">{event.title}</span></>
+              ) : (
+                'Access your card battles and account profile'
+              )}
             </p>
           </div>
           <button 
@@ -345,11 +357,11 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             {loading ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                Preparing Secure Checkout...
+                {event ? 'Preparing Secure Checkout...' : 'Authenticating...'}
               </>
             ) : (
               <>
-                Proceed to PayPal Checkout
+                {event ? 'Proceed to PayPal Checkout' : (isRegister ? 'Register Account' : 'Sign In')}
                 <ArrowRight size={16} />
               </>
             )}

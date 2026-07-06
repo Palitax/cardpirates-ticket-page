@@ -16,10 +16,16 @@ function App() {
     setModalOpen(true);
   };
 
+  const handleNavbarLoginTrigger = () => {
+    setSelectedEvent(null);
+    setModalOpen(true);
+  };
+
   const handleCheckoutSuccess = (checkoutUrl: string) => {
-    // Clean up modal state and redirect the user's browser directly to Shopify/PayPal checkout
     setModalOpen(false);
-    window.location.href = checkoutUrl;
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+    }
   };
 
   return (
@@ -27,7 +33,7 @@ function App() {
       <div className="flex flex-col min-h-screen bg-[#0b0f19] text-slate-100 antialiased selection:bg-violet-600/30 selection:text-white">
         
         {/* Navigation Bar */}
-        <Navbar />
+        <Navbar onLoginTrigger={handleNavbarLoginTrigger} />
 
         {/* Main Content Area */}
         <main className="flex-1 w-full max-w-4xl mx-auto py-6">
