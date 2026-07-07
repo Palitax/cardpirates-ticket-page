@@ -121,8 +121,8 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <Modal.Backdrop className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in" />
-      <Modal.Container className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <Modal.Dialog className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative animate-scale-up text-zinc-300">
+      <Modal.Container className="fixed inset-0 z-50 flex items-end md:items-center justify-center sm:p-4 p-0">
+        <Modal.Dialog className="bg-zinc-900 border-t md:border border-zinc-800 rounded-t-3xl md:rounded-3xl w-full max-w-lg h-[92vh] md:h-auto md:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative animate-slide-up md:animate-scale-up text-zinc-300">
           
           {/* Close button */}
           <Modal.CloseTrigger 
@@ -133,7 +133,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           </Modal.CloseTrigger>
 
           {/* Header */}
-          <Modal.Header className="border-b border-zinc-800/80 px-6 py-5 text-left">
+          <Modal.Header className="border-b border-zinc-800/80 px-4 py-4 md:px-6 md:py-5 text-left">
             <Modal.Heading className="text-lg font-bold text-white tracking-tight">
               {event 
                 ? (activeTab === 'register' ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
@@ -150,7 +150,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           </Modal.Header>
 
           {/* Scrollable Body */}
-          <Modal.Body className="px-6 py-5 overflow-y-auto space-y-6 flex-1 text-left">
+          <Modal.Body className="px-4 py-4 md:px-6 md:py-5 overflow-y-auto space-y-4 md:space-y-6 flex-1 text-left">
             {error && (
               <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm rounded-xl font-medium">
                 {error}
@@ -215,7 +215,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             </Tabs>
 
             {/* Input Form Fields */}
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
               <TextField name="email" className="space-y-1.5 w-full">
                 <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">E-Mail-Adresse</Label>
                 <Input
@@ -241,7 +241,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               </TextField>
 
               {activeTab === 'register' && (
-                <div className="space-y-5 animate-fade-in">
+                <div className="space-y-4 md:space-y-5 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <TextField name="firstName" className="space-y-1.5">
                       <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Vorname</Label>
@@ -378,7 +378,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             </form>
           </Modal.Body>
 
-          <Modal.Footer className="border-t border-zinc-800 bg-zinc-950/60 p-6 flex justify-end">
+          <Modal.Footer className="border-t border-zinc-800 bg-zinc-950/60 p-4 md:p-6 flex justify-end shrink-0">
             <Button
               onPress={() => handleSubmit()}
               className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer"

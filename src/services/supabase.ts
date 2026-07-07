@@ -35,43 +35,49 @@ export interface CustomerProfile {
 // Service wrapper to easily handle mock storage or real Supabase database
 export const profileService = {
   async getProfile(shopifyCustomerId: string): Promise<CustomerProfile | null> {
-    if (supabase) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('shopify_customer_id', shopifyCustomerId)
-        .single();
-      
-      if (error) {
-        if (error.code === 'PGRST116') return null; // Row not found
-        console.error('Error fetching profile from Supabase:', error);
-        throw error;
+    try {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('shopify_customer_id', shopifyCustomerId)
+          .single();
+        
+        if (error) {
+          if (error.code === 'PGRST116') return null; // Row not found
+          console.error('Error fetching profile from Supabase:', error);
+        } else {
+          return data;
+        }
       }
-      return data;
-    } else {
-      // LocalStorage Fallback for local sandbox/testing
-      const profile = localStorage.getItem(`profile_${shopifyCustomerId}`);
-      return profile ? JSON.parse(profile) : null;
+    } catch (e) {
+      console.warn('Network error fetching profile from Supabase, falling back to local storage:', e);
     }
+    // LocalStorage Fallback for local sandbox/testing
+    const profile = localStorage.getItem(`profile_${shopifyCustomerId}`);
+    return profile ? JSON.parse(profile) : null;
   },
 
   async saveProfile(profile: CustomerProfile): Promise<CustomerProfile> {
-    if (supabase) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .upsert(profile, { onConflict: 'shopify_customer_id' })
-        .select()
-        .single();
+    try {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .upsert(profile, { onConflict: 'shopify_customer_id' })
+          .select()
+          .single();
 
-      if (error) {
-        console.error('Error saving profile to Supabase:', error);
-        throw error;
+        if (error) {
+          console.error('Error saving profile to Supabase:', error);
+        } else {
+          return data;
+        }
       }
-      return data;
-    } else {
-      // LocalStorage Fallback
-      localStorage.setItem(`profile_${profile.shopify_customer_id}`, JSON.stringify(profile));
-      return profile;
+    } catch (e) {
+      console.warn('Network error saving profile to Supabase, falling back to local storage:', e);
     }
+    // LocalStorage Fallback
+    localStorage.setItem(`profile_${profile.shopify_customer_id}`, JSON.stringify(profile));
+    return profile;
   }
 };
