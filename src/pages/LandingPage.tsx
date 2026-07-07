@@ -6,6 +6,7 @@ import EventCard from '../components/EventCard';
 import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import logoAnimVideo from '../assets/Logo-animiert.mp4';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -15,6 +16,7 @@ interface LandingPageProps {
 
 export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger }: LandingPageProps) {
   const navigate = useNavigate();
+  const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -188,8 +190,15 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                         className="w-full h-full bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between shadow-2xl"
                       >
                         {/* Card Cover image with fading gradient blend */}
-                        <div className="relative h-[155px] w-full overflow-hidden shrink-0">
-                          <img src={event.images.nodes[0]?.url} className="w-full h-full object-cover" alt="" />
+                        <div className="relative h-[155px] w-full overflow-hidden shrink-0 bg-black">
+                          <video
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover grayscale brightness-110"
+                            src={logoAnimVideoUrl}
+                          />
                           <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
                           
                           {/* Event Title overlayed on image */}
