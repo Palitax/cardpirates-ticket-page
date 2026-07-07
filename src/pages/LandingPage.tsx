@@ -59,7 +59,6 @@ export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProp
       try {
         const products = await shopifyService.getEvents();
         setEvents(products);
-        // Find index of first upcoming event to auto-center if needed
         setCarouselIndex(0);
       } catch (err) {
         console.error('Failed to load events schedule', err);
@@ -100,6 +99,16 @@ export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProp
   return (
     <div className="px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300">
       
+      {/* Hero Welcome Header (Restored) */}
+      <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+          Werde Teil der Crew!
+        </h1>
+        <p className="text-sm text-zinc-400 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]">
+          Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
+        </p>
+      </header>
+
       {/* Event Schedule Section */}
       <section className="space-y-6 text-center">
         
@@ -115,7 +124,7 @@ export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProp
           </div>
         ) : (
           <>
-            {/* Mobile Swipe-Stack Carousel (Fanned layout, resembling physical tickets) */}
+            {/* Mobile Swipe-Stack Carousel (Fanned layout, physical ticket cutouts) */}
             <div className="md:hidden flex flex-col items-center select-none">
               
               {/* Stack Wrapper */}
@@ -130,7 +139,6 @@ export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProp
                   const offset = idx - carouselIndex;
                   const absOffset = Math.abs(offset);
                   
-                  // Fanned rotation & translation logic
                   if (absOffset > 2) return null; // Render max 3 active cards for viewport speed
                   
                   const zIndex = 20 - absOffset;
@@ -144,8 +152,7 @@ export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProp
                       key={event.id}
                       style={{
                         zIndex,
-                        originY: 0.95,
-                        clipPath: "path('M 0 0 L 230 0 L 230 227 A 8 8 0 0 0 230 243 L 230 395 L 0 395 L 0 243 A 8 8 0 0 0 0 227 Z')"
+                        originY: 0.95
                       }}
                       animate={{
                         x: xTranslation,
@@ -161,94 +168,102 @@ export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProp
                           setCarouselIndex(idx);
                         }
                       }}
-                      className={`absolute w-[230px] h-[395px] bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between shadow-2xl transition-all duration-300 border-none ${offset === 0 ? '' : 'cursor-pointer'}`}
+                      className={`absolute w-[230px] h-[395px] bg-transparent border-none outline-none select-none ${offset === 0 ? '' : 'cursor-pointer'}`}
                     >
-                      {/* Card Cover image with fading gradient blend */}
-                      <div className="relative h-[155px] w-full overflow-hidden shrink-0">
-                        <img src={event.images.nodes[0]?.url} className="w-full h-full object-cover" alt="" />
-                        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
-                        
-                        {/* Event Title overlayed on image */}
-                        <div className="absolute bottom-2 inset-x-0 px-3 text-center">
-                          <h3 className="text-sm font-extrabold text-zinc-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)] tracking-tight leading-tight">
-                            {event.title}
-                          </h3>
-                        </div>
-                      </div>
-
-                      {/* Card details */}
-                      <div className="flex-1 p-4 flex flex-col justify-between">
-                        <div className="grid grid-cols-2 gap-x-2 gap-y-3.5 text-left">
-                          <div className="min-w-0">
-                            <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Ort</span>
-                            <span className="block text-[10px] text-zinc-800 font-extrabold truncate">{event.eventLocation?.value || 'TBA'}</span>
-                          </div>
-                          <div className="min-w-0">
-                            <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Datum</span>
-                            <span className="block text-[10px] text-zinc-800 font-extrabold truncate">
-                              {event.eventDate?.value ? new Date(event.eventDate.value).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' }) : 'TBA'}
-                            </span>
-                          </div>
-                          <div className="min-w-0">
-                            <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Uhrzeit</span>
-                            <span className="block text-[10px] text-zinc-800 font-extrabold truncate">
-                              {event.eventDate?.value ? new Date(event.eventDate.value).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr' : 'TBA'}
-                            </span>
-                          </div>
-                          <div className="min-w-0">
-                            <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Kategorie</span>
-                            <span className="block text-[9px] text-zinc-500 font-extrabold truncate uppercase tracking-widest">Crew-Event</span>
+                      {/* Inner Card Container clipped into physical ticket for hardware-accelerated animations */}
+                      <div 
+                        style={{
+                          clipPath: "path('M 0 0 L 230 0 L 230 227 A 8 8 0 0 0 230 243 L 230 395 L 0 395 L 0 243 A 8 8 0 0 0 0 227 Z')"
+                        }}
+                        className="w-full h-full bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between shadow-2xl"
+                      >
+                        {/* Card Cover image with fading gradient blend */}
+                        <div className="relative h-[155px] w-full overflow-hidden shrink-0">
+                          <img src={event.images.nodes[0]?.url} className="w-full h-full object-cover" alt="" />
+                          <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
+                          
+                          {/* Event Title overlayed on image */}
+                          <div className="absolute bottom-2 inset-x-0 px-3 text-center">
+                            <h3 className="text-sm font-extrabold text-zinc-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)] tracking-tight leading-tight">
+                              {event.title}
+                            </h3>
                           </div>
                         </div>
 
-                        {/* Perforation Line with CSS Notches */}
-                        <div className="relative my-3 shrink-0">
-                          <div className="border-t border-dashed border-zinc-200 w-full" />
-                        </div>
-
-                        {/* Bottom Barcode or Buy Ticket Button */}
-                        <div className="flex flex-col items-center justify-center shrink-0 min-h-[50px]">
-                          {purchasedEventIds.includes(event.id) ? (
-                            <div className="flex flex-col items-center justify-center space-y-1 w-full animate-fade-in">
-                              <svg className="w-36 h-8 text-zinc-900 fill-current" viewBox="0 0 100 20" preserveAspectRatio="none">
-                                <rect x="0" y="0" width="2" height="20" />
-                                <rect x="4" y="0" width="1" height="20" />
-                                <rect x="7" y="0" width="3" height="20" />
-                                <rect x="12" y="0" width="1" height="20" />
-                                <rect x="15" y="0" width="2" height="20" />
-                                <rect x="19" y="0" width="4" height="20" />
-                                <rect x="28" y="0" width="2" height="20" />
-                                <rect x="32" y="0" width="3" height="20" />
-                                <rect x="37" y="0" width="1" height="20" />
-                                <rect x="40" y="0" width="4" height="20" />
-                                <rect x="46" y="0" width="2" height="20" />
-                                <rect x="50" y="0" width="1" height="20" />
-                                <rect x="53" y="0" width="3" height="20" />
-                                <rect x="58" y="0" width="2" height="20" />
-                                <rect x="62" y="0" width="1" height="20" />
-                                <rect x="65" y="0" width="4" height="20" />
-                                <rect x="71" y="0" width="2" height="20" />
-                                <rect x="75" y="0" width="3" height="20" />
-                                <rect x="80" y="0" width="1" height="20" />
-                                <rect x="83" y="0" width="2" height="20" />
-                                <rect x="87" y="0" width="4" height="20" />
-                                <rect x="93" y="0" width="1" height="20" />
-                                <rect x="96" y="0" width="3" height="20" />
-                              </svg>
-                              <span className="text-[7px] font-mono tracking-widest text-zinc-500 uppercase">CP-{event.handle.substring(0, 8)}</span>
+                        {/* Card details */}
+                        <div className="flex-1 p-4 flex flex-col justify-between">
+                          <div className="grid grid-cols-2 gap-x-2 gap-y-3.5 text-left">
+                            <div className="min-w-0">
+                              <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Ort</span>
+                              <span className="block text-[10px] text-zinc-800 font-extrabold truncate">{event.eventLocation?.value || 'TBA'}</span>
                             </div>
-                          ) : (
-                            <Button
-                              variant="primary"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onQuickBuy(event);
-                              }}
-                              className="w-full py-2.5 rounded-full bg-black hover:bg-zinc-950 text-white font-extrabold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-black"
-                            >
-                              Ticket kaufen ({event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode})
-                            </Button>
-                          )}
+                            <div className="min-w-0">
+                              <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Datum</span>
+                              <span className="block text-[10px] text-zinc-800 font-extrabold truncate">
+                                {event.eventDate?.value ? new Date(event.eventDate.value).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' }) : 'TBA'}
+                              </span>
+                            </div>
+                            <div className="min-w-0">
+                              <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Uhrzeit</span>
+                              <span className="block text-[10px] text-zinc-800 font-extrabold truncate">
+                                {event.eventDate?.value ? new Date(event.eventDate.value).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr' : 'TBA'}
+                              </span>
+                            </div>
+                            <div className="min-w-0">
+                              <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Kategorie</span>
+                              <span className="block text-[9px] text-zinc-500 font-extrabold truncate uppercase tracking-widest">Crew-Event</span>
+                            </div>
+                          </div>
+
+                          {/* Perforation Line with CSS Notches */}
+                          <div className="relative my-3 shrink-0">
+                            <div className="border-t border-dashed border-zinc-200 w-full" />
+                          </div>
+
+                          {/* Bottom Barcode or Buy Ticket Button */}
+                          <div className="flex flex-col items-center justify-center shrink-0 min-h-[50px]">
+                            {purchasedEventIds.includes(event.id) ? (
+                              <div className="flex flex-col items-center justify-center space-y-1 w-full animate-fade-in">
+                                <svg className="w-36 h-8 text-zinc-900 fill-current" viewBox="0 0 100 20" preserveAspectRatio="none">
+                                  <rect x="0" y="0" width="2" height="20" />
+                                  <rect x="4" y="0" width="1" height="20" />
+                                  <rect x="7" y="0" width="3" height="20" />
+                                  <rect x="12" y="0" width="1" height="20" />
+                                  <rect x="15" y="0" width="2" height="20" />
+                                  <rect x="19" y="0" width="4" height="20" />
+                                  <rect x="28" y="0" width="2" height="20" />
+                                  <rect x="32" y="0" width="3" height="20" />
+                                  <rect x="37" y="0" width="1" height="20" />
+                                  <rect x="40" y="0" width="4" height="20" />
+                                  <rect x="46" y="0" width="2" height="20" />
+                                  <rect x="50" y="0" width="1" height="20" />
+                                  <rect x="53" y="0" width="3" height="20" />
+                                  <rect x="58" y="0" width="2" height="20" />
+                                  <rect x="62" y="0" width="1" height="20" />
+                                  <rect x="65" y="0" width="4" height="20" />
+                                  <rect x="71" y="0" width="2" height="20" />
+                                  <rect x="75" y="0" width="3" height="20" />
+                                  <rect x="80" y="0" width="1" height="20" />
+                                  <rect x="83" y="0" width="2" height="20" />
+                                  <rect x="87" y="0" width="4" height="20" />
+                                  <rect x="93" y="0" width="1" height="20" />
+                                  <rect x="96" y="0" width="3" height="20" />
+                                </svg>
+                                <span className="text-[7px] font-mono tracking-widest text-zinc-500 uppercase">CP-{event.handle.substring(0, 8)}</span>
+                              </div>
+                            ) : (
+                              <Button
+                                variant="primary"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onQuickBuy(event);
+                                }}
+                                className="w-full py-2.5 rounded-full bg-black hover:bg-zinc-950 text-white font-extrabold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-black"
+                              >
+                                Ticket kaufen ({event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode})
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </motion.div>
