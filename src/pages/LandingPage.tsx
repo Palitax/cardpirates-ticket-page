@@ -7,7 +7,7 @@ import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-ohne-watermark.mp4';
-import logoSchrift from '../assets/cardpirates-schrift-rot.jpg';
+import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
