@@ -196,7 +196,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             loop
                             muted
                             playsInline
-                            className="w-full h-full object-cover grayscale brightness-110"
+                            className="w-full h-full object-cover scale-[0.85] grayscale brightness-110"
                             src={logoAnimVideoUrl}
                           />
                           <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
