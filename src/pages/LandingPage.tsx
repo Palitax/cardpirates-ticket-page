@@ -119,7 +119,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             <img 
               src={logoSchriftUrl} 
               alt="Cardpirates" 
-              className="w-64 sm:w-80 h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
+              className="w-[330px] sm:w-[480px] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
             />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Werde Teil der Crew!
@@ -219,7 +219,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                               loop
                               muted
                               playsInline
-                              className="w-full h-full object-cover scale-[0.85] grayscale brightness-150 contrast-125"
+                              className="w-full h-full object-cover grayscale brightness-150 contrast-125"
                               src={logoAnimVideoUrl}
                             />
                             <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
@@ -410,7 +410,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
   return (
     <>
       <div 
-        className={`px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 ${
+        className={`px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden ${
           slashState === 'slashing' ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
       >
