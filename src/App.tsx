@@ -1,18 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import BurgerMenu from './components/BurgerMenu';
 import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
 import LoginModal from './components/LoginModal';
 import type { ShopifyProduct } from './services/shopify';
+import type { CustomerProfile } from './services/supabase';
 import logoAnimVideo from './assets/Logo-animiert.mp4';
 import './App.css';
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<ShopifyProduct | null>(null);
+  const [currentUser, setCurrentUser] = useState<CustomerProfile | null>(null);
 
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
+
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        setCurrentUser(JSON.parse(savedUser));
+      } catch (err) {
+        console.error('Failed to parse saved user', err);
+      }
+    }
+  }, []);
 
   const handleQuickBuyTrigger = (event: ShopifyProduct) => {
     setSelectedEvent(event);
@@ -24,8 +39,17 @@ function App() {
     setModalOpen(true);
   };
 
-  const handleCheckoutSuccess = (checkoutUrl: string) => {
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
+  };
+
+  const handleCheckoutSuccess = (checkoutUrl: string, profile?: CustomerProfile) => {
     setModalOpen(false);
+    if (profile) {
+      setCurrentUser(profile);
+      localStorage.setItem('currentUser', JSON.stringify(profile));
+    }
     if (checkoutUrl) {
       window.location.href = checkoutUrl;
     }
@@ -48,6 +72,13 @@ function App() {
           <div className="absolute inset-0 bg-[#0b0f19]/30" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-[#0b0f19]/10" />
         </div>
+
+        {/* Mobile Burger Menu Button */}
+        <BurgerMenu 
+          currentUser={currentUser} 
+          onLoginTrigger={handleNavbarLoginTrigger} 
+          onLogout={handleLogout} 
+        />
 
         {/* Navigation Bar */}
         <Navbar onLoginTrigger={handleNavbarLoginTrigger} />

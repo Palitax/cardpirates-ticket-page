@@ -17,7 +17,7 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   event: ShopifyProduct | null;
-  onSuccess: (checkoutUrl: string) => void;
+  onSuccess: (checkoutUrl: string, profile?: CustomerProfile) => void;
 }
 
 export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginModalProps) {
@@ -70,6 +70,24 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
       // 2. Checkout link generation
       if (event) {
+        // Save to mock purchased tickets list in localStorage
+        const savedTicketsRaw = localStorage.getItem(`purchased_tickets_${mockCustomerId}`);
+        const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
+        
+        // Add new ticket if not already purchased
+        if (!savedTickets.some((t: any) => t.id === event.id)) {
+          savedTickets.push({
+            id: event.id,
+            title: event.title,
+            date: event.eventDate?.value,
+            location: event.eventLocation?.value,
+            image: event.images.nodes[0]?.url,
+            purchaseDate: new Date().toISOString(),
+            status: 'active'
+          });
+          localStorage.setItem(`purchased_tickets_${mockCustomerId}`, JSON.stringify(savedTickets));
+        }
+
         const variantId = event.variants.nodes[0]?.id;
         if (!variantId) {
           throw new Error('Ticket-Variante für dieses Event nicht gefunden.');
@@ -86,12 +104,12 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         });
 
         if (checkoutUrl) {
-          onSuccess(checkoutUrl);
+          onSuccess(checkoutUrl, profileData);
         } else {
           throw new Error('Fehler beim Erstellen der Kasse.');
         }
       } else {
-        onSuccess('');
+        onSuccess('', profileData);
       }
     } catch (err: any) {
       setError(err.message || 'Ein Fehler ist aufgetreten.');

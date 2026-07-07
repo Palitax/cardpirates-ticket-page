@@ -122,6 +122,36 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     setTouchEnd(null);
   };
 
+  // Carousel State & Swipe Handlers
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [carouselTouchStart, setCarouselTouchStart] = useState<number | null>(null);
+  const [carouselTouchEnd, setCarouselTouchEnd] = useState<number | null>(null);
+
+  const handleCarouselTouchStart = (e: TouchEvent) => {
+    setCarouselTouchStart(e.targetTouches[0].clientX);
+    setIsInitialMount(false);
+  };
+
+  const handleCarouselTouchMove = (e: TouchEvent) => {
+    setCarouselTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleCarouselTouchEnd = () => {
+    if (!carouselTouchStart || !carouselTouchEnd) return;
+    const distance = carouselTouchStart - carouselTouchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && carouselIndex < events.length - 1) {
+      setCarouselIndex((prev) => prev + 1);
+    }
+    if (isRightSwipe && carouselIndex > 0) {
+      setCarouselIndex((prev) => prev - 1);
+    }
+    setCarouselTouchStart(null);
+    setCarouselTouchEnd(null);
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
@@ -328,15 +358,167 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
           Alle anstehenden Events & Meetups
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <EventCard
-              key={event.id}
-              event={event}
-              onQuickBuy={onQuickBuy}
-            />
-          ))}
-        </div>
+        {/* Mobile Swipeable Stack Carousel (Nintendo Switch Style) */}
+        {events.length === 0 ? (
+          <div className="p-8 bg-slate-900/40 rounded-none border border-slate-900 text-center">
+            <p className="text-sm text-slate-400">Zurzeit sind keine Events geplant. Komm bald wieder vorbei!</p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile-Only Carousel */}
+            <div className="md:hidden relative w-full overflow-hidden py-8 px-4 flex flex-col items-center select-none">
+              
+              {/* Swipe Tutorial Overlay inside Carousel */}
+              {isInitialMount && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 1, 0] }}
+                  transition={{ duration: 5.2, times: [0, 0.05, 0.95, 1], ease: "easeInOut" }}
+                  className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/65 backdrop-blur-[2px] pointer-events-none rounded-none"
+                >
+                  <div className="relative flex items-center justify-center w-36 h-36">
+                    <motion.div
+                      animate={{ x: [0, -12, 0], opacity: [0.4, 1, 0.4] }}
+                      transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
+                      className="absolute left-1 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                    >
+                      <svg className="w-8 h-8 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m15 18-6-6 6-6" />
+                      </svg>
+                    </motion.div>
+                    <motion.div
+                      animate={{ x: [0, -25, 25, 0], scale: [1, 0.93, 0.93, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.5, times: [0, 0.35, 0.7, 1], ease: "easeInOut" }}
+                      className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
+                    >
+                      <svg className="w-12 h-12 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 11V4a1.5 1.5 0 0 0-3 0v7M9 11V9a1.5 1.5 0 0 0-3 0v2M6 11V10a1.5 1.5 0 0 0-3 0v5a7 7 0 0 0 14 0v-4a1.5 1.5 0 0 0-3 0v3M15 11v-1a1.5 1.5 0 0 0-3 0v3" />
+                      </svg>
+                    </motion.div>
+                    <motion.div
+                      animate={{ x: [0, 12, 0], opacity: [0.4, 1, 0.4] }}
+                      transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
+                      className="absolute right-1 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]"
+                    >
+                      <svg className="w-8 h-8 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m9 18 6-6-6-6" />
+                      </svg>
+                    </motion.div>
+                  </div>
+                  <span className="text-[10px] uppercase font-bold tracking-widest text-slate-300 mt-1">Wische zum Durchblättern</span>
+                </motion.div>
+              )}
+
+              {/* Carousel Stack Container */}
+              <div 
+                onTouchStart={handleCarouselTouchStart}
+                onTouchMove={handleCarouselTouchMove}
+                onTouchEnd={handleCarouselTouchEnd}
+                className="relative flex items-center justify-center w-full h-[380px] overflow-visible touch-pan-y"
+              >
+                {events.map((event, idx) => {
+                  const offset = idx - carouselIndex;
+                  const absOffset = Math.abs(offset);
+                  
+                  if (absOffset > 2) return null;
+
+                  const xTranslation = offset * 115;
+                  const rotateAngle = offset * 5;
+                  const scale = 1 - absOffset * 0.08;
+                  const zIndex = 20 - absOffset;
+                  const opacity = 1 - absOffset * 0.35;
+
+                  return (
+                    <motion.div
+                      key={event.id}
+                      style={{
+                        zIndex,
+                        originY: 0.95
+                      }}
+                      animate={{
+                        x: xTranslation,
+                        scale,
+                        rotate: rotateAngle,
+                        opacity,
+                      }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                      onClick={() => {
+                        if (offset === 0) {
+                          navigate(`/events/${event.handle}`);
+                        } else {
+                          setCarouselIndex(idx);
+                        }
+                      }}
+                      className={`absolute w-[210px] h-[320px] bg-slate-900 border border-slate-800 rounded-none overflow-hidden flex flex-col justify-between shadow-2xl transition-colors duration-300 ${offset === 0 ? 'border-sky-500/50 shadow-sky-500/5 ring-1 ring-sky-500/10' : 'cursor-pointer hover:border-slate-700'}`}
+                    >
+                      {/* Card Cover image */}
+                      <div className="relative h-[160px] w-full overflow-hidden shrink-0 rounded-none">
+                        <img src={event.images.nodes[0]?.url} className="w-full h-full object-cover" alt="" />
+                        <span className="absolute top-2 left-2 px-2 py-0.5 bg-slate-950/80 backdrop-blur-sm border border-slate-800 text-[9px] uppercase tracking-widest text-sky-400 font-bold">
+                          Event
+                        </span>
+                      </div>
+
+                      {/* Card details */}
+                      <div className="flex-1 p-3.5 flex flex-col justify-between text-left">
+                        <div className="space-y-1">
+                          <h3 className="text-sm font-bold text-white leading-tight line-clamp-1">{event.title}</h3>
+                          <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                            <MapPin size={11} className="text-slate-500 shrink-0" />
+                            <span className="truncate text-left">{event.eventLocation?.value || 'TBA'}</span>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 border-t border-slate-950 flex items-center justify-between">
+                          <div className="flex flex-col text-left">
+                            <span className="text-[8px] text-slate-500 uppercase font-bold tracking-wider">Preis</span>
+                            <span className="text-xs font-bold text-white leading-none mt-0.5">
+                              {event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode}
+                            </span>
+                          </div>
+
+                          <Button
+                            variant="primary"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onQuickBuy(event);
+                            }}
+                            className="py-1.5 px-3 rounded-none bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-[10px] cursor-pointer"
+                          >
+                            Ticket
+                          </Button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Carousel Indicators */}
+              <div className="flex gap-1.5 mt-3 justify-center items-center">
+                {events.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCarouselIndex(idx)}
+                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === carouselIndex ? 'w-4.5 bg-sky-500' : 'bg-slate-700'}`}
+                    aria-label={`Gehe zu Event ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Grid View */}
+            <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6">
+              {events.map((event) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  onQuickBuy={onQuickBuy}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       {/* Community Call to Actions & Newsletter (Bottom of Page) */}
