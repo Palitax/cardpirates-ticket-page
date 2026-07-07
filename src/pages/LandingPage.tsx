@@ -132,30 +132,15 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
     }
   };
 
-  // Sword Slash Transition State
-  const [slashState, setSlashState] = useState<'idle' | 'slashing'>('idle');
-  const [scrollY, setScrollY] = useState(0);
-
   const handleRegisterClick = () => {
-    setScrollY(window.scrollY);
-    setSlashState('slashing');
-    
-    // Trigger modal open after animation completes
-    setTimeout(() => {
-      onRegisterTrigger();
-    }, 480);
-
-    // Reset slashState back to idle after animation wraps up
-    setTimeout(() => {
-      setSlashState('idle');
-    }, 800);
+    onRegisterTrigger();
   };
 
   const renderMainContent = () => {
     return (
       <>
         {/* Hero Welcome Header (Restored) */}
-        <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4 flex flex-col items-center">
+        <header className="text-center pt-3 pb-3 max-w-xl mx-auto space-y-4 flex flex-col items-center">
           <div className="flex flex-col items-center space-y-1.5">
             <img 
               src={logoSchriftUrl} 
@@ -463,103 +448,10 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
   };
 
   return (
-    <>
-      <div 
-        className={`px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden ${
-          slashState === 'slashing' ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
-      >
-        {renderMainContent()}
-      </div>
-
-      {slashState === 'slashing' && (
-        <div className="fixed inset-0 z-50 overflow-hidden pointer-events-none flex items-center justify-center px-4">
-          {/* Glowing Mock Registration Card (Reveal Effect) */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.94 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.25, delay: 0.05, ease: "easeOut" }}
-            className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col space-y-5 shadow-[0_0_60px_rgba(255,255,255,0.06)] relative z-0 text-left"
-          >
-            {/* Header Mock */}
-            <div className="space-y-2 border-b border-zinc-850 pb-4">
-              <div className="h-5 w-40 bg-zinc-800 rounded animate-pulse" />
-              <div className="h-3 w-56 bg-zinc-850/40 rounded animate-pulse" />
-            </div>
-            {/* Inputs Mock */}
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <div className="h-2.5 w-20 bg-zinc-800/60 rounded" />
-                <div className="h-10 bg-zinc-950 border border-zinc-850 rounded-xl" />
-              </div>
-              <div className="space-y-1.5">
-                <div className="h-2.5 w-16 bg-zinc-800/60 rounded" />
-                <div className="h-10 bg-zinc-950 border border-zinc-850 rounded-xl" />
-              </div>
-            </div>
-            {/* Button Mock */}
-            <div className="h-12 bg-zinc-800 rounded-xl border border-zinc-750 flex items-center justify-center">
-              <div className="h-3 w-28 bg-zinc-700 rounded animate-pulse" />
-            </div>
-          </motion.div>
-          {/* White Screen Slash Flash */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.75, 0] }}
-            transition={{ duration: 0.22, times: [0, 0.35, 1] }}
-            className="absolute inset-0 bg-white z-50"
-          />
-
-          {/* Spark trail / neon green laser cut line */}
-          <motion.div 
-            initial={{ scaleX: 0, opacity: 1 }}
-            animate={{ scaleX: 1, opacity: [1, 1, 0] }}
-            transition={{ duration: 0.35, ease: "easeInOut", times: [0, 0.7, 1] }}
-            className="absolute w-full h-[4px] bg-gradient-to-r from-green-500 via-emerald-300 to-lime-400 shadow-[0_0_20px_#22c55e,0_0_35px_#10b981,0_0_55px_#39ff14] z-50 origin-left"
-            style={{ 
-              top: '40%',
-              left: 0,
-              rotate: 9
-            }}
-          />
-
-          {/* Top Cut Part (quick fade out & slide up/left) */}
-          <motion.div
-            initial={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
-            animate={{ opacity: 0, y: -90, x: -20, rotate: -2 }}
-            transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1], delay: 0.02 }}
-            className="absolute inset-0 bg-[#000000] flex flex-col justify-start"
-            style={{ 
-              clipPath: "polygon(0 0, 100% 0, 100% 48%, 0 32%)",
-            }}
-          >
-            {/* Scroll matching wrapper */}
-            <div style={{ transform: `translateY(${-scrollY}px)` }} className="px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 text-zinc-300">
-              {renderMainContent()}
-            </div>
-          </motion.div>
-
-          {/* Bottom Cut Part (gravity fall - slide down and rotate) */}
-          <motion.div
-            initial={{ y: 0, x: 0, rotate: 0 }}
-            animate={{ 
-              y: window.innerHeight + 100, 
-              x: 25, 
-              rotate: 14 
-            }}
-            transition={{ duration: 0.58, ease: [0.32, 0, 0.67, 0], delay: 0.02 }}
-            className="absolute inset-0 bg-[#000000] flex flex-col justify-start"
-            style={{ 
-              clipPath: "polygon(0 32%, 100% 48%, 100% 100%, 0 100%)",
-            }}
-          >
-            {/* Scroll matching wrapper */}
-            <div style={{ transform: `translateY(${-scrollY}px)` }} className="px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 text-zinc-300">
-              {renderMainContent()}
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </>
+    <div 
+      className="px-4 sm:px-6 pb-24 pt-2 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
+    >
+      {renderMainContent()}
+    </div>
   );
 }
