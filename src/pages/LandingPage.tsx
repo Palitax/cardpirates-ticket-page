@@ -140,12 +140,12 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
     return (
       <>
         {/* Hero Welcome Header (Restored) */}
-        <header className="text-center pt-3 pb-3 max-w-xl mx-auto space-y-4 flex flex-col items-center">
+        <header className="text-center pt-3 pb-3 max-w-xl sm:max-w-3xl mx-auto space-y-4 flex flex-col items-center">
           <div className="flex flex-col items-center space-y-1.5">
             <img 
               src={logoSchriftUrl} 
               alt="Cardpirates" 
-              className="w-[330px] sm:w-[480px] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
+              className="w-[330px] sm:w-[800px] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
             />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Werde Teil der Crew!
