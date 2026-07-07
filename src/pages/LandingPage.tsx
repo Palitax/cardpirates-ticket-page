@@ -9,6 +9,47 @@ import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 
+interface TicketTimerProps {
+  targetDate: string;
+}
+
+function TicketTimer({ targetDate }: TicketTimerProps) {
+  const [timeLeft, setTimeLeft] = useState(() => calculate(targetDate));
+
+  function calculate(dateStr: string) {
+    const diff = +new Date(dateStr) - +new Date();
+    if (diff <= 0) return 'Event läuft';
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const mins = Math.floor((diff / (1000 * 60) % 60));
+    const secs = Math.floor((diff / 1000) % 60);
+
+    const pad = (n: number) => String(n).padStart(2, '0');
+    if (days > 0) {
+      return `${days}t ${pad(hours)}st ${pad(mins)}m`;
+    }
+    return `${pad(hours)}st ${pad(mins)}m ${pad(secs)}s`;
+  }
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(calculate(targetDate));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [targetDate]);
+
+  return (
+    <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider text-center mb-2 flex items-center justify-center gap-1.5">
+      <span className="relative flex h-1.5 w-1.5">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
+      </span>
+      <span>Einlass in:</span>
+      <span className="font-mono text-zinc-800 font-extrabold">{timeLeft}</span>
+    </div>
+  );
+}
+
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
   currentUser: any | null;
@@ -263,7 +304,10 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             </div>
 
                             {/* Bottom Barcode or Buy Ticket Button */}
-                            <div className="flex flex-col items-center justify-center shrink-0 min-h-[50px]">
+                            <div className="flex flex-col items-center justify-center shrink-0 min-h-[50px] w-full">
+                              {event.eventDate?.value && (
+                                <TicketTimer targetDate={event.eventDate.value} />
+                              )}
                               {purchasedEventIds.includes(event.id) ? (
                                 <div className="flex flex-col items-center justify-center space-y-1 w-full animate-fade-in">
                                   <svg className="w-36 h-8 text-zinc-900 fill-current" viewBox="0 0 100 20" preserveAspectRatio="none">
@@ -427,18 +471,52 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             className="absolute inset-0 bg-white z-50"
           />
 
-          {/* Sword Slash visual line */}
+          {/* Spark trail / cut line */}
           <motion.div 
-            initial={{ x: '-120%', rotate: 9 }}
-            animate={{ x: '120%' }}
-            transition={{ duration: 0.38, ease: "easeOut" }}
-            className="absolute w-[180%] h-[4px] bg-white shadow-[0_0_15px_#f43f5e,0_0_30px_#f43f5e,0_0_55px_#fff] z-50"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.32, ease: "easeOut" }}
+            className="absolute w-full h-[3px] bg-gradient-to-r from-rose-500 via-white to-amber-500 shadow-[0_0_15px_#f43f5e,0_0_30px_#f59e0b,0_0_50px_#fff] z-50 origin-left"
             style={{ 
-              top: '40%', // matches midpoint of 32% and 48%
-              left: '-40%',
-              transformOrigin: 'center'
+              top: '40%',
+              left: 0,
+              rotate: 9
             }}
           />
+
+          {/* Premium animated Pirate Saber (Sword) */}
+          <motion.div
+            initial={{ x: '-20%' }}
+            animate={{ x: '120%' }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute z-50"
+            style={{ 
+              top: '40%',
+              left: 0,
+              rotate: 9,
+              transformOrigin: 'left center',
+              translateY: '-50%'
+            }}
+          >
+            <svg className="w-40 h-10 text-zinc-300 fill-current drop-shadow-[0_0_15px_rgba(255,255,255,0.95)]" viewBox="0 0 200 50">
+              {/* Blade with metallic linear gradient */}
+              <path d="M25,28 Q100,24 180,12 Q192,10 198,6 Q185,19 150,23 Q100,27 25,29 Z" fill="url(#metalGrad)" />
+              {/* Guard (Pirate Basket hilt) */}
+              <path d="M30,18 C20,15 15,22 15,28 C15,38 25,42 33,40 Q20,40 20,28 Z" fill="#b45309" stroke="#d97706" strokeWidth="1.5" />
+              {/* Grip */}
+              <rect x="23" y="24" width="7" height="10" rx="3" fill="#1c1917" />
+              {/* Pommel */}
+              <circle cx="30" cy="29" r="3.5" fill="#d97706" />
+              <defs>
+                <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#78716c" />
+                  <stop offset="30%" stopColor="#d6d3d1" />
+                  <stop offset="70%" stopColor="#fafaf9" />
+                  <stop offset="100%" stopColor="#ffffff" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </motion.div>
 
           {/* Top Cut Part (quick fade out & slide up/left) */}
           <motion.div
