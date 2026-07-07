@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, CreditCard, ChevronRight, Video } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, CreditCard, ChevronRight, Video, Share2 } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
@@ -16,6 +16,26 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
   const [event, setEvent] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState('');
+  const [isShareSupported, setIsShareSupported] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && !!(navigator as any).share) {
+      setIsShareSupported(true);
+    }
+  }, []);
+
+  const handleShare = async () => {
+    if (!event) return;
+    try {
+      await navigator.share({
+        title: event.title,
+        text: `Komm zu unserem Event: ${event.title}!`,
+        url: window.location.href,
+      });
+    } catch (err) {
+      console.log('Share failed or cancelled', err);
+    }
+  };
 
   useEffect(() => {
     async function loadEvent() {
@@ -72,16 +92,29 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
     <div className="px-4 sm:px-6 pb-32 pt-4 max-w-4xl mx-auto space-y-8 animate-fade-in">
       
       {/* Back Navigation & Breadcrumb */}
-      <nav className="flex items-center gap-2 text-xs text-slate-400">
-        <button 
-          onClick={() => navigate('/')}
-          className="flex items-center gap-1 hover:text-white transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Zeitplan
-        </button>
-        <ChevronRight size={12} className="text-slate-600" />
-        <span className="text-slate-300 font-medium truncate">{event.title}</span>
+      <nav className="flex items-center justify-between text-xs text-slate-400 w-full">
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center gap-1 hover:text-white transition-colors"
+          >
+            <ArrowLeft size={14} />
+            Zeitplan
+          </button>
+          <ChevronRight size={12} className="text-slate-600" />
+          <span className="text-slate-300 font-medium truncate max-w-[150px] sm:max-w-xs">{event.title}</span>
+        </div>
+
+        {/* Mobile-Only Share Button */}
+        {isShareSupported && (
+          <button
+            onClick={handleShare}
+            className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 border border-slate-800 active:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
+          >
+            <Share2 size={13} className="text-sky-400" />
+            <span>Teilen</span>
+          </button>
+        )}
       </nav>
 
       {/* Main Grid: Media & Layout */}
@@ -226,13 +259,26 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
           </span>
         </div>
 
-        <Button
-          variant="primary"
-          onPress={() => onQuickBuy(event)}
-          className="py-3 px-8 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-sky-500/15 transition-all select-none active:scale-[0.98]"
-        >
-          Jetzt Ticket sichern
-        </Button>
+        <div className="flex gap-2">
+          {isShareSupported && (
+            <Button
+              variant="outline"
+              onPress={handleShare}
+              className="py-3 px-3.5 rounded-xl border border-slate-800 bg-slate-900 active:bg-slate-850 text-slate-300 flex items-center justify-center transition-all cursor-pointer"
+              aria-label="Event teilen"
+            >
+              <Share2 size={16} className="text-sky-400" />
+            </Button>
+          )}
+
+          <Button
+            variant="primary"
+            onPress={() => onQuickBuy(event)}
+            className="py-3 px-8 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-sky-500/15 transition-all select-none active:scale-[0.98]"
+          >
+            Jetzt Ticket sichern
+          </Button>
+        </div>
       </div>
 
     </div>
