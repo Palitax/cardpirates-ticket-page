@@ -175,6 +175,10 @@ export const shopifyService = {
         GET_PRODUCTS_QUERY,
         { first: limit }
       );
+      if (!data.products.nodes || data.products.nodes.length === 0) {
+        console.warn("Shopify returned 0 products. Falling back to mock events for staging.");
+        return getMockEvents();
+      }
       return data.products.nodes;
     } catch {
       // Fallback Mock Data for demo purposes if Shopify is empty/unreachable
