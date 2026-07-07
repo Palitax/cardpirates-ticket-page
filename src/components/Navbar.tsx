@@ -25,7 +25,7 @@ export default function Navbar({ onLoginTrigger }: NavbarProps) {
             onPress={onLoginTrigger}
             className="bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold px-4 py-2.5 flex items-center gap-2"
           >
-            <UserCheck size={14} className="text-sky-400" />
+            <UserCheck size={14} className="text-white" />
             <span>Anmelden / Registrieren</span>
           </Button>
         </div>

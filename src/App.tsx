@@ -57,7 +57,7 @@ function App() {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen bg-[#0b0f19] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-white relative">
+      <div className="flex flex-col min-h-screen bg-black text-slate-100 antialiased selection:bg-white/20 selection:text-white relative">
         
         {/* Full Website Background Video */}
         <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
@@ -69,8 +69,8 @@ function App() {
             className="w-full h-full object-cover opacity-[0.35]"
             src={logoAnimVideoUrl}
           />
-          <div className="absolute inset-0 bg-[#0b0f19]/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-[#0b0f19]/10" />
+          <div className="absolute inset-0 bg-black/35" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/10" />
         </div>
 
         {/* Mobile Burger Menu Button */}

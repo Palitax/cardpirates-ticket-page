@@ -58,7 +58,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
         <p className="text-slate-400 text-sm font-semibold">Lade Event-Details...</p>
       </div>
     );
@@ -111,7 +111,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             onClick={handleShare}
             className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 border border-slate-800 active:bg-slate-800 text-slate-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
           >
-            <Share2 size={13} className="text-sky-400" />
+            <Share2 size={13} className="text-white" />
             <span>Teilen</span>
           </button>
         )}
@@ -146,7 +146,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                 <button
                   key={idx}
                   onClick={() => setActiveImage(img.url)}
-                  className={`w-20 aspect-video rounded-xl overflow-hidden border-2 shrink-0 transition-all ${activeImage === img.url ? 'border-sky-500' : 'border-slate-800 hover:border-slate-700'}`}
+                  className={`w-20 aspect-video rounded-xl overflow-hidden border-2 shrink-0 transition-all ${activeImage === img.url ? 'border-white' : 'border-slate-800 hover:border-slate-700'}`}
                 >
                   <img src={img.url} className="w-full h-full object-cover" alt="" />
                 </button>
@@ -157,7 +157,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
           {/* Promo Video Option */}
           {videoUrl && (
             <div className="p-4 bg-slate-900/60 rounded-2xl border border-slate-800/80 flex items-center gap-3">
-              <div className="p-2.5 bg-rose-500/10 text-rose-400 rounded-xl">
+              <div className="p-2.5 bg-slate-800 text-white rounded-xl">
                 <Video size={18} />
               </div>
               <div className="flex-1">
@@ -168,7 +168,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                 href={videoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs font-bold text-sky-400 hover:underline"
+                className="text-xs font-bold text-white hover:underline"
               >
                 Jetzt ansehen
               </a>
@@ -182,7 +182,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
               {event.title}
             </h1>
-            <div className="flex items-center gap-1.5 text-xs text-sky-400 font-bold uppercase tracking-wider">
+            <div className="flex items-center gap-1.5 text-xs text-white font-bold uppercase tracking-wider">
               <Calendar size={13} />
               Bevorstehendes Event
             </div>
@@ -223,7 +223,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                   {priceAmount} <span className="text-xs text-slate-400 font-semibold">{currency}</span>
                 </span>
               </div>
-              <span className="text-[10px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-2 py-1 rounded-md">
+              <span className="text-[10px] text-white font-bold bg-slate-950 border border-slate-800 px-2 py-1 rounded-md">
                 Verfügbar
               </span>
             </div>
@@ -231,7 +231,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             <Button
               variant="primary"
               onPress={() => onQuickBuy(event)}
-              className="w-full py-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-sky-500/15 transition-all select-none hover:brightness-105 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-6 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm border border-white transition-all select-none active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/5"
             >
               Jetzt Ticket sichern
             </Button>
@@ -267,14 +267,14 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
               className="py-3 px-3.5 rounded-xl border border-slate-800 bg-slate-900 active:bg-slate-850 text-slate-300 flex items-center justify-center transition-all cursor-pointer"
               aria-label="Event teilen"
             >
-              <Share2 size={16} className="text-sky-400" />
+              <Share2 size={16} className="text-white" />
             </Button>
           )}
 
           <Button
             variant="primary"
             onPress={() => onQuickBuy(event)}
-            className="py-3 px-8 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-sky-500/15 transition-all select-none active:scale-[0.98]"
+            className="py-3 px-8 rounded-xl bg-white hover:bg-slate-200 text-black border border-white font-extrabold text-sm transition-all select-none active:scale-[0.98] cursor-pointer"
           >
             Jetzt Ticket sichern
           </Button>

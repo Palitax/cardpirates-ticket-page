@@ -142,7 +142,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             </Modal.Heading>
             <p className="text-xs text-slate-400 font-normal mt-1">
               {event ? (
-                <>Um Tickets zu kaufen für <span className="text-sky-400 font-semibold">{event.title}</span></>
+                <>Um Tickets zu kaufen für <span className="text-white font-semibold">{event.title}</span></>
               ) : (
                 'Greife auf deine Cardpirates-Kämpfe und dein Profil zu'
               )}
@@ -166,13 +166,13 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 <Tabs.List className="w-full flex bg-slate-950 border border-slate-800 rounded-xl p-1">
                   <Tabs.Tab 
                     id="register" 
-                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-white text-black' : 'text-slate-400 hover:text-white'}`}
                   >
                     Registrieren
                   </Tabs.Tab>
                   <Tabs.Tab 
                     id="login" 
-                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-sky-500 text-slate-950' : 'text-slate-400 hover:text-white'}`}
+                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-white text-black' : 'text-slate-400 hover:text-white'}`}
                   >
                     Einloggen
                   </Tabs.Tab>
@@ -191,13 +191,13 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       <Tabs.List className="w-full flex bg-slate-950 p-1 border border-slate-800 rounded-xl">
                         <Tabs.Tab 
                           id="private" 
-                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-slate-800 text-sky-400' : 'text-slate-400 hover:text-white'}`}
+                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}
                         >
                           Privatperson
                         </Tabs.Tab>
                         <Tabs.Tab 
                           id="business" 
-                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-slate-800 text-sky-400' : 'text-slate-400 hover:text-white'}`}
+                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}
                         >
                           Unternehmen
                         </Tabs.Tab>
@@ -224,7 +224,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                 />
               </TextField>
 
@@ -236,7 +236,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                 />
               </TextField>
 
@@ -251,7 +251,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
                     <TextField name="lastName" className="space-y-1.5">
@@ -262,7 +262,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
                   </div>
@@ -279,7 +279,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
                           required={userType === 'business'}
-                          className="w-full bg-slate-905 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-905 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                       
@@ -291,7 +291,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={vatNumber}
                           onChange={(e) => setVatNumber(e.target.value)}
                           required={userType === 'business'}
-                          className="w-full bg-slate-905 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-905 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                     </div>
@@ -308,7 +308,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         value={address1}
                         onChange={(e) => setAddress1(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
 
@@ -319,7 +319,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                         placeholder="Wohnung, Etage, etc."
                         value={address2}
                         onChange={(e) => setAddress2(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                       />
                     </TextField>
 
@@ -332,7 +332,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={zip}
                           onChange={(e) => setZip(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                       <TextField name="city" className="space-y-1.5">
@@ -343,7 +343,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                     </div>
@@ -358,7 +358,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           onChange={(e) => setCountry(e.target.value)}
                           maxLength={2}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                       <TextField name="phone" className="space-y-1.5">
@@ -369,7 +369,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-sky-500 rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
                         />
                       </TextField>
                     </div>
@@ -379,11 +379,10 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             </form>
           </Modal.Body>
 
-          {/* Footer */}
           <Modal.Footer className="border-t border-slate-800 bg-slate-950/60 p-6 flex justify-end">
             <Button
               onPress={() => handleSubmit()}
-              className="w-full py-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-xl shadow-sky-500/10 hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+              className="w-full py-6 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2"
             >
               {loading ? (
                 <span>Sichere Kasse wird geladen...</span>

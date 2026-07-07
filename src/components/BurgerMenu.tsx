@@ -134,13 +134,13 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
   return (
     <>
-      {/* Floating Menu Button (Top Left - Mobile Only) */}
+      {/* Minimalist Floating Menu Button (Top Left - Mobile Only, no border or background) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-4 left-4 z-40 md:hidden flex items-center justify-center w-11 h-11 bg-slate-900/90 hover:bg-slate-800 border border-slate-800 rounded-xl shadow-xl backdrop-blur-md active:scale-95 transition-all cursor-pointer"
+        className="fixed top-6 left-6 z-40 md:hidden flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-1"
         aria-label="Menü öffnen"
       >
-        <svg className="w-5 h-5 stroke-current text-white fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="w-6 h-6 stroke-current text-white fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <line x1="4" x2="20" y1="12" y2="12" />
           <line x1="4" x2="20" y1="6" y2="6" />
           <line x1="4" x2="20" y1="18" y2="18" />
@@ -158,7 +158,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
           />
 
           {/* Drawer Sidebar Panel */}
-          <div className="relative w-[75vw] max-w-[280px] h-full bg-[#0b0f19] border-r border-slate-900/80 shadow-2xl flex flex-col z-10 animate-slide-right select-none">
+          <div className="relative w-[75vw] max-w-[280px] h-full bg-black border-r border-slate-900 shadow-2xl flex flex-col z-10 animate-slide-right select-none">
             
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-4 py-4 border-b border-slate-900 shrink-0">
@@ -181,7 +181,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
               {!currentUser ? (
                 /* LOGGED OUT USER VIEW */
                 <div className="space-y-3 shrink-0">
-                  <div className="p-4 bg-slate-900/40 border border-slate-900 rounded-xl space-y-2 text-center">
+                  <div className="p-4 bg-slate-950 border border-slate-900 rounded-xl space-y-2 text-center">
                     <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Crew Profil</span>
                     <p className="text-[11px] text-slate-500 leading-normal">
                       Logge dich ein, um deine Tickets und Profildetails einzusehen.
@@ -192,7 +192,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                         setIsOpen(false);
                         onLoginTrigger();
                       }}
-                      className="w-full py-3.5 rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-[11px] cursor-pointer"
+                      className="w-full py-3 rounded-lg bg-white hover:bg-slate-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98]"
                     >
                       Login / Registrieren
                     </Button>
@@ -202,9 +202,9 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                 /* LOGGED IN USER VIEW */
                 <div className="space-y-4 shrink-0">
                   {/* User Profile Header Card */}
-                  <div className="p-3 bg-slate-900/35 border border-slate-900 rounded-xl flex items-center justify-between gap-2">
+                  <div className="p-3 bg-slate-950 border border-slate-900 rounded-xl flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 bg-sky-500/10 rounded-lg flex items-center justify-center font-bold text-sky-400 uppercase text-xs shrink-0">
+                      <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center font-bold text-white uppercase text-xs shrink-0 border border-slate-800">
                         {currentUser.first_name[0]}{currentUser.last_name[0]}
                       </div>
                       <div className="text-left min-w-0">
@@ -216,7 +216,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                     </div>
                     <button
                       onClick={onLogout}
-                      className="text-[9px] font-bold text-rose-400 hover:underline uppercase tracking-wider px-2 py-1 bg-rose-500/5 border border-rose-500/10 rounded-md transition-all shrink-0"
+                      className="text-[9px] font-bold text-slate-400 hover:text-white uppercase tracking-wider px-2 py-1 bg-slate-900 border border-slate-800 rounded-md transition-all shrink-0"
                     >
                       Logout
                     </button>
@@ -230,7 +230,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
                     {/* Active Ticket */}
                     {tickets.filter(t => t.status === 'active').length === 0 ? (
-                      <div className="py-4 px-3 bg-slate-900/10 border border-dashed border-slate-900 text-center rounded-lg">
+                      <div className="py-4 px-3 bg-slate-950 border border-dashed border-slate-900 text-center rounded-lg">
                         <p className="text-[10px] text-slate-500">Keine aktiven Tickets.</p>
                       </div>
                     ) : (
@@ -242,7 +242,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                           >
                             <div className="p-3 flex gap-2.5 border-b border-slate-850">
                               {ticket.image && (
-                                <img src={ticket.image} className="w-11 h-11 rounded-md object-cover border border-slate-800 shrink-0" alt="" />
+                                <img src={ticket.image} className="w-11 h-11 rounded-md object-cover border border-slate-850 shrink-0" alt="" />
                               )}
                               <div className="text-left flex-1 min-w-0">
                                 <h4 className="text-[11px] font-bold text-white truncate">{ticket.title}</h4>
@@ -297,14 +297,14 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                 </div>
               )}
 
-              {/* Discord Button Sektion */}
+              {/* Discord Button Sektion (Unified size matching Login button) */}
               <div className="space-y-2 shrink-0">
                 <Button
                   variant="primary"
                   onPress={() => window.open('https://discord.gg/8yRykEdr4G', '_blank')}
-                  className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-extrabold text-[11px] py-3 rounded-lg flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-[#5865F2]/10 transition-all active:scale-[0.98]"
+                  className="w-full py-3 rounded-lg bg-black hover:bg-slate-950 text-white font-extrabold text-xs cursor-pointer border border-slate-700 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                 >
-                  <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 fill-white shrink-0 block" viewBox="0 0 24 24">
                     <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.03c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.03A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.094 13.094 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z"/>
                   </svg>
                   <span>Tritt unserem Discord bei</span>
@@ -318,9 +318,9 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                 </span>
                 <a
                   href="mailto:support@cardpirates.de?subject=Cardpirates%20Supportanfrage"
-                  className="w-full flex items-center justify-center gap-2 p-2.5 bg-slate-950/40 border border-slate-900/60 rounded-lg hover:border-slate-800 transition-all text-slate-300 text-xs font-bold text-center"
+                  className="w-full flex items-center justify-center gap-2 p-2.5 bg-slate-950 border border-slate-900 rounded-lg hover:border-slate-800 transition-all text-slate-300 text-xs font-bold text-center"
                 >
-                  <Mail size={13} className="text-sky-400" />
+                  <Mail size={13} className="text-white" />
                   <span>Support kontaktieren</span>
                 </a>
               </div>
@@ -334,7 +334,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                   className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-slate-900/50"
                 >
                   <div className="flex items-center gap-2">
-                    <FileText size={12} className="text-sky-400 shrink-0" />
+                    <FileText size={12} className="text-white shrink-0" />
                     <span>Impressum</span>
                   </div>
                   <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
@@ -344,7 +344,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                   className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-slate-900/50"
                 >
                   <div className="flex items-center gap-2">
-                    <Scale size={12} className="text-sky-400 shrink-0" />
+                    <Scale size={12} className="text-white shrink-0" />
                     <span>AGB</span>
                   </div>
                   <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
@@ -354,7 +354,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                   className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-slate-900/50"
                 >
                   <div className="flex items-center gap-2">
-                    <Shield size={12} className="text-sky-400 shrink-0" />
+                    <Shield size={12} className="text-white shrink-0" />
                     <span>Datenschutz</span>
                   </div>
                   <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
@@ -364,7 +364,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                   className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2"
                 >
                   <div className="flex items-center gap-2">
-                    <Info size={12} className="text-sky-400 shrink-0" />
+                    <Info size={12} className="text-white shrink-0" />
                     <span>Widerruf</span>
                   </div>
                   <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
@@ -377,7 +377,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
             {/* Legal modal sheets */}
             {activeSheet && (
-              <div className="fixed inset-0 z-50 bg-[#0b0f19] flex flex-col animate-slide-up">
+              <div className="fixed inset-0 z-50 bg-black flex flex-col animate-slide-up">
                 <div className="flex items-center justify-between px-4 py-4 border-b border-slate-900">
                   <h3 className="text-sm font-bold text-white tracking-tight">
                     {legalContent[activeSheet].title}
