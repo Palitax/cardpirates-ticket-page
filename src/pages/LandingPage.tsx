@@ -240,14 +240,23 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             setCarouselIndex(idx);
                           }
                         }}
-                        className={`absolute left-1/2 -ml-[115px] w-[230px] h-[395px] bg-transparent border-none outline-none select-none transition-shadow duration-300 ${offset === 0 ? 'drop-shadow-[0_16px_28px_rgba(0,0,0,0.5)]' : 'drop-shadow-[0_6px_12px_rgba(0,0,0,0.3)] cursor-pointer'}`}
+                        className={`absolute left-1/2 -ml-[115px] w-[230px] h-[395px] bg-transparent border-none outline-none select-none ${offset === 0 ? 'cursor-default' : 'cursor-pointer'}`}
                       >
+                        {/* Soft Premium Shadow Layer to fix Safari GPU drop-shadow clipping/pixelation bugs */}
+                        <div 
+                          className={`absolute pointer-events-none transition-all duration-300 rounded-b-[24px] bg-black ${
+                            offset === 0 
+                              ? 'inset-1.5 opacity-60 blur-xl' 
+                              : 'inset-3.5 opacity-40 blur-md'
+                          }`}
+                        />
+
                         {/* Inner Card Container clipped into physical ticket for hardware-accelerated animations */}
                         <div 
                           style={{
                             clipPath: "path('M 0 0 L 230 0 L 230 227 A 8 8 0 0 0 230 243 L 230 395 L 0 395 L 0 243 A 8 8 0 0 0 0 227 Z')"
                           }}
-                          className="w-full h-full bg-white text-zinc-800 rounded-b-[24px] overflow-hidden flex flex-col justify-between"
+                          className="w-full h-full bg-white text-zinc-800 rounded-b-[24px] overflow-hidden flex flex-col justify-between relative z-10"
                         >
                           {/* Card Cover image with fading gradient blend */}
                           <div className="relative h-[155px] w-full overflow-hidden shrink-0 bg-black">
