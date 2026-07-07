@@ -8,6 +8,7 @@ import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
 import CountdownTimer from '../components/CountdownTimer';
+import introBgImg from '../assets/intro-bg.jpg';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -18,6 +19,8 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [featuredIndex, setFeaturedIndex] = useState(0);
+
+  const introBgUrl = (window as any).ShopifyAssets?.introBgUrl || introBgImg;
 
   // Swipe gesture tracking state
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -113,13 +116,25 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     <div className="space-y-10 px-4 sm:px-6 pb-20 animate-fade-in">
       
       {/* Hero Welcome Header */}
-      <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4">
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-          Werde Teil der Crew!
-        </h1>
-        <p className="text-sm text-slate-400 leading-relaxed">
-          Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
-        </p>
+      <header className="relative rounded-3xl overflow-hidden border border-slate-800/80 shadow-2xl p-6 sm:p-10 max-w-4xl mx-auto text-center">
+        {/* Background Image Container */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+          style={{ backgroundImage: `url(${introBgUrl})` }}
+        />
+        {/* Modern dark overlay with blur */}
+        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[1px] mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950/40" />
+
+        {/* Content */}
+        <div className="relative z-10 space-y-4">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md">
+            Werde Teil der Crew!
+          </h1>
+          <p className="text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
+            Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
+          </p>
+        </div>
       </header>
 
       {/* Featured Shuffling Countdown Hero Section (Mobile Optimized & Swipeable) */}
