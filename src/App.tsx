@@ -57,7 +57,7 @@ function App() {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen bg-black text-slate-100 antialiased selection:bg-white/20 selection:text-white relative">
+      <div className="flex flex-col min-h-screen bg-black text-zinc-100 antialiased selection:bg-white/20 selection:text-white relative">
         
         {/* Full Website Background Video */}
         <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
@@ -88,7 +88,7 @@ function App() {
           <Routes>
             <Route 
               path="/" 
-              element={<LandingPage onQuickBuy={handleQuickBuyTrigger} />} 
+              element={<LandingPage onQuickBuy={handleQuickBuyTrigger} currentUser={currentUser} />} 
             />
             <Route 
               path="/events/:handle" 

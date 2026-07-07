@@ -158,16 +158,16 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
           />
 
           {/* Drawer Sidebar Panel */}
-          <div className="relative w-[75vw] max-w-[280px] h-full bg-black border-r border-slate-900 shadow-2xl flex flex-col z-10 animate-slide-right select-none">
+          <div className="relative w-[75vw] max-w-[280px] h-full bg-black border-r border-zinc-900 shadow-2xl flex flex-col z-10 animate-slide-right select-none text-zinc-300">
             
             {/* Drawer Header */}
-            <div className="flex items-center justify-between px-4 py-4 border-b border-slate-900 shrink-0">
+            <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-900 shrink-0">
               <span className="text-2xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
                 Cardpirates
               </span>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-white p-1.5 hover:bg-slate-900 rounded-lg transition-all cursor-pointer"
+                className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-900 rounded-lg transition-all cursor-pointer"
                 aria-label="Menü schließen"
               >
                 <X size={18} />
@@ -179,44 +179,42 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
               {/* Profile Context Section */}
               {!currentUser ? (
-                /* LOGGED OUT USER VIEW */
-                <div className="space-y-3 shrink-0">
-                  <div className="p-4 bg-slate-950 border border-slate-900 rounded-xl space-y-2 text-center">
-                    <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Crew Profil</span>
-                    <p className="text-[11px] text-slate-500 leading-normal">
-                      Logge dich ein, um deine Tickets und Profildetails einzusehen.
-                    </p>
-                    <Button
-                      variant="primary"
-                      onPress={() => {
-                        setIsOpen(false);
-                        onLoginTrigger();
-                      }}
-                      className="w-full py-3 rounded-lg bg-white hover:bg-slate-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98]"
-                    >
-                      Login / Registrieren
-                    </Button>
-                  </div>
+                /* LOGGED OUT USER VIEW - Card Wrapper Removed */
+                <div className="space-y-3 shrink-0 text-center px-1 py-2">
+                  <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Crew Profil</span>
+                  <p className="text-[11px] text-zinc-500 leading-normal mb-1">
+                    Logge dich ein, um deine Tickets und Profildetails einzusehen.
+                  </p>
+                  <Button
+                    variant="primary"
+                    onPress={() => {
+                      setIsOpen(false);
+                      onLoginTrigger();
+                    }}
+                    className="w-full py-3 rounded-lg bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98]"
+                  >
+                    Login / Registrieren
+                  </Button>
                 </div>
               ) : (
                 /* LOGGED IN USER VIEW */
                 <div className="space-y-4 shrink-0">
                   {/* User Profile Header Card */}
-                  <div className="p-3 bg-slate-950 border border-slate-900 rounded-xl flex items-center justify-between gap-2">
+                  <div className="p-3 bg-zinc-950 border border-zinc-900 rounded-xl flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center font-bold text-white uppercase text-xs shrink-0 border border-slate-800">
+                      <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center font-bold text-white uppercase text-xs shrink-0 border border-zinc-800">
                         {currentUser.first_name[0]}{currentUser.last_name[0]}
                       </div>
                       <div className="text-left min-w-0">
                         <h4 className="text-xs font-bold text-white truncate">Hallo, {currentUser.first_name}!</h4>
-                        <span className="block text-[8px] text-slate-500 uppercase tracking-widest font-semibold truncate">
+                        <span className="block text-[8px] text-zinc-500 uppercase tracking-widest font-semibold truncate">
                           {currentUser.user_type === 'business' ? 'Business' : 'Private'}
                         </span>
                       </div>
                     </div>
                     <button
                       onClick={onLogout}
-                      className="text-[9px] font-bold text-slate-400 hover:text-white uppercase tracking-wider px-2 py-1 bg-slate-900 border border-slate-800 rounded-md transition-all shrink-0"
+                      className="text-[9px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-md transition-all shrink-0"
                     >
                       Logout
                     </button>
@@ -224,47 +222,47 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
                   {/* Tickets Sektion */}
                   <div className="space-y-2.5">
-                    <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-900 pb-1.5 text-left">
+                    <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5 text-left">
                       Meine Tickets
                     </span>
 
                     {/* Active Ticket */}
                     {tickets.filter(t => t.status === 'active').length === 0 ? (
-                      <div className="py-4 px-3 bg-slate-950 border border-dashed border-slate-900 text-center rounded-lg">
-                        <p className="text-[10px] text-slate-500">Keine aktiven Tickets.</p>
+                      <div className="py-4 px-3 bg-zinc-950 border border-dashed border-zinc-900 text-center rounded-lg">
+                        <p className="text-[10px] text-zinc-500">Keine aktiven Tickets.</p>
                       </div>
                     ) : (
                       <div className="space-y-2.5">
                         {tickets.filter(t => t.status === 'active').map((ticket) => (
                           <div 
                             key={ticket.id}
-                            className="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-md text-left"
+                            className="bg-zinc-900/90 border border-zinc-800 rounded-xl overflow-hidden shadow-md text-left"
                           >
-                            <div className="p-3 flex gap-2.5 border-b border-slate-850">
+                            <div className="p-3 flex gap-2.5 border-b border-zinc-850">
                               {ticket.image && (
-                                <img src={ticket.image} className="w-11 h-11 rounded-md object-cover border border-slate-850 shrink-0" alt="" />
+                                <img src={ticket.image} className="w-11 h-11 rounded-md object-cover border border-zinc-850 shrink-0" alt="" />
                               )}
                               <div className="text-left flex-1 min-w-0">
                                 <h4 className="text-[11px] font-bold text-white truncate">{ticket.title}</h4>
-                                <span className="block text-[9px] text-slate-400 mt-1 truncate">
+                                <span className="block text-[9px] text-zinc-400 mt-1 truncate">
                                   {ticket.date ? new Date(ticket.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' }) : 'TBA'}
                                 </span>
                               </div>
                             </div>
                             
                             {/* QR Barcode */}
-                            <div className="bg-slate-950/60 p-2.5 flex flex-col items-center justify-center text-center space-y-1">
+                            <div className="bg-zinc-950/60 p-2.5 flex flex-col items-center justify-center text-center space-y-1">
                               <div className="w-16 h-16 bg-white p-1 rounded flex flex-wrap gap-0.5 justify-center items-center relative">
                                 <div className="grid grid-cols-6 gap-0.5 w-full h-full">
                                   {[...Array(36)].map((_, i) => (
                                     <div 
                                       key={i} 
-                                      className={`rounded-none ${(i % 3 === 0 || i % 7 === 0 || i < 6 || i % 6 === 0 || i > 30) ? 'bg-slate-950' : 'bg-transparent'}`}
+                                      className={`rounded-none ${(i % 3 === 0 || i % 7 === 0 || i < 6 || i % 6 === 0 || i > 30) ? 'bg-zinc-950' : 'bg-transparent'}`}
                                     />
                                   ))}
                                 </div>
                               </div>
-                              <span className="text-[7px] uppercase font-bold tracking-widest text-slate-500">Scan am Einlass</span>
+                              <span className="text-[7px] uppercase font-bold tracking-widest text-zinc-500">Scan am Einlass</span>
                             </div>
                           </div>
                         ))}
@@ -274,20 +272,20 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                     {/* Expired Tickets */}
                     {tickets.filter(t => t.status === 'expired').length > 0 && (
                       <div className="space-y-1.5 pt-1">
-                        <span className="block text-[8px] font-bold text-slate-600 uppercase tracking-widest text-left">
+                        <span className="block text-[8px] font-bold text-zinc-600 uppercase tracking-widest text-left">
                           Archiv
                         </span>
                         {tickets.filter(t => t.status === 'expired').map((ticket) => (
                           <div 
                             key={ticket.id}
-                            className="p-2.5 bg-slate-950/30 border border-slate-900 rounded-lg flex gap-2.5 opacity-30 select-none grayscale text-left"
+                            className="p-2.5 bg-zinc-950/30 border border-zinc-900 rounded-lg flex gap-2.5 opacity-30 select-none grayscale text-left"
                           >
                             {ticket.image && (
-                              <img src={ticket.image} className="w-8 h-8 rounded-md object-cover border border-slate-900 shrink-0" alt="" />
+                              <img src={ticket.image} className="w-8 h-8 rounded-md object-cover border border-zinc-900 shrink-0" alt="" />
                             )}
                             <div className="text-left flex-1 min-w-0">
-                              <h5 className="text-[10px] font-bold text-slate-300 truncate">{ticket.title}</h5>
-                              <p className="text-[8px] text-slate-500 mt-0.5">Genutzt 2026</p>
+                              <h5 className="text-[10px] font-bold text-zinc-300 truncate">{ticket.title}</h5>
+                              <p className="text-[8px] text-zinc-500 mt-0.5">Genutzt 2026</p>
                             </div>
                           </div>
                         ))}
@@ -297,15 +295,15 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                 </div>
               )}
 
-              {/* Discord Button Sektion (Unified size matching Login button) */}
+              {/* Discord Button Sektion (Unified size matching Login button, official logo path) */}
               <div className="space-y-2 shrink-0">
                 <Button
                   variant="primary"
                   onPress={() => window.open('https://discord.gg/8yRykEdr4G', '_blank')}
-                  className="w-full py-3 rounded-lg bg-black hover:bg-slate-950 text-white font-extrabold text-xs cursor-pointer border border-slate-700 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                  className="w-full py-3 rounded-lg bg-black hover:bg-zinc-950 text-white font-extrabold text-xs cursor-pointer border border-zinc-700 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                 >
-                  <svg className="w-4 h-4 fill-white shrink-0 block" viewBox="0 0 24 24">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.03c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.03A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.094 13.094 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z"/>
+                  <svg className="w-4 h-4 fill-white shrink-0 block" viewBox="0 0 127.14 96.36">
+                    <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c1.07-.79,2.12-1.61,3.13-2.47a75.1,75.1,0,0,0,64.84,0c1,.86,2.06,1.68,3.13,2.47a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129.07,47,122.9,24.16,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.9,46,53.72,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.14,46,96,53,91,65.69,84.69,65.69Z"/>
                   </svg>
                   <span>Tritt unserem Discord bei</span>
                 </Button>
@@ -313,12 +311,12 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
               {/* Support & Kontakt */}
               <div className="space-y-2 shrink-0">
-                <span className="block text-[9px] font-bold text-slate-500 uppercase tracking-widest border-b border-slate-900 pb-1.5 text-left">
+                <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5 text-left">
                   Support
                 </span>
                 <a
                   href="mailto:support@cardpirates.de?subject=Cardpirates%20Supportanfrage"
-                  className="w-full flex items-center justify-center gap-2 p-2.5 bg-slate-950 border border-slate-900 rounded-lg hover:border-slate-800 transition-all text-slate-300 text-xs font-bold text-center"
+                  className="w-full flex items-center justify-center gap-2 p-2.5 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-zinc-800 transition-all text-slate-300 text-xs font-bold text-center"
                 >
                   <Mail size={13} className="text-white" />
                   <span>Support kontaktieren</span>
@@ -327,75 +325,75 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
             </div>
 
             {/* Legal Documents Listed Vertically (Footer) */}
-            <div className="px-4 border-t border-slate-900 pt-4 pb-6 mt-auto bg-slate-950/20">
+            <div className="px-4 border-t border-zinc-900 pt-4 pb-6 mt-auto bg-zinc-950/20">
               <div className="flex flex-col space-y-0.5 text-left">
                 <button 
                   onClick={() => setActiveSheet('impressum')}
-                  className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-slate-900/50"
+                  className="text-[10px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-zinc-900/55"
                 >
                   <div className="flex items-center gap-2">
                     <FileText size={12} className="text-white shrink-0" />
                     <span>Impressum</span>
                   </div>
-                  <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
+                  <span className="text-zinc-700 text-[10px] font-extrabold">&rarr;</span>
                 </button>
                 <button 
                   onClick={() => setActiveSheet('agb')}
-                  className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-slate-900/50"
+                  className="text-[10px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-zinc-900/55"
                 >
                   <div className="flex items-center gap-2">
                     <Scale size={12} className="text-white shrink-0" />
                     <span>AGB</span>
                   </div>
-                  <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
+                  <span className="text-zinc-700 text-[10px] font-extrabold">&rarr;</span>
                 </button>
                 <button 
                   onClick={() => setActiveSheet('datenschutz')}
-                  className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-slate-900/50"
+                  className="text-[10px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2 border-b border-zinc-900/55"
                 >
                   <div className="flex items-center gap-2">
                     <Shield size={12} className="text-white shrink-0" />
                     <span>Datenschutz</span>
                   </div>
-                  <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
+                  <span className="text-zinc-700 text-[10px] font-extrabold">&rarr;</span>
                 </button>
                 <button 
                   onClick={() => setActiveSheet('widerruf')}
-                  className="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2"
+                  className="text-[10px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider flex items-center justify-between cursor-pointer py-2"
                 >
                   <div className="flex items-center gap-2">
                     <Info size={12} className="text-white shrink-0" />
                     <span>Widerruf</span>
                   </div>
-                  <span className="text-slate-600 text-[10px] font-extrabold">&rarr;</span>
+                  <span className="text-zinc-700 text-[10px] font-extrabold">&rarr;</span>
                 </button>
               </div>
-              <p className="text-[9px] text-slate-600 text-center mt-4">
+              <p className="text-[9px] text-zinc-650 text-center mt-4">
                 &copy; {new Date().getFullYear()} Cardpirates.
               </p>
             </div>
 
             {/* Legal modal sheets */}
             {activeSheet && (
-              <div className="fixed inset-0 z-50 bg-black flex flex-col animate-slide-up">
-                <div className="flex items-center justify-between px-4 py-4 border-b border-slate-900">
+              <div className="fixed inset-0 z-50 bg-black flex flex-col animate-slide-up text-zinc-300">
+                <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-900">
                   <h3 className="text-sm font-bold text-white tracking-tight">
                     {legalContent[activeSheet].title}
                   </h3>
                   <button
                     onClick={() => setActiveSheet(null)}
-                    className="text-slate-400 hover:text-white p-1.5 hover:bg-slate-900 rounded-lg transition-all cursor-pointer"
+                    className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-900 rounded-lg transition-all cursor-pointer"
                   >
                     <X size={18} />
                   </button>
                 </div>
-                <div className="flex-1 p-4 overflow-y-auto text-left text-slate-300 text-[11px] leading-relaxed whitespace-pre-line space-y-4">
+                <div className="flex-1 p-4 overflow-y-auto text-left text-zinc-300 text-[11px] leading-relaxed whitespace-pre-line space-y-4">
                   {legalContent[activeSheet].body}
                 </div>
-                <div className="p-4 border-t border-slate-900 bg-slate-950/20">
+                <div className="p-4 border-t border-zinc-900 bg-zinc-950/20">
                   <Button
                     onPress={() => setActiveSheet(null)}
-                    className="w-full py-3.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-white font-bold text-xs cursor-pointer"
+                    className="w-full py-3.5 rounded-lg bg-zinc-800 hover:bg-zinc-750 text-white font-bold text-xs cursor-pointer"
                   >
                     Schließen
                   </Button>

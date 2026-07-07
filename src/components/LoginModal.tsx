@@ -122,25 +122,25 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
     <Modal isOpen={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <Modal.Backdrop className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in" />
       <Modal.Container className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <Modal.Dialog className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative animate-scale-up">
+        <Modal.Dialog className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative animate-scale-up text-zinc-300">
           
           {/* Close button */}
           <Modal.CloseTrigger 
             onClick={onClose}
-            className="absolute top-5 right-5 text-slate-400 hover:text-white p-1 hover:bg-slate-850 rounded-lg transition-colors cursor-pointer z-10"
+            className="absolute top-5 right-5 text-zinc-400 hover:text-white p-1 hover:bg-zinc-850 rounded-lg transition-colors cursor-pointer z-10"
           >
             <X size={18} />
           </Modal.CloseTrigger>
 
           {/* Header */}
-          <Modal.Header className="border-b border-slate-800/80 px-6 py-5">
+          <Modal.Header className="border-b border-zinc-800/80 px-6 py-5 text-left">
             <Modal.Heading className="text-lg font-bold text-white tracking-tight">
               {event 
                 ? (activeTab === 'register' ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
                 : (activeTab === 'register' ? 'Konto erstellen' : 'Konto-Login')
               }
             </Modal.Heading>
-            <p className="text-xs text-slate-400 font-normal mt-1">
+            <p className="text-xs text-zinc-400 font-normal mt-1">
               {event ? (
                 <>Um Tickets zu kaufen für <span className="text-white font-semibold">{event.title}</span></>
               ) : (
@@ -150,7 +150,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           </Modal.Header>
 
           {/* Scrollable Body */}
-          <Modal.Body className="px-6 py-5 overflow-y-auto space-y-6 flex-1">
+          <Modal.Body className="px-6 py-5 overflow-y-auto space-y-6 flex-1 text-left">
             {error && (
               <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm rounded-xl font-medium">
                 {error}
@@ -163,16 +163,16 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               onSelectionChange={(key) => setActiveTab(key as string)}
             >
               <Tabs.ListContainer className="w-full">
-                <Tabs.List className="w-full flex bg-slate-950 border border-slate-800 rounded-xl p-1">
+                <Tabs.List className="w-full flex bg-zinc-950 border border-zinc-800 rounded-xl p-1">
                   <Tabs.Tab 
                     id="register" 
-                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-white text-black' : 'text-slate-400 hover:text-white'}`}
+                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
                   >
                     Registrieren
                   </Tabs.Tab>
                   <Tabs.Tab 
                     id="login" 
-                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-white text-black' : 'text-slate-400 hover:text-white'}`}
+                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
                   >
                     Einloggen
                   </Tabs.Tab>
@@ -182,22 +182,22 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               <Tabs.Panel id="register" className="space-y-5 pt-4">
                 {/* Account Type Toggle */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Kontotyp</label>
+                  <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Kontotyp</label>
                   <Tabs 
                     selectedKey={userType} 
                     onSelectionChange={(key) => setUserType(key as 'private' | 'business')}
                   >
                     <Tabs.ListContainer className="w-full">
-                      <Tabs.List className="w-full flex bg-slate-950 p-1 border border-slate-800 rounded-xl">
+                      <Tabs.List className="w-full flex bg-zinc-950 p-1 border border-zinc-800 rounded-xl">
                         <Tabs.Tab 
                           id="private" 
-                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}
+                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
                         >
                           Privatperson
                         </Tabs.Tab>
                         <Tabs.Tab 
                           id="business" 
-                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'}`}
+                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
                         >
                           Unternehmen
                         </Tabs.Tab>
@@ -217,26 +217,26 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             {/* Input Form Fields */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <TextField name="email" className="space-y-1.5 w-full">
-                <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">E-Mail-Adresse</Label>
+                <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">E-Mail-Adresse</Label>
                 <Input
                   type="email"
                   placeholder="name@firma.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                 />
               </TextField>
 
               <TextField name="password" className="space-y-1.5 w-full">
-                <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Passwort</Label>
+                <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Passwort</Label>
                 <Input
                   type="password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                  className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                 />
               </TextField>
 
@@ -244,113 +244,112 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 <div className="space-y-5 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <TextField name="firstName" className="space-y-1.5">
-                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Vorname</Label>
+                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Vorname</Label>
                       <Input
                         type="text"
                         placeholder="Max"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                       />
                     </TextField>
                     <TextField name="lastName" className="space-y-1.5">
-                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Nachname</Label>
+                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Nachname</Label>
                       <Input
                         type="text"
                         placeholder="Mustermann"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                       />
                     </TextField>
                   </div>
 
                   {userType === 'business' && (
-                    <div className="space-y-4 p-4 bg-slate-950 rounded-2xl border border-slate-800/80 animate-slide-down">
-                      <h4 className="text-xs font-bold text-sky-400 uppercase tracking-widest">Unternehmensdaten</h4>
-                      
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
                       <TextField name="companyName" className="space-y-1.5">
-                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Firmenname</Label>
+                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Firmenname</Label>
                         <Input
                           type="text"
-                          placeholder="Muster GmbH"
+                          placeholder="Cardpirates GmbH"
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
                           required={userType === 'business'}
-                          className="w-full bg-slate-905 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-zinc-905 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                         />
                       </TextField>
                       
                       <TextField name="vatNumber" className="space-y-1.5">
-                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">USt-IdNr. (Mehrwertsteuer)</Label>
+                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">USt-IdNr.</Label>
                         <Input
                           type="text"
                           placeholder="DE123456789"
                           value={vatNumber}
                           onChange={(e) => setVatNumber(e.target.value)}
                           required={userType === 'business'}
-                          className="w-full bg-slate-905 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-zinc-905 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                         />
                       </TextField>
                     </div>
                   )}
 
-                  <div className="space-y-4 border-t border-slate-850 pt-4">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Rechnungs- & Lieferadresse</h4>
+                  {/* Address Section */}
+                  <div className="space-y-4 pt-3 border-t border-zinc-800/80">
+                    <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-left">Rechnungsadresse</span>
                     
                     <TextField name="address1" className="space-y-1.5">
-                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Straße & Hausnummer</Label>
+                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Straße und Hausnummer</Label>
                       <Input
                         type="text"
-                        placeholder="Musterstraße 12"
+                        placeholder="Musterstraße 12a"
                         value={address1}
                         onChange={(e) => setAddress1(e.target.value)}
                         required
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                       />
                     </TextField>
 
                     <TextField name="address2" className="space-y-1.5">
-                      <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Adresszusatz (Optional)</Label>
+                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Adresszusatz (optional)</Label>
                       <Input
                         type="text"
                         placeholder="Wohnung, Etage, etc."
                         value={address2}
                         onChange={(e) => setAddress2(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                       />
                     </TextField>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4">
                       <TextField name="zip" className="space-y-1.5">
-                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Postleitzahl</Label>
+                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">PLZ</Label>
                         <Input
                           type="text"
                           placeholder="10115"
                           value={zip}
                           onChange={(e) => setZip(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                         />
                       </TextField>
                       <TextField name="city" className="space-y-1.5">
-                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Stadt</Label>
+                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Ort</Label>
                         <Input
                           type="text"
                           placeholder="Berlin"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                         />
                       </TextField>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <TextField name="country" className="space-y-1.5">
-                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Länderkürzel</Label>
+                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Länderkürzel</Label>
                         <Input
                           type="text"
                           placeholder="DE"
@@ -358,18 +357,18 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                           onChange={(e) => setCountry(e.target.value)}
                           maxLength={2}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                         />
                       </TextField>
                       <TextField name="phone" className="space-y-1.5">
-                        <Label className="text-slate-400 text-xs font-bold uppercase tracking-wider block">Telefonnummer</Label>
+                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Telefonnummer</Label>
                         <Input
                           type="tel"
                           placeholder="+49 170 1234567"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           required
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-slate-600 outline-none transition-all"
+                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
                         />
                       </TextField>
                     </div>
@@ -379,10 +378,10 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             </form>
           </Modal.Body>
 
-          <Modal.Footer className="border-t border-slate-800 bg-slate-950/60 p-6 flex justify-end">
+          <Modal.Footer className="border-t border-zinc-800 bg-zinc-950/60 p-6 flex justify-end">
             <Button
               onPress={() => handleSubmit()}
-              className="w-full py-6 rounded-xl bg-white hover:bg-slate-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2"
+              className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <span>Sichere Kasse wird geladen...</span>
