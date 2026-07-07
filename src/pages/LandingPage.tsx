@@ -143,12 +143,12 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
     // Trigger modal open after animation completes
     setTimeout(() => {
       onRegisterTrigger();
-    }, 700);
+    }, 480);
 
     // Reset slashState back to idle after animation wraps up
     setTimeout(() => {
       setSlashState('idle');
-    }, 950);
+    }, 800);
   };
 
   const renderMainContent = () => {
@@ -476,9 +476,9 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
         <div className="fixed inset-0 z-50 overflow-hidden pointer-events-none flex items-center justify-center px-4">
           {/* Glowing Mock Registration Card (Reveal Effect) */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.93 }}
+            initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.28, delay: 0.12 }}
+            transition={{ duration: 0.25, delay: 0.05, ease: "easeOut" }}
             className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col space-y-5 shadow-[0_0_60px_rgba(255,255,255,0.06)] relative z-0 text-left"
           >
             {/* Header Mock */}
@@ -510,12 +510,12 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             className="absolute inset-0 bg-white z-50"
           />
 
-          {/* Spark trail / cut line */}
+          {/* Spark trail / neon green laser cut line */}
           <motion.div 
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.32, ease: "easeOut" }}
-            className="absolute w-full h-[3px] bg-gradient-to-r from-rose-500 via-white to-amber-500 shadow-[0_0_15px_#f43f5e,0_0_30px_#f59e0b,0_0_50px_#fff] z-50 origin-left"
+            initial={{ scaleX: 0, opacity: 1 }}
+            animate={{ scaleX: 1, opacity: [1, 1, 0] }}
+            transition={{ duration: 0.35, ease: "easeInOut", times: [0, 0.7, 1] }}
+            className="absolute w-full h-[4px] bg-gradient-to-r from-green-500 via-emerald-300 to-lime-400 shadow-[0_0_20px_#22c55e,0_0_35px_#10b981,0_0_55px_#39ff14] z-50 origin-left"
             style={{ 
               top: '40%',
               left: 0,
@@ -523,45 +523,11 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             }}
           />
 
-          {/* Premium animated Pirate Saber (Sword) */}
-          <motion.div
-            initial={{ x: '-20%' }}
-            animate={{ x: '120%' }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute z-50"
-            style={{ 
-              top: '40%',
-              left: 0,
-              rotate: 9,
-              transformOrigin: 'left center',
-              translateY: '-50%'
-            }}
-          >
-            <svg className="w-40 h-10 text-zinc-300 fill-current drop-shadow-[0_0_15px_rgba(255,255,255,0.95)]" viewBox="0 0 200 50">
-              {/* Blade with metallic linear gradient */}
-              <path d="M25,28 Q100,24 180,12 Q192,10 198,6 Q185,19 150,23 Q100,27 25,29 Z" fill="url(#metalGrad)" />
-              {/* Guard (Pirate Basket hilt) */}
-              <path d="M30,18 C20,15 15,22 15,28 C15,38 25,42 33,40 Q20,40 20,28 Z" fill="#b45309" stroke="#d97706" strokeWidth="1.5" />
-              {/* Grip */}
-              <rect x="23" y="24" width="7" height="10" rx="3" fill="#1c1917" />
-              {/* Pommel */}
-              <circle cx="30" cy="29" r="3.5" fill="#d97706" />
-              <defs>
-                <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#78716c" />
-                  <stop offset="30%" stopColor="#d6d3d1" />
-                  <stop offset="70%" stopColor="#fafaf9" />
-                  <stop offset="100%" stopColor="#ffffff" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </motion.div>
-
           {/* Top Cut Part (quick fade out & slide up/left) */}
           <motion.div
             initial={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
-            animate={{ opacity: 0, y: -70, x: -15, rotate: -1.5 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.08 }}
+            animate={{ opacity: 0, y: -90, x: -20, rotate: -2 }}
+            transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1], delay: 0.02 }}
             className="absolute inset-0 bg-[#000000] flex flex-col justify-start"
             style={{ 
               clipPath: "polygon(0 0, 100% 0, 100% 48%, 0 32%)",
@@ -578,10 +544,10 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             initial={{ y: 0, x: 0, rotate: 0 }}
             animate={{ 
               y: window.innerHeight + 100, 
-              x: 20, 
-              rotate: 12 
+              x: 25, 
+              rotate: 14 
             }}
-            transition={{ duration: 0.78, ease: [0.32, 0, 0.67, 0], delay: 0.08 }}
+            transition={{ duration: 0.58, ease: [0.32, 0, 0.67, 0], delay: 0.02 }}
             className="absolute inset-0 bg-[#000000] flex flex-col justify-start"
             style={{ 
               clipPath: "polygon(0 32%, 100% 48%, 100% 100%, 0 100%)",
