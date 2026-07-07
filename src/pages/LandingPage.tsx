@@ -201,7 +201,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             setCarouselIndex(idx);
                           }
                         }}
-                        className={`absolute w-[230px] h-[395px] bg-transparent border-none outline-none select-none transition-shadow duration-300 ${offset === 0 ? 'drop-shadow-[0_16px_28px_rgba(0,0,0,0.5)]' : 'drop-shadow-[0_6px_12px_rgba(0,0,0,0.3)] cursor-pointer'}`}
+                        className={`absolute left-1/2 -ml-[115px] w-[230px] h-[395px] bg-transparent border-none outline-none select-none transition-shadow duration-300 ${offset === 0 ? 'drop-shadow-[0_16px_28px_rgba(0,0,0,0.5)]' : 'drop-shadow-[0_6px_12px_rgba(0,0,0,0.3)] cursor-pointer'}`}
                       >
                         {/* Inner Card Container clipped into physical ticket for hardware-accelerated animations */}
                         <div 
