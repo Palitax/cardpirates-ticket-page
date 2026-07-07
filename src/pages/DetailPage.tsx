@@ -181,6 +181,29 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             </div>
           </div>
 
+          {/* Desktop Buy Ticket Card */}
+          <div className="hidden md:block p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-4 shadow-xl shadow-black/20">
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Ticketpreis</span>
+                <span className="text-2xl font-extrabold text-white">
+                  {priceAmount} <span className="text-xs text-slate-400 font-semibold">{currency}</span>
+                </span>
+              </div>
+              <span className="text-[10px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-2 py-1 rounded-md">
+                Verfügbar
+              </span>
+            </div>
+
+            <Button
+              variant="primary"
+              onPress={() => onQuickBuy(event)}
+              className="w-full py-6 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-sky-500/15 transition-all select-none hover:brightness-105 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
+            >
+              Jetzt Ticket sichern
+            </Button>
+          </div>
+
           <div className="space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
               Über dieses Event
@@ -195,7 +218,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
       </div>
 
       {/* Mobile Sticky Bottom CTA Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 p-4 pb-safe flex items-center justify-between max-w-4xl mx-auto sm:rounded-t-3xl sm:border-x">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/90 backdrop-blur-lg border-t border-slate-800 p-4 pb-safe flex items-center justify-between max-w-4xl mx-auto sm:rounded-t-3xl sm:border-x md:hidden">
         <div className="flex flex-col">
           <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Gesamtpreis</span>
           <span className="text-2xl font-extrabold text-white">
