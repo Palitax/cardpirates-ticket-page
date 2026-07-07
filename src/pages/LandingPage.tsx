@@ -116,22 +116,22 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     <div className="space-y-10 px-4 sm:px-6 pb-20 animate-fade-in">
       
       {/* Hero Welcome Header */}
-      <header className="relative rounded-3xl overflow-hidden border border-slate-800/80 shadow-2xl p-6 sm:p-10 max-w-4xl mx-auto text-center">
+      <header className="relative overflow-hidden -mx-4 sm:mx-0 p-8 sm:p-12 max-w-4xl text-center">
         {/* Background Image Container */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat scale-105"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${introBgUrl})` }}
         />
-        {/* Modern dark overlay with blur */}
-        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[1px] mix-blend-multiply" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950/40" />
+        {/* Modern dark overlay reduced by 50% */}
+        <div className="absolute inset-0 bg-slate-950/40 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 to-slate-950/65" />
 
         {/* Content */}
         <div className="relative z-10 space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-md">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
             Werde Teil der Crew!
           </h1>
-          <p className="text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
+          <p className="text-sm text-slate-100 max-w-2xl mx-auto leading-relaxed font-bold drop-shadow-[0_1.5px_5px_rgba(0,0,0,0.95)]">
             Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
           </p>
         </div>
