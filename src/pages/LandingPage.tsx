@@ -9,7 +9,7 @@ import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
 import CountdownTimer from '../components/CountdownTimer';
 import introBgImg from '../assets/intro-bg.jpg';
-import introBgVideo from '../assets/Zoro.mp4';
+import logoAnimVideo from '../assets/Logo-animiert.mp4';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -22,7 +22,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
   const introBgUrl = (window as any).ShopifyAssets?.introBgUrl || introBgImg;
-  const introBgVideoUrl = (window as any).ShopifyAssets?.introBgVideoUrl || introBgVideo;
+  const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
 
   // Swipe gesture tracking state
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -118,7 +118,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     <div className="space-y-10 px-4 sm:px-6 pb-20 animate-fade-in">
       
       {/* Hero Welcome Header */}
-      <header className="relative -mx-4 sm:mx-0 p-8 sm:p-12 max-w-4xl text-center -mt-6">
+      <header className="relative -mx-4 sm:mx-0 p-8 sm:p-12 min-h-[65vh] sm:min-h-[320px] flex flex-col justify-center items-center max-w-4xl text-center -mt-6">
         {/* Fallback Static Background Image Container */}
         <div 
           className="absolute inset-x-0 top-0 bottom-[-100px] bg-cover bg-center bg-no-repeat pointer-events-none"
@@ -140,7 +140,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
           }}
-          src={introBgVideoUrl}
+          src={logoAnimVideoUrl}
         />
 
         {/* Modern dark overlay reduced by 50% with same vertical bleed */}
@@ -190,7 +190,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onClick={() => navigate(`/events/${featuredEvent.handle}`)}
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 p-5 sm:p-6 shadow-2xl touch-pan-y cursor-pointer hover:border-sky-500/35 transition-colors duration-300"
+            className="relative overflow-hidden rounded-none bg-transparent p-0 touch-pan-y cursor-pointer transition-colors duration-300"
           >
             {isInitialMount && (
               <motion.div
@@ -258,7 +258,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center"
               >
                 {/* Photo & Timer Overlay on Top-Right */}
-                <div className="relative aspect-video rounded-2xl overflow-hidden group">
+                <div className="relative aspect-video rounded-none overflow-hidden group">
                   <img 
                     src={featuredEvent.images.nodes[0]?.url} 
                     alt={featuredEvent.title}

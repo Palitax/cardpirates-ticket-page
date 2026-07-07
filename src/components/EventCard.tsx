@@ -26,11 +26,11 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
   return (
     <Card 
       onClick={() => navigate(`/events/${event.handle}`)}
-      className="bg-slate-900/40 border border-slate-800/80 hover:border-sky-500/50 shadow-2xl rounded-3xl overflow-hidden group transition-all duration-300 hover:scale-[1.01] hover:shadow-sky-500/5 cursor-pointer"
+      className="bg-transparent border-none shadow-none rounded-none overflow-hidden group transition-all duration-300 hover:scale-[1.005] cursor-pointer"
     >
       <Card.Content className="p-0 flex flex-col h-full">
         {/* Thumbnail and Countdown Container */}
-        <div className="relative aspect-video w-full overflow-hidden shrink-0">
+        <div className="relative aspect-video w-full overflow-hidden shrink-0 rounded-none">
           <img 
             src={image} 
             alt={title}
@@ -39,7 +39,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
           />
           
           {/* Date Badge */}
-          <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-950/80 backdrop-blur-md rounded-full text-xs font-semibold text-sky-400 border border-slate-800/80">
+          <div className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-950/90 backdrop-blur-md rounded-none text-xs font-semibold text-sky-400 border border-slate-900">
             <Calendar size={13} />
             {formattedDate}
           </div>
@@ -53,7 +53,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
         </div>
 
         {/* Info Section */}
-        <div className="flex flex-col p-6 flex-1 justify-between">
+        <div className="flex flex-col p-5 flex-1 justify-between bg-slate-900/10 border border-slate-900/40 border-t-0">
           <div>
             <h3 className="text-xl font-bold text-white tracking-tight leading-snug mb-2 line-clamp-1 group-hover:text-sky-400 transition-colors">
               {title}
@@ -70,7 +70,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
           </div>
 
           {/* Buy/Details Actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-800/50">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-900/50">
             {/* Price Tag */}
             <div className="flex flex-col">
               <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Ticketpreis</span>
@@ -85,7 +85,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
               <Button
                 variant="outline"
                 onPress={() => navigate(`/events/${event.handle}`)}
-                className="w-10 h-10 min-w-0 p-0 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
+                className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-800 hover:border-slate-600 text-slate-200 flex items-center justify-center transition-all cursor-pointer bg-slate-950/40"
                 aria-label="Mehr Infos"
               >
                 <Info size={16} />
@@ -95,7 +95,7 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
               <Button
                 variant="primary"
                 onPress={() => onQuickBuy(event)}
-                className="w-10 h-10 min-w-0 p-0 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 shadow-lg shadow-sky-500/10 hover:brightness-105 flex items-center justify-center transition-all cursor-pointer"
+                className="w-10 h-10 min-w-0 p-0 rounded-none bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 shadow-lg shadow-sky-500/10 hover:brightness-105 flex items-center justify-center transition-all cursor-pointer"
                 aria-label="Direkt kaufen"
               >
                 <ShoppingCart size={16} />
