@@ -36,24 +36,24 @@ function App() {
       <div className="flex flex-col min-h-screen bg-[#0b0f19] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-white relative">
         
         {/* Full Website Background Video */}
-        <div className="fixed inset-0 -z-10 w-full h-full overflow-hidden pointer-events-none">
+        <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="w-full h-full object-cover opacity-[0.22] mix-blend-lighten"
+            className="w-full h-full object-cover opacity-[0.18]"
             src={logoAnimVideoUrl}
           />
-          <div className="absolute inset-0 bg-[#0b0f19]/50 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-[#0b0f19]/30" />
+          <div className="absolute inset-0 bg-[#0b0f19]/50" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-[#0b0f19]/20" />
         </div>
 
         {/* Navigation Bar */}
         <Navbar onLoginTrigger={handleNavbarLoginTrigger} />
 
         {/* Main Content Area */}
-        <main className="flex-1 w-full max-w-4xl mx-auto py-6">
+        <main className="relative z-10 flex-1 w-full max-w-4xl mx-auto py-6">
           <Routes>
             <Route 
               path="/" 
@@ -75,7 +75,7 @@ function App() {
         />
 
         {/* Footer */}
-        <footer className="py-8 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full">
+        <footer className="relative z-10 py-8 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full">
           &copy; {new Date().getFullYear()} Cardpirates. All rights reserved. Powered by Shopify Storefront.
         </footer>
       </div>
