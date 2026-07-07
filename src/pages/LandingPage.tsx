@@ -22,7 +22,16 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
   
   // Carousel State for Mobile Swipe
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const [dragStartX, setDragStartX] = useState(0);
+  const [hasSwiped, setHasSwiped] = useState(() => {
+    return localStorage.getItem('has_swiped_carousel') === 'true';
+  });
+
+  useEffect(() => {
+    if (carouselIndex !== 0 && !hasSwiped) {
+      setHasSwiped(true);
+      localStorage.setItem('has_swiped_carousel', 'true');
+    }
+  }, [carouselIndex, hasSwiped]);
 
   // Newsletter form state
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -80,24 +89,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
     }
   };
 
-  // Drag Gesture Handlers for Carousel swiping
-  const handleDragStart = (e: any) => {
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    setDragStartX(clientX);
-  };
 
-  const handleDragEnd = (e: any) => {
-    const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-    const diffX = dragStartX - clientX;
-    
-    if (Math.abs(diffX) > 45) { // Swipe threshold
-      if (diffX > 0 && carouselIndex < events.length - 1) {
-        setCarouselIndex(prev => prev + 1);
-      } else if (diffX < 0 && carouselIndex > 0) {
-        setCarouselIndex(prev => prev - 1);
-      }
-    }
-  };
 
   return (
     <div className="px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300">
@@ -140,13 +132,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             <div className="md:hidden flex flex-col items-center select-none">
               
               {/* Stack Wrapper */}
-              <div 
-                className="relative w-full h-[415px] flex items-center justify-center overflow-visible touch-pan-y"
-                onTouchStart={handleDragStart}
-                onTouchEnd={handleDragEnd}
-                onMouseDown={handleDragStart}
-                onMouseUp={handleDragEnd}
-              >
+              <div className="relative w-full h-[415px] flex items-center justify-center overflow-visible touch-pan-y">
                 {events.map((event, idx) => {
                   const offset = idx - carouselIndex;
                   const absOffset = Math.abs(offset);
@@ -172,6 +158,17 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                         rotate: rotateAngle,
                         opacity,
                       }}
+                      drag={offset === 0 ? "x" : false}
+                      dragConstraints={{ left: 0, right: 0 }}
+                      dragElastic={0.25}
+                      onDragEnd={(_, info) => {
+                        const threshold = 40;
+                        if (info.offset.x < -threshold && carouselIndex < events.length - 1) {
+                          setCarouselIndex(prev => prev + 1);
+                        } else if (info.offset.x > threshold && carouselIndex > 0) {
+                          setCarouselIndex(prev => prev - 1);
+                        }
+                      }}
                       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                       onClick={() => {
                         if (offset === 0) {
@@ -180,14 +177,14 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           setCarouselIndex(idx);
                         }
                       }}
-                      className={`absolute w-[230px] h-[395px] bg-transparent border-none outline-none select-none ${offset === 0 ? '' : 'cursor-pointer'}`}
+                      className={`absolute w-[230px] h-[395px] bg-transparent border-none outline-none select-none transition-shadow duration-300 ${offset === 0 ? 'drop-shadow-[0_16px_28px_rgba(0,0,0,0.5)]' : 'drop-shadow-[0_6px_12px_rgba(0,0,0,0.3)] cursor-pointer'}`}
                     >
                       {/* Inner Card Container clipped into physical ticket for hardware-accelerated animations */}
                       <div 
                         style={{
                           clipPath: "path('M 0 0 L 230 0 L 230 227 A 8 8 0 0 0 230 243 L 230 395 L 0 395 L 0 243 A 8 8 0 0 0 0 227 Z')"
                         }}
-                        className="w-full h-full bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between shadow-2xl"
+                        className="w-full h-full bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between"
                       >
                         {/* Card Cover image with fading gradient blend */}
                         <div className="relative h-[155px] w-full overflow-hidden shrink-0 bg-black">
@@ -301,6 +298,24 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                   />
                 ))}
               </div>
+
+              {/* Swipe Tutorial */}
+              {!hasSwiped && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-center gap-1.5 mt-4 text-[10px] uppercase tracking-widest text-zinc-500 font-bold pointer-events-none"
+                >
+                  <motion.span
+                    animate={{ x: [-8, 8, -8] }}
+                    transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
+                    className="text-xs"
+                  >
+                    ↔️
+                  </motion.span>
+                  <span>Wische zum Durchblättern</span>
+                </motion.div>
+              )}
             </div>
 
             {/* Desktop Grid View */}

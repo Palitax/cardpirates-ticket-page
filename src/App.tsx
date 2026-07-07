@@ -59,8 +59,8 @@ function App() {
     <Router>
       <div className="flex flex-col min-h-screen bg-black text-zinc-100 antialiased selection:bg-white/20 selection:text-white relative">
         
-        {/* Full Website Background Video */}
-        <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
+        {/* Full Website Background Video (Only on Desktop) */}
+        <div className="hidden md:block fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
           <video
             autoPlay
             loop
