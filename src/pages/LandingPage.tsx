@@ -6,7 +6,8 @@ import EventCard from '../components/EventCard';
 import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import logoAnimVideo from '../assets/Logo-animiert.mp4';
+import logoAnimVideo from '../assets/Logo-animiert-ohne-watermark.mp4';
+import logoSchrift from '../assets/cardpirates-schrift-rot.jpg';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -17,6 +18,7 @@ interface LandingPageProps {
 export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger }: LandingPageProps) {
   const navigate = useNavigate();
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
+  const logoSchriftUrl = (window as any).ShopifyAssets?.logoSchriftUrl || logoSchrift;
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -96,6 +98,11 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       
       {/* Hero Welcome Header (Restored) */}
       <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4 flex flex-col items-center">
+        <img 
+          src={logoSchriftUrl} 
+          alt="Cardpirates" 
+          className="w-64 sm:w-80 h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
+        />
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
           Werde Teil der Crew!
         </h1>
@@ -193,7 +200,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             loop
                             muted
                             playsInline
-                            className="w-full h-full object-cover scale-[0.85] grayscale brightness-110"
+                            className="w-full h-full object-cover scale-[0.85] grayscale brightness-150 contrast-125"
                             src={logoAnimVideoUrl}
                           />
                           <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />

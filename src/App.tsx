@@ -7,7 +7,7 @@ import DetailPage from './pages/DetailPage';
 import LoginModal from './components/LoginModal';
 import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
-import logoAnimVideo from './assets/Logo-animiert.mp4';
+import logoAnimVideo from './assets/Logo-animiert-ohne-watermark.mp4';
 import './App.css';
 
 function App() {
@@ -66,7 +66,7 @@ function App() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover md:object-contain md:scale-[0.85] opacity-[0.35] grayscale brightness-110"
+            className="w-full h-full object-cover md:object-contain md:scale-[0.85] opacity-[0.35] grayscale brightness-150 contrast-125"
             src={logoAnimVideoUrl}
           />
           <div className="absolute inset-0 bg-black/35" />
@@ -107,7 +107,7 @@ function App() {
 
         {/* Footer */}
         <footer className="relative z-10 py-8 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full">
-          &copy; {new Date().getFullYear()} Cardpirates. All rights reserved. Powered by Shopify Storefront.
+          &copy; {new Date().getFullYear()} Cardpirates x Rohde Media. All rights reserved. Powered by Shopify Storefront.
         </footer>
       </div>
     </Router>
