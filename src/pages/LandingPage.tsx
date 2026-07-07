@@ -9,6 +9,7 @@ import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
 import CountdownTimer from '../components/CountdownTimer';
 import introBgImg from '../assets/intro-bg.jpg';
+import introBgVideo from '../assets/Zoro.mp4';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -21,6 +22,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
   const introBgUrl = (window as any).ShopifyAssets?.introBgUrl || introBgImg;
+  const introBgVideoUrl = (window as any).ShopifyAssets?.introBgVideoUrl || introBgVideo;
 
   // Swipe gesture tracking state
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -117,7 +119,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
       
       {/* Hero Welcome Header */}
       <header className="relative -mx-4 sm:mx-0 p-8 sm:p-12 max-w-4xl text-center -mt-6">
-        {/* Background Image Container that bleeds into the next section */}
+        {/* Fallback Static Background Image Container */}
         <div 
           className="absolute inset-x-0 top-0 bottom-[-100px] bg-cover bg-center bg-no-repeat pointer-events-none"
           style={{ 
@@ -126,10 +128,25 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
             WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
           }}
         />
+
+        {/* Video Background Container */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-x-0 top-0 w-full h-[calc(100%+100px)] object-cover pointer-events-none"
+          style={{ 
+            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
+          }}
+          src={introBgVideoUrl}
+        />
+
         {/* Modern dark overlay reduced by 50% with same vertical bleed */}
-        <div className="absolute inset-x-0 top-0 bottom-[-100px] bg-slate-950/40 mix-blend-multiply pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 bottom-[-100px] bg-slate-950/40 mix-blend-multiply pointer-events-none z-10" />
         <div 
-          className="absolute inset-x-0 top-0 bottom-[-100px] bg-gradient-to-b from-slate-950/20 to-slate-950/65 pointer-events-none"
+          className="absolute inset-x-0 top-0 bottom-[-100px] bg-gradient-to-b from-slate-950/20 to-slate-950/65 pointer-events-none z-10"
           style={{
             maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)',
             WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)'
@@ -137,7 +154,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
         />
 
         {/* Content */}
-        <div className="relative z-10 space-y-4">
+        <div className="relative z-20 space-y-4">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
             Werde Teil der Crew!
           </h1>
