@@ -42,11 +42,11 @@ function App() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover opacity-[0.18]"
+            className="w-full h-full object-cover opacity-[0.35]"
             src={logoAnimVideoUrl}
           />
-          <div className="absolute inset-0 bg-[#0b0f19]/50" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-[#0b0f19]/20" />
+          <div className="absolute inset-0 bg-[#0b0f19]/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-[#0b0f19]/10" />
         </div>
 
         {/* Navigation Bar */}
