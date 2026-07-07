@@ -10,9 +10,10 @@ import { useNavigate } from 'react-router-dom';
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
   currentUser: any | null;
+  onRegisterTrigger: () => void;
 }
 
-export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProps) {
+export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger }: LandingPageProps) {
   const navigate = useNavigate();
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,13 +101,22 @@ export default function LandingPage({ onQuickBuy, currentUser }: LandingPageProp
     <div className="px-4 sm:px-6 pb-24 pt-4 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300">
       
       {/* Hero Welcome Header (Restored) */}
-      <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4">
+      <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4 flex flex-col items-center">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
           Werde Teil der Crew!
         </h1>
         <p className="text-sm text-zinc-400 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]">
           Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
         </p>
+        {!currentUser && (
+          <Button
+            variant="primary"
+            onPress={onRegisterTrigger}
+            className="mt-2 py-3 px-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs shadow-md transition-all active:scale-[0.98] cursor-pointer"
+          >
+            Jetzt registrieren
+          </Button>
+        )}
       </header>
 
       {/* Event Schedule Section */}

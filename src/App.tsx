@@ -66,7 +66,7 @@ function App() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover opacity-[0.35]"
+            className="w-full h-full object-cover opacity-[0.35] grayscale brightness-110"
             src={logoAnimVideoUrl}
           />
           <div className="absolute inset-0 bg-black/35" />
@@ -88,7 +88,7 @@ function App() {
           <Routes>
             <Route 
               path="/" 
-              element={<LandingPage onQuickBuy={handleQuickBuyTrigger} currentUser={currentUser} />} 
+              element={<LandingPage onQuickBuy={handleQuickBuyTrigger} currentUser={currentUser} onRegisterTrigger={handleNavbarLoginTrigger} />} 
             />
             <Route 
               path="/events/:handle" 
