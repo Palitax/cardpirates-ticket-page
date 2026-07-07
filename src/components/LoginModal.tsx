@@ -17,7 +17,7 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   event: ShopifyProduct | null;
-  onSuccess: (checkoutUrl: string, profile?: CustomerProfile) => void;
+  onSuccess: (checkoutUrl: string, profile?: CustomerProfile, actionType?: 'login' | 'register') => void;
 }
 
 export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginModalProps) {
@@ -104,12 +104,12 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         });
 
         if (checkoutUrl) {
-          onSuccess(checkoutUrl, profileData);
+          onSuccess(checkoutUrl, profileData, activeTab as 'login' | 'register');
         } else {
           throw new Error('Fehler beim Erstellen der Kasse.');
         }
       } else {
-        onSuccess('', profileData);
+        onSuccess('', profileData, activeTab as 'login' | 'register');
       }
     } catch (err: any) {
       setError(err.message || 'Ein Fehler ist aufgetreten.');

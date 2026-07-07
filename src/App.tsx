@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { X } from 'lucide-react';
 import Navbar from './components/Navbar';
 import BurgerMenu from './components/BurgerMenu';
 import LandingPage from './pages/LandingPage';
@@ -14,6 +15,7 @@ function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<ShopifyProduct | null>(null);
   const [currentUser, setCurrentUser] = useState<CustomerProfile | null>(null);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
 
@@ -28,6 +30,30 @@ function App() {
       }
     }
   }, []);
+
+  // Parse query params for mock checkout success
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mock_checkout_success') === 'true') {
+      const email = params.get('email') || '';
+      setNotification({
+        message: `Kauf erfolgreich! Dein Ticket wurde an ${email} gesendet. 🎉`,
+        type: 'success'
+      });
+      // Clear URL search params
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  // Auto-dismiss notification after 6 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const handleQuickBuyTrigger = (event: ShopifyProduct) => {
     setSelectedEvent(event);
@@ -44,11 +70,25 @@ function App() {
     localStorage.removeItem('currentUser');
   };
 
-  const handleCheckoutSuccess = (checkoutUrl: string, profile?: CustomerProfile) => {
+  const handleCheckoutSuccess = (checkoutUrl: string, profile?: CustomerProfile, actionType?: 'login' | 'register') => {
     setModalOpen(false);
     if (profile) {
       setCurrentUser(profile);
       localStorage.setItem('currentUser', JSON.stringify(profile));
+      
+      if (!checkoutUrl) {
+        if (actionType === 'register') {
+          setNotification({
+            message: 'Registrierung erfolgreich! Willkommen in der Crew! Eine Bestätigungs-E-Mail wurde simuliert. 🎉',
+            type: 'success'
+          });
+        } else {
+          setNotification({
+            message: 'Erfolgreich eingeloggt! Willkommen zurück! 👋',
+            type: 'success'
+          });
+        }
+      }
     }
     if (checkoutUrl) {
       window.location.href = checkoutUrl;
@@ -96,6 +136,28 @@ function App() {
             />
           </Routes>
         </main>
+
+        {/* Floating Toast Notification */}
+        {notification && (
+          <div className="fixed bottom-6 right-6 z-[100] animate-fade-in max-w-sm">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-2xl flex items-start gap-3 text-left">
+              <span className="flex h-2 w-2 translate-y-1.5 shrink-0 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <div className="flex-1 space-y-1">
+                <p className="text-[10px] font-bold text-white uppercase tracking-wider">Benachrichtigung</p>
+                <p className="text-xs text-zinc-300 leading-normal">{notification.message}</p>
+              </div>
+              <button 
+                onClick={() => setNotification(null)}
+                className="text-zinc-500 hover:text-white transition-colors cursor-pointer shrink-0"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Unified Checkout Login/Registration Modal */}
         <LoginModal

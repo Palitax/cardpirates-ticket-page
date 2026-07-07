@@ -139,9 +139,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
   const renderMainContent = () => {
     return (
       <>
-        {/* Hero Welcome Header (Restored) */}
-        <header className="text-center pt-3 pb-3 max-w-xl sm:max-w-3xl mx-auto space-y-4 flex flex-col items-center">
-          <div className="flex flex-col items-center space-y-1.5">
+        <header className="text-center pt-1.5 pb-1.5 max-w-xl sm:max-w-3xl mx-auto space-y-2 flex flex-col items-center">
+          <div className="flex flex-col items-center space-y-0.5">
             <img 
               src={logoSchriftUrl} 
               alt="Cardpirates" 
@@ -458,7 +457,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
 
   return (
     <div 
-      className="px-4 sm:px-6 pb-24 pt-2 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
+      className="px-4 sm:px-6 pb-24 pt-1 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
     >
       {renderMainContent()}
     </div>
