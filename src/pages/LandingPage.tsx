@@ -6,7 +6,7 @@ import EventCard from '../components/EventCard';
 import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import logoAnimVideo from '../assets/cardpirates-logo-ohne-watermark.mp4';
+import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 
 interface LandingPageProps {
@@ -115,14 +115,16 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       <>
         {/* Hero Welcome Header (Restored) */}
         <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4 flex flex-col items-center">
-          <img 
-            src={logoSchriftUrl} 
-            alt="Cardpirates" 
-            className="w-64 sm:w-80 h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
-          />
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
-            Werde Teil der Crew!
-          </h1>
+          <div className="flex flex-col items-center space-y-1.5">
+            <img 
+              src={logoSchriftUrl} 
+              alt="Cardpirates" 
+              className="w-64 sm:w-80 h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
+            />
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+              Werde Teil der Crew!
+            </h1>
+          </div>
           <p className="text-sm text-zinc-400 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]">
             Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
           </p>
@@ -208,7 +210,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           style={{
                             clipPath: "path('M 0 0 L 230 0 L 230 227 A 8 8 0 0 0 230 243 L 230 395 L 0 395 L 0 243 A 8 8 0 0 0 0 227 Z')"
                           }}
-                          className="w-full h-full bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between"
+                          className="w-full h-full bg-white text-zinc-800 rounded-b-[24px] overflow-hidden flex flex-col justify-between"
                         >
                           {/* Card Cover image with fading gradient blend */}
                           <div className="relative h-[155px] w-full overflow-hidden shrink-0 bg-black">

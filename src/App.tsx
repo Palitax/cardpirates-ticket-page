@@ -7,7 +7,7 @@ import DetailPage from './pages/DetailPage';
 import LoginModal from './components/LoginModal';
 import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
-import logoAnimVideo from './assets/cardpirates-logo-ohne-watermark.mp4';
+import logoAnimVideo from './assets/cardpirates-logo-kleiner.mp4';
 import './App.css';
 
 function App() {
