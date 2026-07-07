@@ -170,13 +170,24 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
           </p>
           {!currentUser && (
-            <Button
-              variant="primary"
-              onPress={handleRegisterClick}
-              className="mt-2 py-3 px-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs shadow-md transition-all active:scale-[0.98] cursor-pointer"
+            <motion.button
+              onClick={handleRegisterClick}
+              animate={{
+                boxShadow: [
+                  "0 0 8px rgba(255, 255, 255, 0.35)",
+                  "0 0 24px rgba(255, 255, 255, 0.85)",
+                  "0 0 8px rgba(255, 255, 255, 0.35)"
+                ]
+              }}
+              transition={{
+                duration: 1.8,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="mt-2 py-3 px-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs transition-all active:scale-[0.98] cursor-pointer border border-white"
             >
               Jetzt registrieren
-            </Button>
+            </motion.button>
           )}
         </header>
 
@@ -462,7 +473,35 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       </div>
 
       {slashState === 'slashing' && (
-        <div className="fixed inset-0 z-50 overflow-hidden pointer-events-none">
+        <div className="fixed inset-0 z-50 overflow-hidden pointer-events-none flex items-center justify-center px-4">
+          {/* Glowing Mock Registration Card (Reveal Effect) */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.93 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.28, delay: 0.12 }}
+            className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col space-y-5 shadow-[0_0_60px_rgba(255,255,255,0.06)] relative z-0 text-left"
+          >
+            {/* Header Mock */}
+            <div className="space-y-2 border-b border-zinc-850 pb-4">
+              <div className="h-5 w-40 bg-zinc-800 rounded animate-pulse" />
+              <div className="h-3 w-56 bg-zinc-850/40 rounded animate-pulse" />
+            </div>
+            {/* Inputs Mock */}
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <div className="h-2.5 w-20 bg-zinc-800/60 rounded" />
+                <div className="h-10 bg-zinc-950 border border-zinc-850 rounded-xl" />
+              </div>
+              <div className="space-y-1.5">
+                <div className="h-2.5 w-16 bg-zinc-800/60 rounded" />
+                <div className="h-10 bg-zinc-950 border border-zinc-850 rounded-xl" />
+              </div>
+            </div>
+            {/* Button Mock */}
+            <div className="h-12 bg-zinc-800 rounded-xl border border-zinc-750 flex items-center justify-center">
+              <div className="h-3 w-28 bg-zinc-700 rounded animate-pulse" />
+            </div>
+          </motion.div>
           {/* White Screen Slash Flash */}
           <motion.div 
             initial={{ opacity: 0 }}
