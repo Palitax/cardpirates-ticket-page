@@ -141,11 +141,13 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       <>
         <header className="text-center pt-1.5 pb-1.5 max-w-xl sm:max-w-3xl mx-auto space-y-2 flex flex-col items-center">
           <div className="flex flex-col items-center space-y-0.5">
-            <img 
-              src={logoSchriftUrl} 
-              alt="Cardpirates" 
-              className="w-[330px] sm:w-[800px] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
-            />
+            <div className="w-[330px] sm:w-[800px] h-[65px] sm:h-[155px] overflow-hidden flex items-center justify-center relative">
+              <img 
+                src={logoSchriftUrl} 
+                alt="Cardpirates" 
+                className="absolute w-full h-auto object-contain select-none pointer-events-none scale-[2.2] drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
+              />
+            </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Werde Teil der Crew!
             </h1>
