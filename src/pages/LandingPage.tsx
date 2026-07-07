@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { TouchEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, Info, ShoppingCart, MapPin } from 'lucide-react';
+import { CalendarDays, Info, ShoppingCart, MapPin, Share2 } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
@@ -20,6 +20,28 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
 
+
+  const [isShareSupported, setIsShareSupported] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && !!(navigator as any).share) {
+      setIsShareSupported(true);
+    }
+  }, []);
+
+  const handleShareFeatured = async () => {
+    if (!events[featuredIndex]) return;
+    const fEvent = events[featuredIndex];
+    try {
+      await navigator.share({
+        title: fEvent.title,
+        text: `Komm zu unserem Event: ${fEvent.title}!`,
+        url: `${window.location.origin}/events/${fEvent.handle}`,
+      });
+    } catch (err) {
+      console.log('Share failed or cancelled', err);
+    }
+  };
 
   // Swipe gesture tracking state
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -262,19 +284,31 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                     </div>
 
                     <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        variant="outline"
-                        onPress={() => navigate(`/events/${featuredEvent.handle}`)}
-                        className="w-10 h-10 min-w-0 p-0 rounded-xl border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
-                        aria-label="Mehr Infos"
-                      >
-                        <Info size={16} />
-                      </Button>
+                      {/* Share or More Info Button */}
+                      {isShareSupported ? (
+                        <Button
+                          variant="outline"
+                          onPress={handleShareFeatured}
+                          className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
+                          aria-label="Event teilen"
+                        >
+                          <Share2 size={16} className="text-sky-400" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          onPress={() => navigate(`/events/${featuredEvent.handle}`)}
+                          className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
+                          aria-label="Mehr Infos"
+                        >
+                          <Info size={16} />
+                        </Button>
+                      )}
 
                       <Button
                         variant="primary"
                         onPress={() => onQuickBuy(featuredEvent)}
-                        className="w-10 h-10 min-w-0 p-0 rounded-xl bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 shadow-lg shadow-sky-500/10 hover:brightness-105 flex items-center justify-center transition-all cursor-pointer"
+                        className="w-10 h-10 min-w-0 p-0 rounded-none bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 shadow-lg shadow-sky-500/10 hover:brightness-105 flex items-center justify-center transition-all cursor-pointer"
                         aria-label="Direktkauf Ticket"
                       >
                         <ShoppingCart size={16} />

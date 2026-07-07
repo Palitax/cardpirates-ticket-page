@@ -1,4 +1,5 @@
-import { Calendar, MapPin, Info, ShoppingCart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calendar, MapPin, Info, ShoppingCart, Share2 } from 'lucide-react';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,25 @@ interface EventCardProps {
 
 export default function EventCard({ event, onQuickBuy }: EventCardProps) {
   const navigate = useNavigate();
+  const [isShareSupported, setIsShareSupported] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && !!(navigator as any).share) {
+      setIsShareSupported(true);
+    }
+  }, []);
+
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: event.title,
+        text: `Komm zu unserem Event: ${event.title}!`,
+        url: `${window.location.origin}/events/${event.handle}`,
+      });
+    } catch (err) {
+      console.log('Share failed or cancelled', err);
+    }
+  };
 
   const title = event.title;
   const image = event.images.nodes[0]?.url || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=600';
@@ -81,15 +101,26 @@ export default function EventCard({ event, onQuickBuy }: EventCardProps) {
 
             {/* Buttons Row */}
             <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-              {/* More Info Button */}
-              <Button
-                variant="outline"
-                onPress={() => navigate(`/events/${event.handle}`)}
-                className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-800 hover:border-slate-600 text-slate-200 flex items-center justify-center transition-all cursor-pointer bg-slate-950/40"
-                aria-label="Mehr Infos"
-              >
-                <Info size={16} />
-              </Button>
+              {/* Share or More Info Button */}
+              {isShareSupported ? (
+                <Button
+                  variant="outline"
+                  onPress={handleShare}
+                  className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-800 hover:border-slate-650 text-slate-200 flex items-center justify-center transition-all cursor-pointer bg-slate-950/40"
+                  aria-label="Event teilen"
+                >
+                  <Share2 size={16} className="text-sky-400" />
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  onPress={() => navigate(`/events/${event.handle}`)}
+                  className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-800 hover:border-slate-600 text-slate-200 flex items-center justify-center transition-all cursor-pointer bg-slate-950/40"
+                  aria-label="Mehr Infos"
+                >
+                  <Info size={16} />
+                </Button>
+              )}
 
               {/* Quick Buy Trigger */}
               <Button
