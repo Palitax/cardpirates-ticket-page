@@ -8,7 +8,7 @@ interface NavbarProps {
 
 export default function Navbar({ onLoginTrigger }: NavbarProps) {
   return (
-    <nav className="hidden md:block sticky top-0 z-40 w-full bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900 px-4 sm:px-6 py-4">
+    <nav className="hidden md:block sticky top-0 z-40 w-full bg-zinc-950/10 backdrop-blur-sm border-b border-zinc-900/20 px-4 sm:px-6 py-4">
       <div className="max-w-4xl mx-auto flex items-center justify-between">
         
         {/* Brand Logo */}
