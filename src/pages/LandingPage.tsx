@@ -8,8 +8,6 @@ import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
 import CountdownTimer from '../components/CountdownTimer';
-import introBgImg from '../assets/intro-bg.jpg';
-import logoAnimVideo from '../assets/Logo-animiert.mp4';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -21,8 +19,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   const [loading, setLoading] = useState(true);
   const [featuredIndex, setFeaturedIndex] = useState(0);
 
-  const introBgUrl = (window as any).ShopifyAssets?.introBgUrl || introBgImg;
-  const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
+
 
   // Swipe gesture tracking state
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -118,50 +115,13 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     <div className="space-y-10 px-4 sm:px-6 pb-20 animate-fade-in">
       
       {/* Hero Welcome Header */}
-      <header className="relative -mx-4 sm:mx-0 p-8 sm:p-12 min-h-[65vh] sm:min-h-[320px] flex flex-col justify-center items-center max-w-4xl text-center -mt-6">
-        {/* Fallback Static Background Image Container */}
-        <div 
-          className="absolute inset-x-0 top-0 bottom-[-100px] bg-cover bg-center bg-no-repeat pointer-events-none"
-          style={{ 
-            backgroundImage: `url(${introBgUrl})`,
-            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
-          }}
-        />
-
-        {/* Video Background Container */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-x-0 top-0 w-full h-[calc(100%+100px)] object-cover pointer-events-none"
-          style={{ 
-            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%)'
-          }}
-          src={logoAnimVideoUrl}
-        />
-
-        {/* Modern dark overlay reduced by 50% with same vertical bleed */}
-        <div className="absolute inset-x-0 top-0 bottom-[-100px] bg-slate-950/40 mix-blend-multiply pointer-events-none z-10" />
-        <div 
-          className="absolute inset-x-0 top-0 bottom-[-100px] bg-gradient-to-b from-slate-950/20 to-slate-950/65 pointer-events-none z-10"
-          style={{
-            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 45%, rgba(0,0,0,0) 100%)'
-          }}
-        />
-
-        {/* Content */}
-        <div className="relative z-20 space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)]">
-            Werde Teil der Crew!
-          </h1>
-          <p className="text-sm text-slate-100 max-w-2xl mx-auto leading-relaxed font-bold drop-shadow-[0_1.5px_5px_rgba(0,0,0,0.95)]">
-            Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
-          </p>
-        </div>
+      <header className="text-center pt-8 pb-4 max-w-xl mx-auto space-y-4">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
+          Werde Teil der Crew!
+        </h1>
+        <p className="text-sm text-slate-300 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]">
+          Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
+        </p>
       </header>
 
       {/* Featured Shuffling Countdown Hero Section (Mobile Optimized & Swipeable) */}

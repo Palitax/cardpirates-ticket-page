@@ -5,11 +5,14 @@ import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
 import LoginModal from './components/LoginModal';
 import type { ShopifyProduct } from './services/shopify';
+import logoAnimVideo from './assets/Logo-animiert.mp4';
 import './App.css';
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<ShopifyProduct | null>(null);
+
+  const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
 
   const handleQuickBuyTrigger = (event: ShopifyProduct) => {
     setSelectedEvent(event);
@@ -30,8 +33,22 @@ function App() {
 
   return (
     <Router>
-      <div className="flex flex-col min-h-screen bg-[#0b0f19] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-white">
+      <div className="flex flex-col min-h-screen bg-[#0b0f19] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-white relative">
         
+        {/* Full Website Background Video */}
+        <div className="fixed inset-0 -z-10 w-full h-full overflow-hidden pointer-events-none">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-[0.22] mix-blend-lighten"
+            src={logoAnimVideoUrl}
+          />
+          <div className="absolute inset-0 bg-[#0b0f19]/50 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-[#0b0f19]/30" />
+        </div>
+
         {/* Navigation Bar */}
         <Navbar onLoginTrigger={handleNavbarLoginTrigger} />
 
