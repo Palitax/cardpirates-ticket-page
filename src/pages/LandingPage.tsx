@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import type { TouchEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, Info, ShoppingCart, MapPin, Share2 } from 'lucide-react';
 import { Button } from '@heroui/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
-import CountdownTimer from '../components/CountdownTimer';
 
 interface LandingPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -17,35 +15,11 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
   const navigate = useNavigate();
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [featuredIndex, setFeaturedIndex] = useState(0);
+  const [purchasedEventIds, setPurchasedEventIds] = useState<string[]>([]);
 
 
-
-  const [isShareSupported, setIsShareSupported] = useState(false);
-
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && !!(navigator as any).share) {
-      setIsShareSupported(true);
-    }
-  }, []);
-
-  const handleShareFeatured = async () => {
-    if (!events[featuredIndex]) return;
-    const fEvent = events[featuredIndex];
-    try {
-      await navigator.share({
-        title: fEvent.title,
-        text: `Komm zu unserem Event: ${fEvent.title}!`,
-        url: `${window.location.origin}/events/${fEvent.handle}`,
-      });
-    } catch (err) {
-      console.log('Share failed or cancelled', err);
-    }
-  };
 
   // Swipe gesture tracking state
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const minSwipeDistance = 50;
 
   // Newsletter state
@@ -65,11 +39,23 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     }, 5000);
   };
 
-  useEffect(() => {
-    const tutorialTimer = setTimeout(() => {
-      setIsInitialMount(false);
-    }, 5200);
+  // Helper to load owned ticket ids from localStorage
+  const getPurchasedIds = () => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (!savedUser) return [];
+    try {
+      const user = JSON.parse(savedUser);
+      const key = `purchased_tickets_${user.shopify_customer_id}`;
+      const savedTicketsRaw = localStorage.getItem(key);
+      if (savedTicketsRaw) {
+        return JSON.parse(savedTicketsRaw).map((t: any) => t.id);
+      }
+    } catch (e) {}
+    return [];
+  };
 
+  useEffect(() => {
+    // 1. Load Shopify events
     async function loadEvents() {
       try {
         const products = await shopifyService.getEvents();
@@ -82,45 +68,23 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     }
     loadEvents();
 
-    return () => clearTimeout(tutorialTimer);
+    // 2. Load purchased tickets list
+    const updateTickets = () => {
+      setPurchasedEventIds(getPurchasedIds());
+    };
+    updateTickets();
+    window.addEventListener('focus', updateTickets);
+
+    // 3. Setup tutorial timer
+    const tutorialTimer = setTimeout(() => {
+      setIsInitialMount(false);
+    }, 5200);
+
+    return () => {
+      clearTimeout(tutorialTimer);
+      window.removeEventListener('focus', updateTickets);
+    };
   }, []);
-
-  // Shuffle/cycle through featured events at the top every 8 seconds
-  useEffect(() => {
-    if (events.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setFeaturedIndex((prevIndex) => (prevIndex + 1) % events.length);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [events]);
-
-  // Swipe Handlers
-  const handleTouchStart = (e: TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    setIsInitialMount(false);
-  };
-
-  const handleTouchMove = (e: TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe && events.length > 0) {
-      setFeaturedIndex((prev) => (prev + 1) % events.length);
-    }
-    if (isRightSwipe && events.length > 0) {
-      setFeaturedIndex((prev) => (prev - 1 + events.length) % events.length);
-    }
-    setTouchStart(null);
-    setTouchEnd(null);
-  };
 
   // Carousel State & Swipe Handlers
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -161,8 +125,6 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
     );
   }
 
-  const featuredEvent = events[featuredIndex];
-
   return (
     <div className="space-y-10 px-4 sm:px-6 pb-20 animate-fade-in">
       
@@ -175,182 +137,6 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
           Triff uns und unsere Community auf einem unserer spannenden Events. Von exklusiven Cardshows über packende Turniere bis hin zu gemütlichen Community Meetups und Trade Nights.
         </p>
       </header>
-
-      {/* Featured Shuffling Countdown Hero Section (Mobile Optimized & Swipeable) */}
-      {featuredEvent && (
-        <section className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1.5">
-              <CalendarDays size={14} className="text-sky-500" />
-              Nächstes Event
-            </h2>
-            <div className="flex gap-1">
-              {events.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setFeaturedIndex(idx)}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === featuredIndex ? 'w-4 bg-sky-500' : 'bg-slate-700'}`}
-                  aria-label={`Zeige Highlight-Event ${idx + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Shuffling Highlight Container with Swipe Gestures */}
-          <div 
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onClick={() => navigate(`/events/${featuredEvent.handle}`)}
-            className="relative overflow-hidden rounded-none bg-transparent p-0 touch-pan-y cursor-pointer transition-colors duration-300"
-          >
-            {isInitialMount && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0] }}
-                transition={{ duration: 5.2, times: [0, 0.05, 0.95, 1], ease: "easeInOut" }}
-                className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/65 backdrop-blur-[2px] rounded-3xl pointer-events-none"
-              >
-                <div className="relative flex items-center justify-center w-36 h-36">
-                  {/* Left Arrow */}
-                  <motion.div
-                    animate={{ x: [0, -12, 0], opacity: [0.4, 1, 0.4] }}
-                    transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
-                    className="absolute left-1 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]"
-                  >
-                    <svg className="w-8 h-8 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="m15 18-6-6 6-6" />
-                    </svg>
-                  </motion.div>
-
-                  {/* Finger Component */}
-                  <motion.div
-                    animate={{
-                      x: [0, -25, 25, 0],
-                      scale: [1, 0.93, 0.93, 1]
-                    }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 1.5,
-                      times: [0, 0.35, 0.7, 1],
-                      ease: "easeInOut"
-                    }}
-                    className="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]"
-                  >
-                    <svg className="w-12 h-12 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 11V4a1.5 1.5 0 0 0-3 0v7M9 11V9a1.5 1.5 0 0 0-3 0v2M6 11V10a1.5 1.5 0 0 0-3 0v5a7 7 0 0 0 14 0v-4a1.5 1.5 0 0 0-3 0v3M15 11v-1a1.5 1.5 0 0 0-3 0v3" />
-                    </svg>
-                  </motion.div>
-
-                  {/* Right Arrow */}
-                  <motion.div
-                    animate={{ x: [0, 12, 0], opacity: [0.4, 1, 0.4] }}
-                    transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
-                    className="absolute right-1 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]"
-                  >
-                    <svg className="w-8 h-8 stroke-current fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="m9 18 6-6-6-6" />
-                    </svg>
-                  </motion.div>
-                </div>
-                
-                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mt-1">
-                  Wischen zum Blättern
-                </span>
-              </motion.div>
-            )}
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={featuredIndex}
-                initial={{ opacity: 0, x: 40, filter: 'blur(6px)' }}
-                animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, x: -40, filter: 'blur(6px)' }}
-                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center"
-              >
-                {/* Photo & Timer Overlay on Top-Right */}
-                <div className="relative aspect-video rounded-none overflow-hidden group">
-                  <img 
-                    src={featuredEvent.images.nodes[0]?.url} 
-                    alt={featuredEvent.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-transparent to-transparent" />
-                </div>
-
-                {/* Event details and Call-To-Actions */}
-                <div className="flex flex-col h-full justify-center space-y-4 relative">
-                  {featuredEvent.eventDate?.value && (
-                    <div className="absolute top-0 right-0 z-10" onClick={(e) => e.stopPropagation()}>
-                      <CountdownTimer targetDate={featuredEvent.eventDate.value} />
-                    </div>
-                  )}
-
-                  <div className="pr-28 sm:pr-32">
-                    <span className="text-xs font-semibold text-sky-400 uppercase tracking-widest">
-                      Als nächstes im Fokus
-                    </span>
-                    <h3 className="text-2xl font-bold text-white tracking-tight mt-1 hover:text-sky-400 transition-colors">
-                      {featuredEvent.title}
-                    </h3>
-                    
-                    <div className="flex items-center gap-1.5 text-slate-400 text-xs mt-2" onClick={(e) => e.stopPropagation()}>
-                      <MapPin size={14} className="text-slate-500 shrink-0" />
-                      <span>{featuredEvent.eventLocation?.value || 'TBA'}</span>
-                    </div>
-                  </div>
-
-                  <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
-                    {featuredEvent.description}
-                  </p>
-
-                  <div className="pt-4 border-t border-slate-900 flex flex-wrap gap-4 items-center justify-between">
-                    <div>
-                      <span className="block text-[10px] text-slate-500 font-bold uppercase tracking-wider">Eintrittsticket</span>
-                      <span className="text-xl font-extrabold text-white">
-                        {featuredEvent.variants.nodes[0]?.price.amount} {featuredEvent.variants.nodes[0]?.price.currencyCode}
-                      </span>
-                    </div>
-
-                    <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                      {/* Share or More Info Button */}
-                      {isShareSupported ? (
-                        <Button
-                          variant="outline"
-                          onPress={handleShareFeatured}
-                          className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
-                          aria-label="Event teilen"
-                        >
-                          <Share2 size={16} className="text-sky-400" />
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          onPress={() => navigate(`/events/${featuredEvent.handle}`)}
-                          className="w-10 h-10 min-w-0 p-0 rounded-none border-slate-700 hover:border-slate-500 text-slate-200 flex items-center justify-center transition-all cursor-pointer"
-                          aria-label="Mehr Infos"
-                        >
-                          <Info size={16} />
-                        </Button>
-                      )}
-
-                      <Button
-                        variant="primary"
-                        onPress={() => onQuickBuy(featuredEvent)}
-                        className="w-10 h-10 min-w-0 p-0 rounded-none bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 shadow-lg shadow-sky-500/10 hover:brightness-105 flex items-center justify-center transition-all cursor-pointer"
-                        aria-label="Direktkauf Ticket"
-                      >
-                        <ShoppingCart size={16} />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </section>
-      )}
 
       {/* Grid of All Upcoming Events */}
       <section className="space-y-6">
@@ -414,7 +200,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                 onTouchStart={handleCarouselTouchStart}
                 onTouchMove={handleCarouselTouchMove}
                 onTouchEnd={handleCarouselTouchEnd}
-                className="relative flex items-center justify-center w-full h-[380px] overflow-visible touch-pan-y"
+                className="relative flex items-center justify-center w-full h-[430px] overflow-visible touch-pan-y"
               >
                 {events.map((event, idx) => {
                   const offset = idx - carouselIndex;
@@ -423,7 +209,7 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                   if (absOffset > 2) return null;
 
                   const xTranslation = offset * 115;
-                  const rotateAngle = offset * 5;
+                  const rotateAngle = offset * 4;
                   const scale = 1 - absOffset * 0.08;
                   const zIndex = 20 - absOffset;
                   const opacity = 1 - absOffset * 0.35;
@@ -449,44 +235,97 @@ export default function LandingPage({ onQuickBuy }: LandingPageProps) {
                           setCarouselIndex(idx);
                         }
                       }}
-                      className={`absolute w-[210px] h-[320px] bg-slate-900 border border-slate-800 rounded-none overflow-hidden flex flex-col justify-between shadow-2xl transition-colors duration-300 ${offset === 0 ? 'border-sky-500/50 shadow-sky-500/5 ring-1 ring-sky-500/10' : 'cursor-pointer hover:border-slate-700'}`}
+                      className={`absolute w-[230px] h-[395px] bg-white text-slate-800 rounded-[24px] overflow-hidden flex flex-col justify-between shadow-2xl transition-colors duration-300 border-none ${offset === 0 ? 'ring-2 ring-sky-500/30' : 'cursor-pointer hover:border-slate-300'}`}
                     >
-                      {/* Card Cover image */}
-                      <div className="relative h-[160px] w-full overflow-hidden shrink-0 rounded-none">
+                      {/* Card Cover image with fading gradient blend */}
+                      <div className="relative h-[155px] w-full overflow-hidden shrink-0">
                         <img src={event.images.nodes[0]?.url} className="w-full h-full object-cover" alt="" />
-                        <span className="absolute top-2 left-2 px-2 py-0.5 bg-slate-950/80 backdrop-blur-sm border border-slate-800 text-[9px] uppercase tracking-widest text-sky-400 font-bold">
-                          Event
-                        </span>
+                        <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
+                        
+                        {/* Event Title overlayed on image */}
+                        <div className="absolute bottom-2 inset-x-0 px-3 text-center">
+                          <h3 className="text-sm font-extrabold text-slate-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)] tracking-tight leading-tight">
+                            {event.title}
+                          </h3>
+                        </div>
                       </div>
 
                       {/* Card details */}
-                      <div className="flex-1 p-3.5 flex flex-col justify-between text-left">
-                        <div className="space-y-1">
-                          <h3 className="text-sm font-bold text-white leading-tight line-clamp-1">{event.title}</h3>
-                          <div className="flex items-center gap-1 text-[10px] text-slate-400">
-                            <MapPin size={11} className="text-slate-500 shrink-0" />
-                            <span className="truncate text-left">{event.eventLocation?.value || 'TBA'}</span>
+                      <div className="flex-1 p-4 flex flex-col justify-between">
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-3.5 text-left">
+                          <div className="min-w-0">
+                            <span className="block text-[8px] text-slate-400 font-bold uppercase tracking-wider">Ort</span>
+                            <span className="block text-[10px] text-slate-800 font-extrabold truncate">{event.eventLocation?.value || 'TBA'}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <span className="block text-[8px] text-slate-400 font-bold uppercase tracking-wider">Datum</span>
+                            <span className="block text-[10px] text-slate-800 font-extrabold truncate">
+                              {event.eventDate?.value ? new Date(event.eventDate.value).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' }) : 'TBA'}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <span className="block text-[8px] text-slate-400 font-bold uppercase tracking-wider">Uhrzeit</span>
+                            <span className="block text-[10px] text-slate-800 font-extrabold truncate">
+                              {event.eventDate?.value ? new Date(event.eventDate.value).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr' : 'TBA'}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <span className="block text-[8px] text-slate-400 font-bold uppercase tracking-wider">Kategorie</span>
+                            <span className="block text-[9px] text-sky-600 font-extrabold truncate uppercase tracking-widest">Crew-Event</span>
                           </div>
                         </div>
 
-                        <div className="pt-2 border-t border-slate-950 flex items-center justify-between">
-                          <div className="flex flex-col text-left">
-                            <span className="text-[8px] text-slate-500 uppercase font-bold tracking-wider">Preis</span>
-                            <span className="text-xs font-bold text-white leading-none mt-0.5">
-                              {event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode}
-                            </span>
-                          </div>
+                        {/* Perforation Line with CSS Notches */}
+                        <div className="relative my-3 shrink-0">
+                          <div className="border-t border-dashed border-slate-200 w-full" />
+                          <div className="absolute left-[-22px] top-[-8px] w-4 h-4 bg-[#0b0f19] rounded-full z-10" />
+                          <div className="absolute right-[-22px] top-[-8px] w-4 h-4 bg-[#0b0f19] rounded-full z-10" />
+                        </div>
 
-                          <Button
-                            variant="primary"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onQuickBuy(event);
-                            }}
-                            className="py-1.5 px-3 rounded-none bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-[10px] cursor-pointer"
-                          >
-                            Ticket
-                          </Button>
+                        {/* Bottom Barcode or Buy Ticket Button */}
+                        <div className="flex flex-col items-center justify-center shrink-0 min-h-[50px]">
+                          {purchasedEventIds.includes(event.id) ? (
+                            <div className="flex flex-col items-center justify-center space-y-1 w-full animate-fade-in">
+                              <svg className="w-36 h-8 text-slate-900 fill-current" viewBox="0 0 100 20" preserveAspectRatio="none">
+                                <rect x="0" y="0" width="2" height="20" />
+                                <rect x="4" y="0" width="1" height="20" />
+                                <rect x="7" y="0" width="3" height="20" />
+                                <rect x="12" y="0" width="1" height="20" />
+                                <rect x="15" y="0" width="2" height="20" />
+                                <rect x="19" y="0" width="4" height="20" />
+                                <rect x="25" y="0" width="1" height="20" />
+                                <rect x="28" y="0" width="2" height="20" />
+                                <rect x="32" y="0" width="3" height="20" />
+                                <rect x="37" y="0" width="1" height="20" />
+                                <rect x="40" y="0" width="4" height="20" />
+                                <rect x="46" y="0" width="2" height="20" />
+                                <rect x="50" y="0" width="1" height="20" />
+                                <rect x="53" y="0" width="3" height="20" />
+                                <rect x="58" y="0" width="2" height="20" />
+                                <rect x="62" y="0" width="1" height="20" />
+                                <rect x="65" y="0" width="4" height="20" />
+                                <rect x="71" y="0" width="2" height="20" />
+                                <rect x="75" y="0" width="3" height="20" />
+                                <rect x="80" y="0" width="1" height="20" />
+                                <rect x="83" y="0" width="2" height="20" />
+                                <rect x="87" y="0" width="4" height="20" />
+                                <rect x="93" y="0" width="1" height="20" />
+                                <rect x="96" y="0" width="3" height="20" />
+                              </svg>
+                              <span className="text-[7px] font-mono tracking-widest text-slate-500 uppercase">CP-{event.handle.substring(0, 8)}</span>
+                            </div>
+                          ) : (
+                            <Button
+                              variant="primary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onQuickBuy(event);
+                              }}
+                              className="w-full py-2 rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 text-slate-950 font-extrabold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              Ticket kaufen ({event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode})
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </motion.div>
