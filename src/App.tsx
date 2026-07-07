@@ -66,7 +66,7 @@ function App() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover opacity-[0.35] grayscale brightness-110 desktop-bg-video"
+            className="w-full h-full object-cover md:object-contain md:scale-[0.85] opacity-[0.35] grayscale brightness-110"
             src={logoAnimVideoUrl}
           />
           <div className="absolute inset-0 bg-black/35" />
