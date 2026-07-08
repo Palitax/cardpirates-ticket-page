@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { MapPin, Share2, Check } from 'lucide-react';
+import { MapPin, Check } from 'lucide-react';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
@@ -13,26 +12,7 @@ interface EventCardProps {
 
 export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }: EventCardProps) {
   const navigate = useNavigate();
-  const [isShareSupported, setIsShareSupported] = useState(false);
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
-
-  useEffect(() => {
-    if (typeof navigator !== 'undefined' && !!(navigator as any).share) {
-      setIsShareSupported(true);
-    }
-  }, []);
-
-  const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: event.title,
-        text: `Komm zu unserem Event: ${event.title}!`,
-        url: `${window.location.origin}/events/${event.handle}`,
-      });
-    } catch (err) {
-      console.log('Share failed or cancelled', err);
-    }
-  };
 
   const title = event.title;
   const location = event.eventLocation?.value || 'TBA';
@@ -54,67 +34,59 @@ export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }:
           mask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 50% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 50% no-repeat',
           WebkitMask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 50% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 50% no-repeat'
         }}
-        className="relative w-full h-full flex flex-row rounded-3xl border border-white/[0.08] bg-zinc-950/40 backdrop-blur-xl group hover:border-white/20 transition-all duration-300 cursor-pointer overflow-hidden"
+        className="relative w-full h-full flex flex-row rounded-3xl border border-white/[0.12] bg-white/[0.07] hover:bg-white/[0.09] hover:border-white/[0.22] backdrop-blur-xl group transition-all duration-300 cursor-pointer overflow-hidden"
       >
         {/* Glossy Reflection Overlay */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/[0.01] via-transparent to-white/[0.04] pointer-events-none z-10" />
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/[0.02] via-transparent to-white/[0.08] pointer-events-none z-10" />
 
         {/* Edge highlight overlay */}
-        <div className="absolute inset-px rounded-[23px] border border-white/[0.03] pointer-events-none z-10" />
+        <div className="absolute inset-px rounded-[23px] border border-white/[0.06] pointer-events-none z-10" />
 
-        {/* Left Section: Video Cover */}
-        <div className="relative w-[220px] h-full overflow-hidden border-r border-white/[0.08] bg-zinc-950 shrink-0">
+        {/* Left Section: Video Cover (Merged) */}
+        <div className="relative w-[220px] h-full overflow-hidden shrink-0">
           <video
             autoPlay
             loop
             muted
             playsInline
+            style={{
+              maskImage: 'linear-gradient(to right, black 55%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 100%)'
+            }}
             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300 grayscale brightness-150 contrast-125"
             src={logoAnimVideoUrl}
           />
-          {/* Cover gradient blending */}
-          <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-zinc-950/90 via-zinc-950/40 to-transparent" />
-
-          {/* Date Circle Badge (Top-Left of Image) */}
-          <div className="absolute top-4 left-4 z-20 w-12 h-12 rounded-full bg-white/[0.06] backdrop-blur-md border border-white/20 shadow-lg flex flex-col items-center justify-center text-white">
-            <span className="text-sm font-black leading-none tracking-tight">{day}</span>
-            <span className="text-[8px] font-extrabold tracking-wider leading-none text-white/70 mt-0.5">{month}</span>
-          </div>
-
-          {/* Share Button (Top-Right of Image) */}
-          {isShareSupported && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleShare();
-              }}
-              className="absolute top-4 right-4 z-20 w-7 h-7 rounded-lg bg-black/40 hover:bg-black/60 border border-white/10 flex items-center justify-center text-white/80 hover:text-white transition-all backdrop-blur-sm"
-              aria-label="Event teilen"
-            >
-              <Share2 size={12} />
-            </button>
-          )}
 
           {/* Countdown Badge (Bottom-Left of Video) */}
           {dateValue && (
-            <div className="absolute bottom-3 left-3 z-20 scale-75 origin-bottom-left">
+            <div className="absolute bottom-4 left-4 z-20 scale-75 origin-bottom-left">
               <CountdownTimer targetDate={dateValue} />
             </div>
           )}
         </div>
 
         {/* Middle Section: Details */}
-        <div className="flex-1 p-6 space-y-3 text-left flex flex-col justify-center min-h-0">
-          <h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-white/95 transition-colors uppercase font-mono line-clamp-2">
-            {title}
-          </h3>
+        <div className="flex-1 p-6 pl-2 space-y-3.5 text-left flex flex-col justify-center min-h-0 z-10">
+          <div className="space-y-1.5">
+            <h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-white/95 transition-colors uppercase font-mono line-clamp-1">
+              {title}
+            </h3>
 
-          <div className="flex items-center gap-1.5 text-zinc-400 text-xs font-semibold">
-            <MapPin size={13} className="text-white/40 shrink-0" />
+            {/* Date Elongated Capsule */}
+            {dateValue && (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.08] border border-white/[0.12] text-white text-[9px] font-black tracking-widest uppercase w-fit">
+                <span className="w-1 h-1 rounded-full bg-white/60 animate-pulse" />
+                <span>{day}. {dateObj ? dateObj.toLocaleDateString('de-DE', { month: 'long' }).toUpperCase() : month}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-1.5 text-zinc-300 text-xs font-semibold">
+            <MapPin size={13} className="text-white/60 shrink-0" />
             <span className="line-clamp-1">{location}</span>
           </div>
 
-          <p className="text-zinc-400 text-xs leading-relaxed line-clamp-2">
+          <p className="text-zinc-300/80 text-xs leading-relaxed line-clamp-2">
             {event.description}
           </p>
         </div>
@@ -137,7 +109,7 @@ export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }:
           {/* Price & Action Area (Bottom) */}
           <div className="flex flex-col items-center text-center justify-center gap-1.5 w-full z-10">
             <div className="flex flex-col items-center">
-              <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Ticketpreis</span>
+              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Ticketpreis</span>
               <span className="text-base font-extrabold text-white leading-none mt-0.5">
                 {priceAmount} <span className="text-[10px] text-zinc-400 font-semibold">{currency}</span>
               </span>
