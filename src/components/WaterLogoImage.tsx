@@ -140,14 +140,6 @@ export default function WaterLogoImage({ src, alt }: WaterLogoImageProps) {
     setIsHovered(false);
   };
 
-  // 3D Bevel look via stacked drop-shadows (semi-transparent white to light-gray bevel edges with a deep dark soft backing shadow)
-  const logo3DFilter = `
-    drop-shadow(0.5px 0.5px 0px rgba(255, 255, 255, 0.7)) 
-    drop-shadow(1px 1px 0px rgba(255, 255, 255, 0.4)) 
-    drop-shadow(1.5px 1.5px 0.5px rgba(255, 255, 255, 0.2)) 
-    drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.95))
-  `.trim();
-
   return (
     <div className="flex justify-center items-center w-full">
       <div
@@ -157,22 +149,21 @@ export default function WaterLogoImage({ src, alt }: WaterLogoImageProps) {
         onMouseMove={handleMouseMove}
         className="relative cursor-pointer select-none inline-block w-[70%]"
       >
-        {/* 1. Base Layer: Sharp, undistorted image with 3D Bevel Filter */}
+        {/* 1. Base Layer: Sharp, undistorted image with original flat shadow */}
         <img
           src={src}
           alt={alt}
-          className="w-full h-auto object-contain select-none pointer-events-none"
-          style={{ filter: logo3DFilter }}
+          className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]"
         />
 
-        {/* 2. Top Layer: Distorted image, clipped to trailing mask, with 3D Bevel Filter */}
+        {/* 2. Top Layer: Distorted image, clipped to trailing mask, with original flat shadow */}
         <img
           ref={topImageRef}
           src={src}
           alt={alt}
-          className="w-full h-auto object-contain select-none pointer-events-none absolute top-0 left-0"
+          className="w-full h-auto object-contain select-none pointer-events-none absolute top-0 left-0 drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]"
           style={{
-            filter: `url(#water-ripple-image-filter) blur(0.3px) ${logo3DFilter}`,
+            filter: 'url(#water-ripple-image-filter) blur(0.3px)',
             willChange: 'mask-image, webkit-mask-image',
           }}
         />
