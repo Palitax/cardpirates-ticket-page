@@ -162,14 +162,20 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       <>
         <header className="text-center pt-1.5 pb-1.5 max-w-xl sm:max-w-3xl mx-auto space-y-2 flex flex-col items-center">
           <div className="flex flex-col items-center space-y-0.5">
-            <video 
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-[70%] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)] mix-blend-screen"
-              src={logoWaterUrl}
-            />
+            <div className="relative w-[80%] max-w-[320px] sm:max-w-[420px] aspect-[16/6] overflow-hidden flex justify-center items-center drop-shadow-[0_0_15px_rgba(0,0,0,0.4)] pointer-events-none select-none">
+              <video 
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute w-full h-auto min-h-full scale-[1.3] object-cover mix-blend-screen bg-transparent"
+                style={{
+                  background: 'transparent',
+                  filter: 'contrast(1.25) brightness(1.1) saturate(1.1)',
+                }}
+                src={logoWaterUrl}
+              />
+            </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Werde Teil der Crew!
             </h1>
