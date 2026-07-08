@@ -27,20 +27,20 @@ export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }:
   const isPurchased = purchasedEventIds.includes(event.id);
 
   return (
-    <div className="w-full h-[220px] transition-all duration-300 hover:scale-[1.005] active:scale-[0.995] filter drop-shadow-[0_15px_15px_rgba(0,0,0,0.55)]">
+    <div className="w-full h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
       <div 
         onClick={() => navigate(`/events/${event.handle}`)}
         style={{
           mask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 50% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 50% no-repeat',
           WebkitMask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 50% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 50% no-repeat'
         }}
-        className="relative w-full h-full flex flex-row rounded-3xl border border-white/[0.12] bg-white/[0.07] hover:bg-white/[0.09] hover:border-white/[0.22] backdrop-blur-xl group transition-all duration-300 cursor-pointer overflow-hidden"
+        className="relative w-full h-full flex flex-row rounded-3xl border border-white/[0.12] bg-white/[0.07] group-hover:bg-white/[0.12] group-hover:border-white/[0.35] backdrop-blur-xl group transition-all duration-350 cursor-pointer overflow-hidden"
       >
         {/* Glossy Reflection Overlay */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/[0.02] via-transparent to-white/[0.08] pointer-events-none z-10" />
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/[0.02] via-transparent to-white/[0.08] group-hover:from-white/[0.08] group-hover:to-white/[0.22] pointer-events-none z-10 transition-all duration-350" />
 
         {/* Edge highlight overlay */}
-        <div className="absolute inset-px rounded-[23px] border border-white/[0.06] pointer-events-none z-10" />
+        <div className="absolute inset-px rounded-[23px] border border-white/[0.06] group-hover:border-white/[0.15] pointer-events-none z-10 transition-all duration-350" />
 
         {/* Left Section: Video Cover (Merged) */}
         <div className="relative w-[220px] h-full overflow-hidden shrink-0">
@@ -97,11 +97,11 @@ export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }:
         {/* Right Part: Ticket Stub (Width 180px) */}
         <div className="w-[180px] shrink-0 h-full flex flex-col items-center justify-between p-5 pt-6 z-10 relative bg-white/[0.01] rounded-r-3xl">
           {/* Left Glow effect behind QR */}
-          <div className="absolute left-4 top-4 w-16 h-16 bg-white/[0.02] rounded-full blur-xl pointer-events-none" />
+          <div className="absolute left-4 top-4 w-16 h-16 bg-white/[0.02] group-hover:bg-white/[0.08] group-hover:scale-125 rounded-full blur-xl pointer-events-none transition-all duration-350" />
           
           {/* QR Code Graphic (Top) */}
-          <div className="p-2 bg-white/[0.04] border border-white/10 rounded-xl flex items-center justify-center shrink-0 shadow-inner z-10">
-            <svg className="w-10 h-10 text-white/50 group-hover:text-white/80 transition-colors duration-300" viewBox="0 0 24 24" fill="currentColor">
+          <div className="p-2 bg-white/[0.04] group-hover:bg-white/[0.08] group-hover:border-white/20 border border-white/10 rounded-xl flex items-center justify-center shrink-0 shadow-inner z-10 transition-all duration-350">
+            <svg className="w-10 h-10 text-white/50 group-hover:text-white/85 transition-colors duration-350" viewBox="0 0 24 24" fill="currentColor">
               <path d="M 2 2 H 8 V 8 H 2 Z M 4 4 V 6 H 6 V 4 Z M 16 2 H 22 V 8 H 16 Z M 18 4 V 6 H 20 V 4 Z M 2 16 H 8 V 22 H 2 Z M 4 18 V 20 H 6 V 18 Z M 11 2 H 13 V 4 H 11 Z M 11 6 H 13 V 8 H 11 Z M 11 11 H 13 V 13 H 11 Z M 16 11 H 18 V 13 H 16 Z M 16 16 H 18 V 18 H 16 Z M 11 16 H 13 V 18 H 11 Z M 18 20 H 20 V 22 H 18 Z M 13 20 H 15 V 22 H 13 Z M 20 16 H 22 V 18 H 20 Z M 20 11 H 22 V 13 H 20 Z" />
             </svg>
           </div>

@@ -16,3 +16,16 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+@keyframes ticket-glow {
+  0%, 100% {
+    filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.05));
+  }
+  50% {
+    filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 22px rgba(255, 255, 255, 0.25));
+  }
+}
+
+.animate-ticket-glow {
+  animation: ticket-glow 4s infinite ease-in-out;
+}
