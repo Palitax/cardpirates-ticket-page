@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { X } from 'lucide-react';
-import Navbar from './components/Navbar';
 import BurgerMenu from './components/BurgerMenu';
 import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
@@ -120,8 +119,7 @@ function App() {
           onLogout={handleLogout} 
         />
 
-        {/* Navigation Bar */}
-        <Navbar onLoginTrigger={handleNavbarLoginTrigger} />
+
 
         {/* Main Content Area */}
         <main className="relative z-10 flex-1 w-full max-w-4xl mx-auto py-6">

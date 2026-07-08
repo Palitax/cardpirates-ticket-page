@@ -134,10 +134,10 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
   return (
     <>
-      {/* Minimalist Floating Menu Button (Top Left - Mobile Only, no border or background) */}
+      {/* Minimalist Floating Menu Button (Top Left - Floating glass circular button on desktop, borderless on mobile) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-6 left-6 z-40 md:hidden flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-1"
+        className="fixed top-6 left-6 z-40 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-1 md:p-3 rounded-xl md:bg-white/[0.04] md:backdrop-blur-md md:border md:border-white/10 md:hover:bg-white/[0.08] md:hover:border-white/20 md:shadow-lg md:shadow-black/20"
         aria-label="Menü öffnen"
       >
         <svg className="w-6 h-6 stroke-current text-white fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -149,7 +149,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
 
       {/* Slide-in Half Drawer Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex animate-fade-in">
+        <div className="fixed inset-0 z-50 flex animate-fade-in">
           
           {/* Clickable Backdrop Overlay (Closes menu) */}
           <div 
@@ -158,7 +158,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
           />
 
           {/* Drawer Sidebar Panel */}
-          <div className="relative w-[75vw] max-w-[280px] h-full bg-black border-r border-zinc-900 shadow-2xl flex flex-col z-10 animate-slide-right select-none text-zinc-300">
+          <div className="relative w-[75vw] max-w-[280px] h-full bg-black md:bg-zinc-950/95 md:backdrop-blur-2xl border-r border-zinc-900 md:border-white/10 shadow-2xl flex flex-col z-10 animate-slide-right select-none text-zinc-300">
             
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-900 shrink-0">
