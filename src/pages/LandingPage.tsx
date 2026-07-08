@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
-import WaterLogoImage from '../components/WaterLogoImage';
 
 interface TicketTimerProps {
   targetDate: string;
@@ -163,9 +162,10 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       <>
         <header className="text-center pt-1.5 pb-1.5 max-w-xl sm:max-w-3xl mx-auto space-y-2 flex flex-col items-center">
           <div className="flex flex-col items-center space-y-0.5">
-            <WaterLogoImage 
+            <img 
               src={logoSchriftUrl} 
               alt="Cardpirates" 
+              className="w-[70%] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
             />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Werde Teil der Crew!
