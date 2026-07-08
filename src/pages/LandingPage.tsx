@@ -392,8 +392,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                 )}
               </div>
 
-              {/* Desktop Grid View */}
-              <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Desktop List View */}
+              <div className="hidden md:flex flex-col gap-6 w-full max-w-4xl mx-auto">
                 {events.map((event) => (
                   <EventCard
                     key={event.id}
