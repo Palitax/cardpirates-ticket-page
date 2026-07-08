@@ -13,15 +13,20 @@ import {
   RefreshCw, 
   UserCheck, 
   ShieldAlert,
-  Loader2
+  Loader2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { supabase } from '../services/supabase';
 import { db } from '../services/localDb';
 import { syncService } from '../services/syncService';
 import { shopifyService, type ShopifyProduct } from '../services/shopify';
+import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 
 export default function ScannerPage() {
+  const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
+
   // Auth state
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<'admin' | 'staff' | null>(null);
@@ -29,6 +34,7 @@ export default function ScannerPage() {
   const [authPassword, setAuthPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // App navigation & Event state
   const [activeTab, setActiveTab] = useState<'scan' | 'dashboard'>('scan');
@@ -413,8 +419,15 @@ export default function ScannerPage() {
       {/* 2. LOGIN VIEW */}
       {!user ? (
         <div className="flex-1 flex flex-col justify-center items-center py-10 max-w-sm mx-auto w-full text-center">
-          <div className="w-16 h-16 bg-red-950/20 border border-red-900/40 text-red-500 rounded-2xl flex items-center justify-center mb-6">
-            <Database size={32} />
+          <div className="w-20 h-20 overflow-hidden rounded-2xl mb-6 border border-zinc-900 bg-zinc-950 flex items-center justify-center relative shadow-inner">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover grayscale brightness-125 scale-105"
+              src={logoAnimVideoUrl}
+            />
           </div>
           
           <h2 className="text-lg font-bold text-white mb-1">Mitarbeiter Login</h2>
@@ -426,6 +439,8 @@ export default function ScannerPage() {
               <input 
                 type="email" 
                 required
+                name="email"
+                autoComplete="username email"
                 value={authEmail}
                 onChange={e => setAuthEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-sm focus:outline-none focus:border-red-600 transition-all font-medium"
@@ -436,15 +451,27 @@ export default function ScannerPage() {
 
             <div className="space-y-1.5 text-left">
               <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Passwort</label>
-              <input 
-                type="password" 
-                required
-                value={authPassword}
-                onChange={e => setAuthPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-sm focus:outline-none focus:border-red-600 transition-all font-medium"
-                placeholder="••••••••"
-                style={{ fontSize: '16px' }} // Prevents iOS input auto-zoom
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? 'text' : 'password'} 
+                  required
+                  name="password"
+                  autoComplete="current-password"
+                  value={authPassword}
+                  onChange={e => setAuthPassword(e.target.value)}
+                  className="w-full pl-4 pr-10 py-3 bg-zinc-900 border border-zinc-800 rounded-xl text-white text-sm focus:outline-none focus:border-red-600 transition-all font-medium"
+                  placeholder="••••••••"
+                  style={{ fontSize: '16px' }} // Prevents iOS input auto-zoom
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-3.5 text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                  title={showPassword ? "Passwort ausblenden" : "Passwort anzeigen"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
             {authError && (

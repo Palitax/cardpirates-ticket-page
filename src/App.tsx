@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import BurgerMenu from './components/BurgerMenu';
 import LandingPage from './pages/LandingPage';
@@ -10,6 +10,24 @@ import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
 import logoAnimVideo from './assets/cardpirates-logo-kleiner.mp4';
 import './App.css';
+
+interface ConditionalBurgerMenuProps {
+  currentUser: CustomerProfile | null;
+  onLoginTrigger: () => void;
+  onLogout: () => void;
+}
+
+function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout }: ConditionalBurgerMenuProps) {
+  const location = useLocation();
+  if (location.pathname === '/scan') return null;
+  return (
+    <BurgerMenu 
+      currentUser={currentUser} 
+      onLoginTrigger={onLoginTrigger} 
+      onLogout={onLogout} 
+    />
+  );
+}
 
 function App() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -114,7 +132,7 @@ function App() {
         </div>
 
         {/* Mobile Burger Menu Button */}
-        <BurgerMenu 
+        <ConditionalBurgerMenu 
           currentUser={currentUser} 
           onLoginTrigger={handleNavbarLoginTrigger} 
           onLogout={handleLogout} 
