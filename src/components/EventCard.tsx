@@ -1,16 +1,18 @@
-import { MapPin, Check } from 'lucide-react';
+import { MapPin, Check, QrCode } from 'lucide-react';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface EventCardProps {
   event: ShopifyProduct;
   onQuickBuy: (event: ShopifyProduct) => void;
-  purchasedEventIds?: string[];
+  purchasedTickets?: any[];
+  onShowQr?: (ticketId: string, title: string) => void;
 }
 
-export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }: EventCardProps) {
+export default function EventCard({ event, onQuickBuy, purchasedTickets = [], onShowQr }: EventCardProps) {
   const navigate = useNavigate();
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
 
@@ -24,7 +26,8 @@ export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }:
 
   const priceAmount = event.variants.nodes[0]?.price.amount || '0.00';
   const currency = event.variants.nodes[0]?.price.currencyCode || 'EUR';
-  const isPurchased = purchasedEventIds.includes(event.id);
+  const userTicket = purchasedTickets.find(t => t.event_id === event.id || t.id === event.id);
+  const isPurchased = !!userTicket;
 
   return (
     <div className="w-full h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
@@ -100,11 +103,28 @@ export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }:
           <div className="absolute left-4 top-4 w-16 h-16 bg-white/[0.02] group-hover:bg-white/[0.08] group-hover:scale-125 rounded-full blur-xl pointer-events-none transition-all duration-350" />
           
           {/* QR Code Graphic (Top) */}
-          <div className="p-2 bg-white/[0.04] group-hover:bg-white/[0.08] group-hover:border-white/20 border border-white/10 rounded-xl flex items-center justify-center shrink-0 shadow-inner z-10 transition-all duration-350">
-            <svg className="w-10 h-10 text-white/50 group-hover:text-white/85 transition-colors duration-350" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M 2 2 H 8 V 8 H 2 Z M 4 4 V 6 H 6 V 4 Z M 16 2 H 22 V 8 H 16 Z M 18 4 V 6 H 20 V 4 Z M 2 16 H 8 V 22 H 2 Z M 4 18 V 20 H 6 V 18 Z M 11 2 H 13 V 4 H 11 Z M 11 6 H 13 V 8 H 11 Z M 11 11 H 13 V 13 H 11 Z M 16 11 H 18 V 13 H 16 Z M 16 16 H 18 V 18 H 16 Z M 11 16 H 13 V 18 H 11 Z M 18 20 H 20 V 22 H 18 Z M 13 20 H 15 V 22 H 13 Z M 20 16 H 22 V 18 H 20 Z M 20 11 H 22 V 13 H 20 Z" />
-            </svg>
-          </div>
+          {isPurchased && userTicket ? (
+            <div 
+              onClick={(e) => {
+                e.stopPropagation();
+                onShowQr?.(userTicket.id, event.title);
+              }}
+              className="p-1.5 bg-white border border-white rounded-xl flex items-center justify-center shrink-0 shadow-lg z-10 hover:scale-[1.08] active:scale-[0.98] transition-all cursor-pointer"
+              title="Tippen zum Vergrößern"
+            >
+              <QRCodeSVG
+                value={userTicket.id}
+                size={40}
+                bgColor={"#ffffff"}
+                fgColor={"#09090b"}
+                level={"M"}
+              />
+            </div>
+          ) : (
+            <div className="p-2 bg-white/[0.04] group-hover:bg-white/[0.08] group-hover:border-white/20 border border-white/10 rounded-xl flex items-center justify-center shrink-0 shadow-inner z-10 transition-all duration-350">
+              <QrCode size={40} className="text-white/40 group-hover:text-white/80 transition-colors" />
+            </div>
+          )}
 
           {/* Price & Action Area (Bottom) */}
           <div className="flex flex-col items-center text-center justify-center gap-1.5 w-full z-10">
@@ -116,10 +136,13 @@ export default function EventCard({ event, onQuickBuy, purchasedEventIds = [] }:
             </div>
 
             <div onClick={(e) => e.stopPropagation()} className="w-full">
-              {isPurchased ? (
-                <span className="inline-flex items-center justify-center gap-1 w-full px-2.5 py-1.5 bg-green-500/10 border border-green-500/20 rounded-lg text-[10px] font-extrabold text-green-400 animate-fade-in">
-                  <Check size={11} strokeWidth={3} /> ERWORBEN
-                </span>
+              {isPurchased && userTicket ? (
+                <button
+                  onClick={() => onShowQr?.(userTicket.id, event.title)}
+                  className="inline-flex items-center justify-center gap-1 w-full px-2.5 py-1.5 bg-green-500/15 hover:bg-green-500/25 border border-green-500/35 rounded-lg text-[10px] font-extrabold text-green-400 cursor-pointer transition-all active:scale-[0.98] animate-fade-in"
+                >
+                  <Check size={11} strokeWidth={3} /> QR ANZEIGEN
+                </button>
               ) : (
                 <button
                   onClick={() => onQuickBuy(event)}

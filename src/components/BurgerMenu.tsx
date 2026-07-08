@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { X, Mail, Shield, Scale, Info, FileText } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@heroui/react';
 import type { CustomerProfile } from '../services/supabase';
 import logo from '../assets/logo.png';
@@ -11,20 +10,9 @@ interface BurgerMenuProps {
   onLogout: () => void;
 }
 
-interface PurchasedTicket {
-  id: string;
-  title: string;
-  date?: string;
-  location?: string;
-  image?: string;
-  purchaseDate: string;
-  status: 'active' | 'expired';
-}
-
 export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: BurgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSheet, setActiveSheet] = useState<'impressum' | 'agb' | 'datenschutz' | 'widerruf' | null>(null);
-  const [tickets, setTickets] = useState<PurchasedTicket[]>([]);
 
   // Toggle body scroll lock when drawer is active
   useEffect(() => {
@@ -37,36 +25,6 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
-
-  // Load purchased ticket history
-  useEffect(() => {
-    if (!currentUser) {
-      setTickets([]);
-      return;
-    }
-
-    const key = `purchased_tickets_${currentUser.shopify_customer_id}`;
-    let savedTicketsRaw = localStorage.getItem(key);
-    let savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
-
-    // Seed default past ticket if empty
-    if (savedTickets.length === 0) {
-      savedTickets = [
-        {
-          id: 'past-event-1',
-          title: 'Cardshow Düsseldorf',
-          date: '2026-05-10T10:00:00.000Z',
-          location: 'Düsseldorf Congress Center',
-          image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=200',
-          purchaseDate: '2026-04-20T15:30:00.000Z',
-          status: 'expired'
-        }
-      ];
-      localStorage.setItem(key, JSON.stringify(savedTickets));
-    }
-
-    setTickets(savedTickets);
-  }, [currentUser, isOpen]);
 
   const legalContent = {
     impressum: {
@@ -227,78 +185,6 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                     >
                       Logout
                     </button>
-                  </div>
-
-                  {/* Tickets Sektion */}
-                  <div className="space-y-2.5">
-                    <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5 text-left">
-                      Meine Tickets
-                    </span>
-
-                    {/* Active Ticket */}
-                    {tickets.filter(t => t.status === 'active').length === 0 ? (
-                      <div className="py-4 px-3 bg-zinc-950 border border-dashed border-zinc-900 text-center rounded-lg">
-                        <p className="text-[10px] text-zinc-500">Keine aktiven Tickets.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2.5">
-                        {tickets.filter(t => t.status === 'active').map((ticket) => (
-                          <div 
-                            key={ticket.id}
-                            className="bg-zinc-900/90 border border-zinc-800 rounded-xl overflow-hidden shadow-md text-left"
-                          >
-                            <div className="p-3 flex gap-2.5 border-b border-zinc-850">
-                              {ticket.image && (
-                                <img src={ticket.image} className="w-11 h-11 rounded-md object-cover border border-zinc-850 shrink-0" alt="" />
-                              )}
-                              <div className="text-left flex-1 min-w-0">
-                                <h4 className="text-[11px] font-bold text-white truncate">{ticket.title}</h4>
-                                <span className="block text-[9px] text-zinc-400 mt-1 truncate">
-                                  {ticket.date ? new Date(ticket.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'short' }) : 'TBA'}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            {/* QR Barcode */}
-                            <div className="bg-zinc-950/60 p-2.5 flex flex-col items-center justify-center text-center space-y-1">
-                              <div className="bg-white p-1.5 rounded flex justify-center items-center relative shadow-sm">
-                                <QRCodeSVG
-                                  value={ticket.id}
-                                  size={72}
-                                  bgColor={"#ffffff"}
-                                  fgColor={"#09090b"}
-                                  level={"M"}
-                                />
-                              </div>
-                              <span className="text-[7px] uppercase font-bold tracking-widest text-zinc-500">Scan am Einlass</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Expired Tickets */}
-                    {tickets.filter(t => t.status === 'expired').length > 0 && (
-                      <div className="space-y-1.5 pt-1">
-                        <span className="block text-[8px] font-bold text-zinc-600 uppercase tracking-widest text-left">
-                          Archiv
-                        </span>
-                        {tickets.filter(t => t.status === 'expired').map((ticket) => (
-                          <div 
-                            key={ticket.id}
-                            className="p-2.5 bg-zinc-950/30 border border-zinc-900 rounded-lg flex gap-2.5 opacity-30 select-none grayscale text-left"
-                          >
-                            {ticket.image && (
-                              <img src={ticket.image} className="w-8 h-8 rounded-md object-cover border border-zinc-900 shrink-0" alt="" />
-                            )}
-                            <div className="text-left flex-1 min-w-0">
-                              <h5 className="text-[10px] font-bold text-zinc-300 truncate">{ticket.title}</h5>
-                              <p className="text-[8px] text-zinc-500 mt-0.5">Genutzt 2026</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               )}

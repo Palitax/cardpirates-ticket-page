@@ -3,6 +3,7 @@ import { AlertCircle } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
+import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -81,7 +82,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
 
   // Local Purchased Tickets Check
-  const [purchasedEventIds, setPurchasedEventIds] = useState<string[]>([]);
+  const [purchasedTickets, setPurchasedTickets] = useState<any[]>([]);
+  const [activeQrModal, setActiveQrModal] = useState<{ ticketId: string; title: string } | null>(null);
 
   const fetchPurchasedTickets = () => {
     if (currentUser) {
@@ -90,15 +92,14 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          const ids = parsed.map((t: any) => t.id);
-          setPurchasedEventIds(ids);
+          setPurchasedTickets(parsed);
           return;
         } catch (e) {
           console.error(e);
         }
       }
     }
-    setPurchasedEventIds([]);
+    setPurchasedTickets([]);
   };
 
   useEffect(() => {
@@ -108,6 +109,26 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       window.removeEventListener('focus', fetchPurchasedTickets);
     };
   }, [currentUser]);
+
+  // Request/release screen wake lock for scanning
+  useEffect(() => {
+    let lock: any = null;
+    const getLock = async () => {
+      if (activeQrModal && 'wakeLock' in navigator) {
+        try {
+          lock = await (navigator as any).wakeLock.request('screen');
+        } catch (e) {
+          console.warn('Wake Lock request failed:', e);
+        }
+      }
+    };
+    getLock();
+    return () => {
+      if (lock) {
+        lock.release().catch((e: any) => console.warn(e));
+      }
+    };
+  }, [activeQrModal]);
 
   useEffect(() => {
     async function loadEvents() {
@@ -312,47 +333,42 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                               {event.eventDate?.value && (
                                 <TicketTimer targetDate={event.eventDate.value} />
                               )}
-                              {purchasedEventIds.includes(event.id) ? (
-                                <div className="flex flex-col items-center justify-center space-y-1 w-full animate-fade-in">
-                                  <svg className="w-36 h-8 text-zinc-900 fill-current" viewBox="0 0 100 20" preserveAspectRatio="none">
-                                    <rect x="0" y="0" width="2" height="20" />
-                                    <rect x="4" y="0" width="1" height="20" />
-                                    <rect x="7" y="0" width="3" height="20" />
-                                    <rect x="12" y="0" width="1" height="20" />
-                                    <rect x="15" y="0" width="2" height="20" />
-                                    <rect x="19" y="0" width="4" height="20" />
-                                    <rect x="28" y="0" width="2" height="20" />
-                                    <rect x="32" y="0" width="3" height="20" />
-                                    <rect x="37" y="0" width="1" height="20" />
-                                    <rect x="40" y="0" width="4" height="20" />
-                                    <rect x="46" y="0" width="2" height="20" />
-                                    <rect x="50" y="0" width="1" height="20" />
-                                    <rect x="53" y="0" width="3" height="20" />
-                                    <rect x="58" y="0" width="2" height="20" />
-                                    <rect x="62" y="0" width="1" height="20" />
-                                    <rect x="65" y="0" width="4" height="20" />
-                                    <rect x="71" y="0" width="2" height="20" />
-                                    <rect x="75" y="0" width="3" height="20" />
-                                    <rect x="80" y="0" width="1" height="20" />
-                                    <rect x="83" y="0" width="2" height="20" />
-                                    <rect x="87" y="0" width="4" height="20" />
-                                    <rect x="93" y="0" width="1" height="20" />
-                                    <rect x="96" y="0" width="3" height="20" />
-                                  </svg>
-                                  <span className="text-[7px] font-mono tracking-widest text-zinc-500 uppercase">CP-{event.handle.substring(0, 8)}</span>
-                                </div>
-                              ) : (
-                                <Button
-                                  variant="primary"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onQuickBuy(event);
-                                  }}
-                                  className="w-full py-2.5 rounded-full bg-black hover:bg-zinc-950 text-white font-extrabold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-black"
-                                >
-                                  Ticket kaufen ({event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode})
-                                </Button>
-                              )}
+                              {(() => {
+                                const ticket = purchasedTickets.find(t => t.event_id === event.id || t.id === event.id);
+                                if (ticket) {
+                                  return (
+                                    <div 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveQrModal({ ticketId: ticket.id, title: event.title });
+                                      }}
+                                      className="flex flex-col items-center justify-center p-2.5 bg-white rounded-2xl border border-zinc-150 cursor-pointer shadow-sm hover:scale-[1.03] active:scale-[0.99] transition-all duration-200 select-none animate-fade-in"
+                                      title="Tippen zum Vergrößern"
+                                    >
+                                      <QRCodeSVG
+                                        value={ticket.id}
+                                        size={72}
+                                        bgColor={"#ffffff"}
+                                        fgColor={"#09090b"}
+                                        level={"M"}
+                                      />
+                                      <span className="text-[7px] font-black tracking-wider text-zinc-400 mt-1 uppercase">Ticket anzeigen</span>
+                                    </div>
+                                  );
+                                }
+                                return (
+                                  <Button
+                                    variant="primary"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onQuickBuy(event);
+                                    }}
+                                    className="w-full py-2.5 rounded-full bg-black hover:bg-zinc-950 text-white font-extrabold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-black"
+                                  >
+                                    Ticket kaufen ({event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode})
+                                  </Button>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>
@@ -399,7 +415,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                     key={event.id}
                     event={event}
                     onQuickBuy={onQuickBuy}
-                    purchasedEventIds={purchasedEventIds}
+                    purchasedTickets={purchasedTickets}
+                    onShowQr={(ticketId, title) => setActiveQrModal({ ticketId, title })}
                   />
                 ))}
               </div>
@@ -461,6 +478,37 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       className="px-4 sm:px-6 pb-24 pt-1 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
     >
       {renderMainContent()}
+      
+      {activeQrModal && (
+        <div 
+          onClick={() => setActiveQrModal(null)}
+          className="fixed inset-0 z-[200] bg-white text-zinc-950 flex flex-col items-center justify-center p-6 cursor-pointer animate-fade-in"
+        >
+          <div className="w-full max-w-xs flex flex-col items-center space-y-6">
+            <div className="text-center space-y-1 select-none">
+              <span className="text-[9px] font-black text-red-600 uppercase tracking-widest">Cardpirates Einlass-Ticket</span>
+              <h2 className="text-lg font-black leading-tight text-zinc-950">{activeQrModal.title}</h2>
+            </div>
+            
+            <div className="bg-white p-4 rounded-3xl shadow-2xl flex justify-center items-center border border-zinc-100">
+              <QRCodeSVG 
+                value={activeQrModal.ticketId}
+                size={220}
+                bgColor={"#ffffff"}
+                fgColor={"#09090b"}
+                level={"Q"}
+              />
+            </div>
+
+            <div className="text-center space-y-2 select-none">
+              <p className="text-xs font-bold text-zinc-800">Bitte zeige diesen QR-Code am Einlass vor.</p>
+              <p className="text-[9px] text-zinc-500 max-w-[80%] mx-auto leading-relaxed">
+                Deine Display-Helligkeit wurde zur optimalen Scanbarkeit erhöht. Tippe auf den Bildschirm, um das Ticket zu schließen.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

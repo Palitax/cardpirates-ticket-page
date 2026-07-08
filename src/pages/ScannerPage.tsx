@@ -272,13 +272,10 @@ export default function ScannerPage() {
 
     // Bypass real Supabase Auth for mock credentials to facilitate instant testing/demoing
     if (authEmail === 'admin@cardpirates.de' && authPassword === 'password') {
-      setTimeout(() => {
-        const mockUser = { id: 'mock-staff-1', email: authEmail };
-        setUser(mockUser);
-        setUserRole('admin');
-        localStorage.setItem('mock_staff_session', JSON.stringify(mockUser));
-        setAuthLoading(false);
-      }, 500);
+      const mockUser = { id: 'mock-staff-1', email: authEmail };
+      localStorage.setItem('mock_staff_session', JSON.stringify(mockUser));
+      // Reload page immediately to trigger native browser password-save prompt
+      window.location.reload();
       return;
     }
 
@@ -292,9 +289,22 @@ export default function ScannerPage() {
         setAuthError(error.message);
         setAuthLoading(false);
       } else if (data.user) {
-        setUser(data.user);
-        await fetchUserRole(data.user.id, data.user.email || '');
-        setAuthLoading(false);
+        // Fetch role to ensure they are staff before reloading
+        const { data: staffData } = await supabase
+          .from('staff_members')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        const email = data.user.email || '';
+        if (staffData || email.endsWith('@cardpirates.de')) {
+          // Valid staff member. Reload page to trigger native password save prompt
+          window.location.reload();
+        } else {
+          setAuthError('Zugriff verweigert: Du bist nicht als Einlass-Mitarbeiter registriert.');
+          await supabase.auth.signOut();
+          setAuthLoading(false);
+        }
       }
     } else {
       // Mock Sandbox Login Fallback
@@ -419,13 +429,13 @@ export default function ScannerPage() {
       {/* 2. LOGIN VIEW */}
       {!user ? (
         <div className="flex-1 flex flex-col justify-center items-center py-10 max-w-sm mx-auto w-full text-center">
-          <div className="w-20 h-20 overflow-hidden rounded-2xl mb-6 border border-zinc-900 bg-zinc-950 flex items-center justify-center relative shadow-inner">
+          <div className="w-36 h-36 overflow-hidden mb-4 flex items-center justify-center relative select-none">
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="w-full h-full object-cover grayscale brightness-125 scale-105"
+              className="w-full h-full object-contain grayscale brightness-125"
               src={logoAnimVideoUrl}
             />
           </div>
