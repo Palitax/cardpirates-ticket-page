@@ -27,6 +27,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [userType, setUserType] = useState<'private' | 'business'>('private');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Form States
   const [email, setEmail] = useState('');
@@ -40,7 +41,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [address2, setAddress2] = useState('');
   const [city, setCity] = useState('');
   const [zip, setZip] = useState('');
-  const [country, setCountry] = useState('DE');
+  const country = 'DE';
 
   // OTP Verification States
   const [showOtpScreen, setShowOtpScreen] = useState(false);
@@ -311,12 +312,42 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
     if (e) e.preventDefault();
     setLoading(true);
     setError(null);
+    setValidationErrors([]);
 
     if (showOtpScreen) {
       await handleVerifyOtp();
     } else if (activeTab === 'register') {
+      const missingFields: string[] = [];
+      if (!email.trim()) missingFields.push('email');
+      if (!password.trim()) missingFields.push('password');
+      if (!firstName.trim()) missingFields.push('firstName');
+      if (!lastName.trim()) missingFields.push('lastName');
+      if (userType === 'business') {
+        if (!companyName.trim()) missingFields.push('companyName');
+        if (!vatNumber.trim()) missingFields.push('vatNumber');
+      }
+      if (!address1.trim()) missingFields.push('address1');
+      if (!zip.trim()) missingFields.push('zip');
+      if (!city.trim()) missingFields.push('city');
+      if (!phone.trim()) missingFields.push('phone');
+
+      if (missingFields.length > 0) {
+        setValidationErrors(missingFields);
+        setError('Bitte fülle alle erforderlichen Felder aus.');
+        setLoading(false);
+        return;
+      }
       await handleSignUp();
     } else {
+      if (!email.trim() || !password.trim()) {
+        const missingFields: string[] = [];
+        if (!email.trim()) missingFields.push('email');
+        if (!password.trim()) missingFields.push('password');
+        setValidationErrors(missingFields);
+        setError('Bitte fülle E-Mail und Passwort aus.');
+        setLoading(false);
+        return;
+      }
       await handleSignIn();
     }
     setLoading(false);
@@ -324,16 +355,16 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <Modal.Backdrop className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in" />
-      <Modal.Container className="fixed inset-0 z-50 flex items-end md:items-center justify-center sm:p-4 p-0">
-        <Modal.Dialog className="bg-zinc-900 border-t md:border border-zinc-800 rounded-t-3xl md:rounded-3xl w-full max-w-lg h-[92vh] md:h-auto md:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl relative animate-slide-up md:animate-scale-up text-zinc-300">
+      <Modal.Backdrop className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in hidden md:block" />
+      <Modal.Container className="fixed inset-0 z-50 flex items-stretch md:items-center justify-stretch md:justify-center p-0 md:p-4">
+        <Modal.Dialog className="bg-zinc-950 md:bg-zinc-900 border-none md:border border-zinc-800 rounded-none md:rounded-3xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-lg overflow-hidden flex flex-col shadow-none md:shadow-2xl relative animate-fade-in md:animate-scale-up text-zinc-300">
           
           {/* Close button */}
           <Modal.CloseTrigger 
             onClick={onClose}
-            className="absolute top-5 right-5 text-zinc-400 hover:text-white p-1 hover:bg-zinc-850 rounded-lg transition-colors cursor-pointer z-10"
+            className="absolute top-4 right-4 text-zinc-400 hover:text-white w-11 h-11 flex items-center justify-center p-0 hover:bg-zinc-850 rounded-xl transition-colors cursor-pointer z-10"
           >
-            <X size={18} />
+            <X size={20} />
           </Modal.CloseTrigger>
 
           {/* Header */}
@@ -414,86 +445,77 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               </div>
             ) : (
               <>
-                {/* Controlled Tabs */}
-                <Tabs 
-                  selectedKey={activeTab} 
-                  onSelectionChange={(key) => setActiveTab(key as string)}
-                >
-                  <Tabs.ListContainer className="w-full">
-                    <Tabs.List className="w-full flex bg-zinc-950 border border-zinc-800 rounded-xl p-1">
-                      <Tabs.Tab 
-                        id="register" 
-                        className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
-                      >
-                        Registrieren
-                      </Tabs.Tab>
-                      <Tabs.Tab 
-                        id="login" 
-                        className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
-                      >
-                        Einloggen
-                      </Tabs.Tab>
-                    </Tabs.List>
-                  </Tabs.ListContainer>
-
-              <Tabs.Panel id="register" className="space-y-5 pt-4">
-                {/* Account Type Toggle */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Kontotyp</label>
-                  <Tabs 
-                    selectedKey={userType} 
-                    onSelectionChange={(key) => setUserType(key as 'private' | 'business')}
-                  >
-                    <Tabs.ListContainer className="w-full">
-                      <Tabs.List className="w-full flex bg-zinc-950 p-1 border border-zinc-800 rounded-xl">
-                        <Tabs.Tab 
-                          id="private" 
-                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
-                        >
-                          Privatperson
-                        </Tabs.Tab>
-                        <Tabs.Tab 
-                          id="business" 
-                          className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
-                        >
-                          Unternehmen
-                        </Tabs.Tab>
-                      </Tabs.List>
-                    </Tabs.ListContainer>
-                    <Tabs.Panel id="private" className="hidden"><div /></Tabs.Panel>
-                    <Tabs.Panel id="business" className="hidden"><div /></Tabs.Panel>
-                  </Tabs>
-                </div>
-              </Tabs.Panel>
-
-              <Tabs.Panel id="login" className="pt-2">
-                <div />
-              </Tabs.Panel>
-            </Tabs>
+                {/* Account Type Toggle (only when registering) */}
+                {activeTab === 'register' && (
+                  <div className="space-y-2 animate-fade-in pt-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Kontotyp</label>
+                    <Tabs 
+                      selectedKey={userType} 
+                      onSelectionChange={(key) => setUserType(key as 'private' | 'business')}
+                    >
+                      <Tabs.ListContainer className="w-full">
+                        <Tabs.List className="w-full flex bg-zinc-950 p-1 border border-zinc-800 rounded-xl">
+                          <Tabs.Tab 
+                            id="private" 
+                            className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
+                          >
+                            Privatperson
+                          </Tabs.Tab>
+                          <Tabs.Tab 
+                            id="business" 
+                            className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
+                          >
+                            Unternehmen
+                          </Tabs.Tab>
+                        </Tabs.List>
+                      </Tabs.ListContainer>
+                      <Tabs.Panel id="private" className="hidden"><div /></Tabs.Panel>
+                      <Tabs.Panel id="business" className="hidden"><div /></Tabs.Panel>
+                    </Tabs>
+                  </div>
+                )}
 
             {/* Input Form Fields */}
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
               <TextField name="email" className="space-y-1.5 w-full">
-                <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">E-Mail-Adresse</Label>
+                <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('email') ? 'text-rose-500' : 'text-zinc-400'}`}>E-Mail-Adresse</Label>
                 <Input
                   type="email"
                   placeholder="name@firma.de"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (validationErrors.includes('email')) {
+                      setValidationErrors(validationErrors.filter((f) => f !== 'email'));
+                    }
+                  }}
                   required
-                  className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                  className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                    validationErrors.includes('email') 
+                      ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                      : 'border-zinc-800'
+                  }`}
                 />
               </TextField>
 
               <TextField name="password" className="space-y-1.5 w-full">
-                <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Passwort</Label>
+                <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('password') ? 'text-rose-500' : 'text-zinc-400'}`}>Passwort</Label>
                 <Input
                   type="password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (validationErrors.includes('password')) {
+                      setValidationErrors(validationErrors.filter((f) => f !== 'password'));
+                    }
+                  }}
                   required
-                  className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                  className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                    validationErrors.includes('password') 
+                      ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                      : 'border-zinc-800'
+                  }`}
                 />
               </TextField>
 
@@ -501,25 +523,43 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 <div className="space-y-4 md:space-y-5 animate-fade-in">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <TextField name="firstName" className="space-y-1.5">
-                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Vorname</Label>
+                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('firstName') ? 'text-rose-500' : 'text-zinc-400'}`}>Vorname</Label>
                       <Input
                         type="text"
                         placeholder="Max"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => {
+                          setFirstName(e.target.value);
+                          if (validationErrors.includes('firstName')) {
+                            setValidationErrors(validationErrors.filter((f) => f !== 'firstName'));
+                          }
+                        }}
                         required
-                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                          validationErrors.includes('firstName') 
+                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                            : 'border-zinc-800'
+                        }`}
                       />
                     </TextField>
                     <TextField name="lastName" className="space-y-1.5">
-                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Nachname</Label>
+                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('lastName') ? 'text-rose-500' : 'text-zinc-400'}`}>Nachname</Label>
                       <Input
                         type="text"
                         placeholder="Mustermann"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => {
+                          setLastName(e.target.value);
+                          if (validationErrors.includes('lastName')) {
+                            setValidationErrors(validationErrors.filter((f) => f !== 'lastName'));
+                          }
+                        }}
                         required
-                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                          validationErrors.includes('lastName') 
+                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                            : 'border-zinc-800'
+                        }`}
                       />
                     </TextField>
                   </div>
@@ -527,26 +567,44 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   {userType === 'business' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
                       <TextField name="companyName" className="space-y-1.5">
-                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Firmenname</Label>
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('companyName') ? 'text-rose-500' : 'text-zinc-400'}`}>Firmenname</Label>
                         <Input
                           type="text"
                           placeholder="Cardpirates GmbH"
                           value={companyName}
-                          onChange={(e) => setCompanyName(e.target.value)}
+                          onChange={(e) => {
+                            setCompanyName(e.target.value);
+                            if (validationErrors.includes('companyName')) {
+                              setValidationErrors(validationErrors.filter((f) => f !== 'companyName'));
+                            }
+                          }}
                           required={userType === 'business'}
-                          className="w-full bg-zinc-905 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                            validationErrors.includes('companyName') 
+                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                              : 'border-zinc-800'
+                          }`}
                         />
                       </TextField>
                       
                       <TextField name="vatNumber" className="space-y-1.5">
-                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">USt-IdNr.</Label>
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('vatNumber') ? 'text-rose-500' : 'text-zinc-400'}`}>USt-IdNr.</Label>
                         <Input
                           type="text"
                           placeholder="DE123456789"
                           value={vatNumber}
-                          onChange={(e) => setVatNumber(e.target.value)}
+                          onChange={(e) => {
+                            setVatNumber(e.target.value);
+                            if (validationErrors.includes('vatNumber')) {
+                              setValidationErrors(validationErrors.filter((f) => f !== 'vatNumber'));
+                            }
+                          }}
                           required={userType === 'business'}
-                          className="w-full bg-zinc-905 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                            validationErrors.includes('vatNumber') 
+                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                              : 'border-zinc-800'
+                          }`}
                         />
                       </TextField>
                     </div>
@@ -557,14 +615,23 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                     <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-left">Rechnungsadresse</span>
                     
                     <TextField name="address1" className="space-y-1.5">
-                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Straße und Hausnummer</Label>
+                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('address1') ? 'text-rose-500' : 'text-zinc-400'}`}>Straße und Hausnummer</Label>
                       <Input
                         type="text"
                         placeholder="Musterstraße 12a"
                         value={address1}
-                        onChange={(e) => setAddress1(e.target.value)}
+                        onChange={(e) => {
+                          setAddress1(e.target.value);
+                          if (validationErrors.includes('address1')) {
+                            setValidationErrors(validationErrors.filter((f) => f !== 'address1'));
+                          }
+                        }}
                         required
-                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                          validationErrors.includes('address1') 
+                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                            : 'border-zinc-800'
+                        }`}
                       />
                     </TextField>
 
@@ -581,54 +648,67 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
                     <div className="grid grid-cols-2 gap-4">
                       <TextField name="zip" className="space-y-1.5">
-                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">PLZ</Label>
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('zip') ? 'text-rose-500' : 'text-zinc-400'}`}>PLZ</Label>
                         <Input
                           type="text"
                           placeholder="10115"
                           value={zip}
-                          onChange={(e) => setZip(e.target.value)}
+                          onChange={(e) => {
+                            setZip(e.target.value);
+                            if (validationErrors.includes('zip')) {
+                              setValidationErrors(validationErrors.filter((f) => f !== 'zip'));
+                            }
+                          }}
                           required
-                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                            validationErrors.includes('zip') 
+                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                              : 'border-zinc-800'
+                          }`}
                         />
                       </TextField>
                       <TextField name="city" className="space-y-1.5">
-                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Ort</Label>
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('city') ? 'text-rose-500' : 'text-zinc-400'}`}>Ort</Label>
                         <Input
                           type="text"
                           placeholder="Berlin"
                           value={city}
-                          onChange={(e) => setCity(e.target.value)}
+                          onChange={(e) => {
+                            setCity(e.target.value);
+                            if (validationErrors.includes('city')) {
+                              setValidationErrors(validationErrors.filter((f) => f !== 'city'));
+                            }
+                          }}
                           required
-                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
+                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                            validationErrors.includes('city') 
+                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                              : 'border-zinc-800'
+                          }`}
                         />
                       </TextField>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <TextField name="country" className="space-y-1.5">
-                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Länderkürzel</Label>
-                        <Input
-                          type="text"
-                          placeholder="DE"
-                          value={country}
-                          onChange={(e) => setCountry(e.target.value)}
-                          maxLength={2}
-                          required
-                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
-                        />
-                      </TextField>
-                      <TextField name="phone" className="space-y-1.5">
-                        <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Telefonnummer</Label>
-                        <Input
-                          type="tel"
-                          placeholder="+49 170 1234567"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          required
-                          className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
-                        />
-                      </TextField>
-                    </div>
+                    <TextField name="phone" className="space-y-1.5">
+                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('phone') ? 'text-rose-500' : 'text-zinc-400'}`}>Telefonnummer</Label>
+                      <Input
+                        type="tel"
+                        placeholder="+49 170 1234567"
+                        value={phone}
+                        onChange={(e) => {
+                          setPhone(e.target.value);
+                          if (validationErrors.includes('phone')) {
+                            setValidationErrors(validationErrors.filter((f) => f !== 'phone'));
+                          }
+                        }}
+                        required
+                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                          validationErrors.includes('phone') 
+                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                            : 'border-zinc-800'
+                        }`}
+                      />
+                    </TextField>
                   </div>
                 </div>
               )}
@@ -637,7 +717,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             )}
           </Modal.Body>
 
-          <Modal.Footer className="border-t border-zinc-800 bg-zinc-950/60 p-4 md:p-6 flex justify-end shrink-0">
+          <Modal.Footer className="border-t border-zinc-800 bg-zinc-950/60 p-4 md:p-6 flex flex-col justify-center items-center gap-4 shrink-0">
             <Button
               onPress={() => handleSubmit()}
               className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer"
@@ -659,6 +739,44 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 </>
               )}
             </Button>
+
+            {!showOtpScreen && (
+              <p className="text-xs text-zinc-400 text-center font-normal">
+                {activeTab === 'register' ? (
+                  <>
+                    Bereits ein Konto?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('login');
+                        setError(null);
+                        setSuccessMessage(null);
+                        setValidationErrors([]);
+                      }}
+                      className="text-white hover:underline font-bold cursor-pointer transition-colors"
+                    >
+                      Jetzt einloggen
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Noch kein Konto?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('register');
+                        setError(null);
+                        setSuccessMessage(null);
+                        setValidationErrors([]);
+                      }}
+                      className="text-white hover:underline font-bold cursor-pointer transition-colors"
+                    >
+                      Jetzt registrieren
+                    </button>
+                  </>
+                )}
+              </p>
+            )}
           </Modal.Footer>
           
         </Modal.Dialog>
