@@ -144,7 +144,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
             <img 
               src={logoSchriftUrl} 
               alt="Cardpirates" 
-              className="w-[50%] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
+              className="w-[70%] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
             />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Werde Teil der Crew!
