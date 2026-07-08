@@ -10,7 +10,7 @@ import {
 import { ArrowRight, X } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
-import { profileService } from '../services/supabase';
+import { profileService, supabase } from '../services/supabase';
 import type { CustomerProfile } from '../services/supabase';
 
 interface LoginModalProps {
@@ -70,23 +70,43 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
       // 2. Checkout link generation
       if (event) {
-        // Save to mock purchased tickets list in localStorage
+        const ticketId = crypto.randomUUID();
+        
+        // 1. Insert into Supabase tickets table if client is initialized
+        if (supabase) {
+          try {
+            const { error: insertErr } = await supabase
+              .from('tickets')
+              .insert({
+                id: ticketId,
+                event_id: event.id,
+                holder_name: `${profileData.first_name} ${profileData.last_name}`,
+                status: 'open'
+              });
+            if (insertErr) {
+              console.error('Failed to insert ticket to Supabase:', insertErr);
+            }
+          } catch (err) {
+            console.warn('Network error writing ticket to Supabase:', err);
+          }
+        }
+
+        // 2. Save to mock purchased tickets list in localStorage for buyer profile display
         const savedTicketsRaw = localStorage.getItem(`purchased_tickets_${mockCustomerId}`);
         const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
         
-        // Add new ticket if not already purchased
-        if (!savedTickets.some((t: any) => t.id === event.id)) {
-          savedTickets.push({
-            id: event.id,
-            title: event.title,
-            date: event.eventDate?.value,
-            location: event.eventLocation?.value,
-            image: event.images.nodes[0]?.url,
-            purchaseDate: new Date().toISOString(),
-            status: 'active'
-          });
-          localStorage.setItem(`purchased_tickets_${mockCustomerId}`, JSON.stringify(savedTickets));
-        }
+        // Save ticket with unique ID
+        savedTickets.push({
+          id: ticketId,
+          event_id: event.id,
+          title: event.title,
+          date: event.eventDate?.value,
+          location: event.eventLocation?.value,
+          image: event.images.nodes[0]?.url,
+          purchaseDate: new Date().toISOString(),
+          status: 'active'
+        });
+        localStorage.setItem(`purchased_tickets_${mockCustomerId}`, JSON.stringify(savedTickets));
 
         const variantId = event.variants.nodes[0]?.id;
         if (!variantId) {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Mail, Shield, Scale, Info, FileText } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@heroui/react';
 import type { CustomerProfile } from '../services/supabase';
 import logo from '../assets/logo.png';
@@ -260,15 +261,14 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
                             
                             {/* QR Barcode */}
                             <div className="bg-zinc-950/60 p-2.5 flex flex-col items-center justify-center text-center space-y-1">
-                              <div className="w-16 h-16 bg-white p-1 rounded flex flex-wrap gap-0.5 justify-center items-center relative">
-                                <div className="grid grid-cols-6 gap-0.5 w-full h-full">
-                                  {[...Array(36)].map((_, i) => (
-                                    <div 
-                                      key={i} 
-                                      className={`rounded-none ${(i % 3 === 0 || i % 7 === 0 || i < 6 || i % 6 === 0 || i > 30) ? 'bg-zinc-950' : 'bg-transparent'}`}
-                                    />
-                                  ))}
-                                </div>
+                              <div className="bg-white p-1.5 rounded flex justify-center items-center relative shadow-sm">
+                                <QRCodeSVG
+                                  value={ticket.id}
+                                  size={72}
+                                  bgColor={"#ffffff"}
+                                  fgColor={"#09090b"}
+                                  level={"M"}
+                                />
                               </div>
                               <span className="text-[7px] uppercase font-bold tracking-widest text-zinc-500">Scan am Einlass</span>
                             </div>
