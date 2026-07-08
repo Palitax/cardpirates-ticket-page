@@ -42,100 +42,269 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [zip, setZip] = useState('');
   const [country, setCountry] = useState('DE');
 
+  // OTP Verification States
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const generateCheckoutAndCallSuccess = async (profileData: CustomerProfile) => {
+    if (!event) return;
+    const ticketId = crypto.randomUUID();
+    
+    if (supabase) {
+      try {
+        const { error: insertErr } = await supabase
+          .from('tickets')
+          .insert({
+            id: ticketId,
+            event_id: event.id,
+            holder_name: `${profileData.first_name} ${profileData.last_name}`,
+            status: 'open'
+          });
+        if (insertErr) {
+          console.error('Failed to insert ticket to Supabase:', insertErr);
+        }
+      } catch (err) {
+        console.warn('Network error writing ticket to Supabase:', err);
+      }
+    }
+
+    const savedTicketsRaw = localStorage.getItem(`purchased_tickets_${profileData.shopify_customer_id}`);
+    const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
+    
+    savedTickets.push({
+      id: ticketId,
+      event_id: event.id,
+      title: event.title,
+      date: event.eventDate?.value,
+      location: event.eventLocation?.value,
+      image: event.images.nodes[0]?.url,
+      purchaseDate: new Date().toISOString(),
+      status: 'active'
+    });
+    localStorage.setItem(`purchased_tickets_${profileData.shopify_customer_id}`, JSON.stringify(savedTickets));
+
+    const variantId = event.variants.nodes[0]?.id;
+    if (!variantId) {
+      throw new Error('Ticket-Variante für dieses Event nicht gefunden.');
+    }
+
+    const checkoutUrl = await shopifyService.createCheckoutLink(variantId, email, {
+      firstName: profileData.first_name,
+      lastName: profileData.last_name,
+      address1: profileData.address_line_1 || 'Hauptstraße 1',
+      city: profileData.city || 'Berlin',
+      zip: profileData.zip_code || '10115',
+      country: profileData.country || 'DE',
+      company: profileData.company_name,
+    });
+
+    if (checkoutUrl) {
+      onSuccess(checkoutUrl, profileData, activeTab === 'register' ? 'register' : 'login');
+    } else {
+      throw new Error('Fehler beim Erstellen der Kasse.');
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!supabase) {
+      setError('Supabase-Datenbank nicht verknüpft.');
+      return;
+    }
+
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            user_type: userType,
+            address_line_1: address1,
+            address_line_2: address2,
+            city: city,
+            zip_code: zip,
+            country: country,
+            company_name: userType === 'business' ? companyName : undefined,
+            vat_number: userType === 'business' ? vatNumber : undefined,
+          }
+        }
+      });
+
+      if (signUpError) {
+        throw signUpError;
+      }
+
+      if (data.user && !data.session) {
+        setShowOtpScreen(true);
+        setSuccessMessage('Bestätigungscode gesendet! Bitte prüfe dein Postfach.');
+      } else if (data.session) {
+        // If double opt-in is disabled, auto-login immediately
+        const mockCustomerId = `shopify-cust-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
+        const profileData: CustomerProfile = {
+          shopify_customer_id: mockCustomerId,
+          user_type: userType,
+          first_name: firstName || 'Gast',
+          last_name: lastName || 'User',
+          phone: phone,
+          address_line_1: address1,
+          address_line_2: address2,
+          city: city,
+          zip_code: zip,
+          country: country,
+          company_name: userType === 'business' ? companyName : undefined,
+          vat_number: userType === 'business' ? vatNumber : undefined,
+        };
+        await profileService.saveProfile(profileData);
+        if (event) {
+          await generateCheckoutAndCallSuccess(profileData);
+        } else {
+          onSuccess('', profileData, 'register');
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Fehler bei der Registrierung.');
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!supabase) return;
+    try {
+      const { error: verifyError } = await supabase.auth.verifyOtp({
+        email,
+        token: otpCode,
+        type: 'signup'
+      });
+
+      if (verifyError) {
+        throw verifyError;
+      }
+
+      // Create database profile row upon successful email validation
+      const mockCustomerId = `shopify-cust-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
+      const profileData: CustomerProfile = {
+        shopify_customer_id: mockCustomerId,
+        user_type: userType,
+        first_name: firstName || 'Gast',
+        last_name: lastName || 'User',
+        phone: phone,
+        address_line_1: address1,
+        address_line_2: address2,
+        city: city,
+        zip_code: zip,
+        country: country,
+        company_name: userType === 'business' ? companyName : undefined,
+        vat_number: userType === 'business' ? vatNumber : undefined,
+      };
+      await profileService.saveProfile(profileData);
+
+      setSuccessMessage('Konto erfolgreich verifiziert! Logge dich jetzt ein.');
+      setShowOtpScreen(false);
+      setActiveTab('login');
+      setOtpCode('');
+    } catch (err: any) {
+      setError(err.message || 'Falscher oder abgelaufener Verifizierungscode.');
+    }
+  };
+
+  const handleSignIn = async () => {
+    if (!supabase) {
+      // Mock Bypass for local/offline testing
+      const mockCustomerId = `shopify-cust-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
+      const profileData: CustomerProfile = {
+        shopify_customer_id: mockCustomerId,
+        user_type: 'private',
+        first_name: 'Gast',
+        last_name: 'User',
+        phone: '',
+        address_line_1: '',
+        city: '',
+        zip_code: '',
+        country: 'DE',
+      };
+      if (event) {
+        await generateCheckoutAndCallSuccess(profileData);
+      } else {
+        onSuccess('', profileData, 'login');
+      }
+      return;
+    }
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (signInError) {
+        throw signInError;
+      }
+
+      if (data.user) {
+        const userMetadata = data.user.user_metadata || {};
+        const mockCustomerId = `shopify-cust-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
+        
+        let profileData = await profileService.getProfile(mockCustomerId);
+        if (!profileData) {
+          profileData = {
+            shopify_customer_id: mockCustomerId,
+            user_type: userMetadata.user_type || 'private',
+            first_name: userMetadata.first_name || 'Gast',
+            last_name: userMetadata.last_name || 'User',
+            phone: userMetadata.phone || '',
+            address_line_1: userMetadata.address_line_1 || '',
+            address_line_2: userMetadata.address_line_2 || '',
+            city: userMetadata.city || '',
+            zip_code: userMetadata.zip_code || '',
+            country: userMetadata.country || 'DE',
+            company_name: userMetadata.company_name,
+            vat_number: userMetadata.vat_number,
+          };
+          await profileService.saveProfile(profileData);
+        }
+
+        if (event) {
+          await generateCheckoutAndCallSuccess(profileData);
+        } else {
+          onSuccess('', profileData, 'login');
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Login fehlgeschlagen. Anmeldedaten prüfen.');
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!supabase) return;
+    try {
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email
+      });
+      if (resendError) throw resendError;
+      setSuccessMessage('Ein neuer Code wurde an deine E-Mail gesendet.');
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || 'Fehler beim Senden des Codes.');
+    }
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setLoading(true);
     setError(null);
 
-    try {
-      const mockCustomerId = `shopify-cust-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
-
-      const profileData: CustomerProfile = {
-        shopify_customer_id: mockCustomerId,
-        user_type: userType,
-        first_name: activeTab === 'register' ? (firstName || 'Gast') : 'Wiederkehrender',
-        last_name: activeTab === 'register' ? (lastName || 'User') : 'Kunde',
-        phone: activeTab === 'register' ? phone : '',
-        address_line_1: activeTab === 'register' ? address1 : '',
-        address_line_2: activeTab === 'register' ? address2 : '',
-        city: activeTab === 'register' ? city : '',
-        zip_code: activeTab === 'register' ? zip : '',
-        country: activeTab === 'register' ? country : 'DE',
-        company_name: activeTab === 'register' && userType === 'business' ? companyName : undefined,
-        vat_number: activeTab === 'register' && userType === 'business' ? vatNumber : undefined,
-      };
-
-      // 1. Save profile metadata
-      await profileService.saveProfile(profileData);
-
-      // 2. Checkout link generation
-      if (event) {
-        const ticketId = crypto.randomUUID();
-        
-        // 1. Insert into Supabase tickets table if client is initialized
-        if (supabase) {
-          try {
-            const { error: insertErr } = await supabase
-              .from('tickets')
-              .insert({
-                id: ticketId,
-                event_id: event.id,
-                holder_name: `${profileData.first_name} ${profileData.last_name}`,
-                status: 'open'
-              });
-            if (insertErr) {
-              console.error('Failed to insert ticket to Supabase:', insertErr);
-            }
-          } catch (err) {
-            console.warn('Network error writing ticket to Supabase:', err);
-          }
-        }
-
-        // 2. Save to mock purchased tickets list in localStorage for buyer profile display
-        const savedTicketsRaw = localStorage.getItem(`purchased_tickets_${mockCustomerId}`);
-        const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
-        
-        // Save ticket with unique ID
-        savedTickets.push({
-          id: ticketId,
-          event_id: event.id,
-          title: event.title,
-          date: event.eventDate?.value,
-          location: event.eventLocation?.value,
-          image: event.images.nodes[0]?.url,
-          purchaseDate: new Date().toISOString(),
-          status: 'active'
-        });
-        localStorage.setItem(`purchased_tickets_${mockCustomerId}`, JSON.stringify(savedTickets));
-
-        const variantId = event.variants.nodes[0]?.id;
-        if (!variantId) {
-          throw new Error('Ticket-Variante für dieses Event nicht gefunden.');
-        }
-
-        const checkoutUrl = await shopifyService.createCheckoutLink(variantId, email, {
-          firstName: profileData.first_name,
-          lastName: profileData.last_name,
-          address1: profileData.address_line_1 || 'Hauptstraße 1',
-          city: profileData.city || 'Berlin',
-          zip: profileData.zip_code || '10115',
-          country: profileData.country || 'DE',
-          company: profileData.company_name,
-        });
-
-        if (checkoutUrl) {
-          onSuccess(checkoutUrl, profileData, activeTab as 'login' | 'register');
-        } else {
-          throw new Error('Fehler beim Erstellen der Kasse.');
-        }
-      } else {
-        onSuccess('', profileData, activeTab as 'login' | 'register');
-      }
-    } catch (err: any) {
-      setError(err.message || 'Ein Fehler ist aufgetreten.');
-    } finally {
-      setLoading(false);
+    if (showOtpScreen) {
+      await handleVerifyOtp();
+    } else if (activeTab === 'register') {
+      await handleSignUp();
+    } else {
+      await handleSignIn();
     }
+    setLoading(false);
   };
 
   return (
@@ -172,32 +341,85 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           {/* Scrollable Body */}
           <Modal.Body className="px-4 py-4 md:px-6 md:py-5 overflow-y-auto space-y-4 md:space-y-6 flex-1 text-left">
             {error && (
-              <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm rounded-xl font-medium">
+              <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm rounded-xl font-medium animate-fade-in">
                 {error}
               </div>
             )}
 
-            {/* Controlled Tabs */}
-            <Tabs 
-              selectedKey={activeTab} 
-              onSelectionChange={(key) => setActiveTab(key as string)}
-            >
-              <Tabs.ListContainer className="w-full">
-                <Tabs.List className="w-full flex bg-zinc-950 border border-zinc-800 rounded-xl p-1">
-                  <Tabs.Tab 
-                    id="register" 
-                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
+            {successMessage && (
+              <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm rounded-xl font-medium animate-fade-in">
+                {successMessage}
+              </div>
+            )}
+
+            {showOtpScreen ? (
+              <div className="space-y-5 animate-fade-in pt-2">
+                <div className="text-center py-2 space-y-2 select-none">
+                  <span className="text-[32px] block">✉️</span>
+                  <p className="text-sm font-bold text-white">E-Mail verifizieren</p>
+                  <p className="text-xs text-zinc-400 max-w-xs mx-auto leading-relaxed">
+                    Bitte gib den 6-stelligen Verifizierungscode ein, den wir dir an <span className="text-white font-semibold">{email}</span> gesendet haben.
+                  </p>
+                </div>
+
+                <TextField name="otpCode" className="space-y-1.5 w-full">
+                  <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block text-center">6-Stelliger Code</Label>
+                  <Input
+                    type="text"
+                    placeholder="123456"
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    required
+                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-center text-lg font-black tracking-[10px] text-white outline-none transition-all placeholder:tracking-normal placeholder:font-normal"
+                  />
+                </TextField>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    className="text-xs text-zinc-500 hover:text-white font-semibold underline cursor-pointer transition-colors"
                   >
-                    Registrieren
-                  </Tabs.Tab>
-                  <Tabs.Tab 
-                    id="login" 
-                    className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
+                    Code erneut senden
+                  </button>
+                  <span className="mx-2 text-zinc-700">|</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowOtpScreen(false);
+                      setError(null);
+                      setSuccessMessage(null);
+                    }}
+                    className="text-xs text-zinc-500 hover:text-white font-semibold underline cursor-pointer transition-colors"
                   >
-                    Einloggen
-                  </Tabs.Tab>
-                </Tabs.List>
-              </Tabs.ListContainer>
+                    Zurück
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Controlled Tabs */}
+                <Tabs 
+                  selectedKey={activeTab} 
+                  onSelectionChange={(key) => setActiveTab(key as string)}
+                >
+                  <Tabs.ListContainer className="w-full">
+                    <Tabs.List className="w-full flex bg-zinc-950 border border-zinc-800 rounded-xl p-1">
+                      <Tabs.Tab 
+                        id="register" 
+                        className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
+                      >
+                        Registrieren
+                      </Tabs.Tab>
+                      <Tabs.Tab 
+                        id="login" 
+                        className={`flex-1 py-2 text-center text-xs font-bold rounded-lg cursor-pointer transition-all ${activeTab === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'}`}
+                      >
+                        Einloggen
+                      </Tabs.Tab>
+                    </Tabs.List>
+                  </Tabs.ListContainer>
 
               <Tabs.Panel id="register" className="space-y-5 pt-4">
                 {/* Account Type Toggle */}
@@ -396,6 +618,8 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                 </div>
               )}
             </form>
+            </>
+            )}
           </Modal.Body>
 
           <Modal.Footer className="border-t border-zinc-800 bg-zinc-950/60 p-4 md:p-6 flex justify-end shrink-0">
@@ -404,10 +628,18 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
-                <span>Sichere Kasse wird geladen...</span>
+                <span>
+                  {showOtpScreen 
+                    ? 'Code wird verifiziert...' 
+                    : (event ? 'Sichere Kasse wird geladen...' : 'Bitte warten...')}
+                </span>
               ) : (
                 <>
-                  <span>{event ? 'Weiter zur PayPal-Zahlung' : (activeTab === 'register' ? 'Konto registrieren' : 'Einloggen')}</span>
+                  <span>
+                    {showOtpScreen 
+                      ? 'Konto verifizieren' 
+                      : (event ? 'Weiter zur PayPal-Zahlung' : (activeTab === 'register' ? 'Konto registrieren' : 'Einloggen'))}
+                  </span>
                   <ArrowRight size={16} />
                 </>
               )}

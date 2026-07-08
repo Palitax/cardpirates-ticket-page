@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import BurgerMenu from './components/BurgerMenu';
+import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
 import ScannerPage from './pages/ScannerPage';
 import LoginModal from './components/LoginModal';
 import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
+import { supabase, profileService } from './services/supabase';
 import logoAnimVideo from './assets/cardpirates-logo-kleiner.mp4';
 import './App.css';
 
@@ -15,6 +17,24 @@ interface ConditionalBurgerMenuProps {
   currentUser: CustomerProfile | null;
   onLoginTrigger: () => void;
   onLogout: () => void;
+}
+
+interface ConditionalNavbarProps {
+  currentUser: CustomerProfile | null;
+  onLoginTrigger: () => void;
+  onLogout: () => void;
+}
+
+function ConditionalNavbar({ currentUser, onLoginTrigger, onLogout }: ConditionalNavbarProps) {
+  const location = useLocation();
+  if (location.pathname === '/scan') return null;
+  return (
+    <Navbar 
+      currentUser={currentUser} 
+      onLoginTrigger={onLoginTrigger} 
+      onLogout={onLogout} 
+    />
+  );
 }
 
 function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout }: ConditionalBurgerMenuProps) {
@@ -37,16 +57,36 @@ function App() {
 
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
 
-  // Restore session from localStorage on mount
+  // 1. Initial State Check (reads active Supabase session or local storage fallback)
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      try {
-        setCurrentUser(JSON.parse(savedUser));
-      } catch (err) {
-        console.error('Failed to parse saved user', err);
+    const checkSession = async () => {
+      if (supabase) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            const email = session.user.email || '';
+            const mockCustomerId = `shopify-cust-${email.replace(/[^a-zA-Z0-9]/g, '')}`;
+            const profile = await profileService.getProfile(mockCustomerId);
+            if (profile) {
+              setCurrentUser(profile);
+              localStorage.setItem('currentUser', JSON.stringify(profile));
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('Error reading active Supabase session:', e);
+        }
       }
-    }
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        try {
+          setCurrentUser(JSON.parse(savedUser));
+        } catch (err) {
+          console.error('Failed to parse saved user', err);
+        }
+      }
+    };
+    checkSession();
   }, []);
 
   // Parse query params for mock checkout success
@@ -83,7 +123,14 @@ function App() {
     setModalOpen(true);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (supabase) {
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.warn(e);
+      }
+    }
     setCurrentUser(null);
     localStorage.removeItem('currentUser');
   };
@@ -130,6 +177,13 @@ function App() {
           <div className="absolute inset-0 bg-black/35" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/10" />
         </div>
+
+        {/* Desktop Navbar */}
+        <ConditionalNavbar 
+          currentUser={currentUser} 
+          onLoginTrigger={handleNavbarLoginTrigger} 
+          onLogout={handleLogout} 
+        />
 
         {/* Mobile Burger Menu Button */}
         <ConditionalBurgerMenu 
