@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import BurgerMenu from './components/BurgerMenu';
-import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
 import ScannerPage from './pages/ScannerPage';
@@ -19,23 +18,7 @@ interface ConditionalBurgerMenuProps {
   onLogout: () => void;
 }
 
-interface ConditionalNavbarProps {
-  currentUser: CustomerProfile | null;
-  onLoginTrigger: () => void;
-  onLogout: () => void;
-}
 
-function ConditionalNavbar({ currentUser, onLoginTrigger, onLogout }: ConditionalNavbarProps) {
-  const location = useLocation();
-  if (location.pathname === '/scan') return null;
-  return (
-    <Navbar 
-      currentUser={currentUser} 
-      onLoginTrigger={onLoginTrigger} 
-      onLogout={onLogout} 
-    />
-  );
-}
 
 function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout }: ConditionalBurgerMenuProps) {
   const location = useLocation();
@@ -178,12 +161,7 @@ function App() {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/10" />
         </div>
 
-        {/* Desktop Navbar */}
-        <ConditionalNavbar 
-          currentUser={currentUser} 
-          onLoginTrigger={handleNavbarLoginTrigger} 
-          onLogout={handleLogout} 
-        />
+
 
         {/* Mobile Burger Menu Button */}
         <ConditionalBurgerMenu 
