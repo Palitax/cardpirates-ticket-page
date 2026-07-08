@@ -114,7 +114,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
             >
               <QRCodeSVG
                 value={userTicket.id}
-                size={40}
+                size={80}
                 bgColor={"#ffffff"}
                 fgColor={"#09090b"}
                 level={"M"}

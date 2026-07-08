@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, X } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
@@ -342,17 +342,17 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                         e.stopPropagation();
                                         setActiveQrModal({ ticketId: ticket.id, title: event.title });
                                       }}
-                                      className="flex flex-col items-center justify-center p-2.5 bg-white rounded-2xl border border-zinc-150 cursor-pointer shadow-sm hover:scale-[1.03] active:scale-[0.99] transition-all duration-200 select-none animate-fade-in"
+                                      className="flex flex-col items-center justify-center p-1.5 pb-2 bg-white rounded-xl border border-zinc-150 cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.99] transition-all duration-200 select-none animate-fade-in mb-1.5"
                                       title="Tippen zum Vergrößern"
                                     >
                                       <QRCodeSVG
                                         value={ticket.id}
-                                        size={72}
+                                        size={52}
                                         bgColor={"#ffffff"}
                                         fgColor={"#09090b"}
                                         level={"M"}
                                       />
-                                      <span className="text-[7px] font-black tracking-wider text-zinc-400 mt-1 uppercase">Ticket anzeigen</span>
+                                      <span className="text-[7px] font-black tracking-wider text-zinc-400 mt-1 uppercase leading-none">Ticket anzeigen</span>
                                     </div>
                                   );
                                 }
@@ -480,31 +480,48 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       {renderMainContent()}
       
       {activeQrModal && (
-        <div 
-          onClick={() => setActiveQrModal(null)}
-          className="fixed inset-0 z-[200] bg-white text-zinc-950 flex flex-col items-center justify-center p-6 cursor-pointer animate-fade-in"
-        >
-          <div className="w-full max-w-xs flex flex-col items-center space-y-6">
-            <div className="text-center space-y-1 select-none">
-              <span className="text-[9px] font-black text-red-600 uppercase tracking-widest">Cardpirates Einlass-Ticket</span>
-              <h2 className="text-lg font-black leading-tight text-zinc-950">{activeQrModal.title}</h2>
-            </div>
-            
-            <div className="bg-white p-4 rounded-3xl shadow-2xl flex justify-center items-center border border-zinc-100">
-              <QRCodeSVG 
-                value={activeQrModal.ticketId}
-                size={220}
-                bgColor={"#ffffff"}
-                fgColor={"#09090b"}
-                level={"Q"}
-              />
-            </div>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center">
+          {/* Backdrop for Desktop/Web, also closes the modal */}
+          <div 
+            onClick={() => setActiveQrModal(null)}
+            className="absolute inset-0 bg-black/75 md:bg-black/60 backdrop-blur-sm"
+          />
+          
+          {/* Modal Container */}
+          <div 
+            className="relative bg-white text-zinc-950 w-full h-full md:h-auto md:max-w-md md:rounded-3xl flex flex-col items-center justify-center p-8 select-none shadow-2xl animate-fade-in z-10"
+          >
+            {/* Close X Button (Visible on mobile fullscreen, and useful for desktop too) */}
+            <button 
+              onClick={() => setActiveQrModal(null)}
+              className="absolute top-5 right-5 text-zinc-400 hover:text-zinc-950 p-2 rounded-full hover:bg-zinc-100 transition-colors cursor-pointer"
+              aria-label="Schließen"
+            >
+              <X size={24} />
+            </button>
 
-            <div className="text-center space-y-2 select-none">
-              <p className="text-xs font-bold text-zinc-800">Bitte zeige diesen QR-Code am Einlass vor.</p>
-              <p className="text-[9px] text-zinc-500 max-w-[80%] mx-auto leading-relaxed">
-                Deine Display-Helligkeit wurde zur optimalen Scanbarkeit erhöht. Tippe auf den Bildschirm, um das Ticket zu schließen.
-              </p>
+            <div className="w-full max-w-xs flex flex-col items-center space-y-6 mt-4">
+              <div className="text-center space-y-1">
+                <span className="text-[9px] font-black text-red-600 uppercase tracking-widest">Cardpirates Einlass-Ticket</span>
+                <h2 className="text-lg font-black leading-tight text-zinc-950">{activeQrModal.title}</h2>
+              </div>
+              
+              <div className="bg-white p-4 rounded-3xl shadow-xl flex justify-center items-center border border-zinc-150/50">
+                <QRCodeSVG 
+                  value={activeQrModal.ticketId}
+                  size={200}
+                  bgColor={"#ffffff"}
+                  fgColor={"#09090b"}
+                  level={"Q"}
+                />
+              </div>
+
+              <div className="text-center space-y-2">
+                <p className="text-xs font-bold text-zinc-800">Bitte zeige diesen QR-Code am Einlass vor.</p>
+                <p className="text-[9px] text-zinc-500 max-w-[90%] mx-auto leading-relaxed">
+                  Stelle deine Display-Helligkeit für optimale Scanbarkeit auf das Maximum.
+                </p>
+              </div>
             </div>
           </div>
         </div>

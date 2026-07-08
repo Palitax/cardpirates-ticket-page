@@ -395,7 +395,7 @@ export default function ScannerPage() {
   };
 
   return (
-    <div className="w-full min-h-[85vh] bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-900 shadow-2xl p-4 md:p-6 overflow-hidden flex flex-col font-sans">
+    <div className="w-full min-h-[85vh] bg-black text-zinc-100 rounded-3xl border border-zinc-900/30 shadow-2xl p-4 md:p-6 overflow-hidden flex flex-col font-sans">
       
       {/* 1. TOP HEADER STATUS */}
       <div className="flex items-center justify-between border-b border-zinc-900 pb-4 mb-4">
