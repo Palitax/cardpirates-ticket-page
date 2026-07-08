@@ -47,6 +47,21 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [otpCode, setOtpCode] = useState('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  const getErrorMessage = (err: any): string => {
+    console.error('Auth Error Details:', err);
+    if (!err) return 'Ein unbekannter Fehler ist aufgetreten.';
+    if (typeof err === 'string') return err;
+    if (err.message && err.message !== '{}') return err.message;
+    if (err.error_description) return err.error_description;
+    
+    try {
+      const serialized = JSON.stringify(err);
+      if (serialized && serialized !== '{}') return serialized;
+    } catch (e) {}
+    
+    return err.toString() !== '[object Object]' ? err.toString() : 'Aktion fehlgeschlagen. Bitte prüfe deine Eingaben und Verbindung.';
+  };
+
   const generateCheckoutAndCallSuccess = async (profileData: CustomerProfile) => {
     if (!event) return;
     const ticketId = crypto.randomUUID();
@@ -166,7 +181,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Fehler bei der Registrierung.');
+      setError(getErrorMessage(err));
     }
   };
 
@@ -206,7 +221,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
       setActiveTab('login');
       setOtpCode('');
     } catch (err: any) {
-      setError(err.message || 'Falscher oder abgelaufener Verifizierungscode.');
+      setError(getErrorMessage(err));
     }
   };
 
@@ -273,7 +288,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Login fehlgeschlagen. Anmeldedaten prüfen.');
+      setError(getErrorMessage(err));
     }
   };
 
@@ -288,7 +303,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
       setSuccessMessage('Ein neuer Code wurde an deine E-Mail gesendet.');
       setError(null);
     } catch (err: any) {
-      setError(err.message || 'Fehler beim Senden des Codes.');
+      setError(getErrorMessage(err));
     }
   };
 
