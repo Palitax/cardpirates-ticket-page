@@ -429,7 +429,7 @@ export default function ScannerPage() {
       {/* 2. LOGIN VIEW */}
       {!user ? (
         <div className="flex-1 flex flex-col justify-center items-center py-10 max-w-sm mx-auto w-full text-center">
-          <div className="w-36 h-36 overflow-hidden mb-4 flex items-center justify-center relative select-none">
+          <div className="w-52 h-52 overflow-hidden mb-4 flex items-center justify-center relative select-none">
             <video
               autoPlay
               loop
