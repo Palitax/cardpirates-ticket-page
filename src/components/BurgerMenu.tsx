@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Mail, Shield, Scale, Info, FileText } from 'lucide-react';
 import { Button } from '@heroui/react';
 import type { CustomerProfile } from '../services/supabase';
+import logo from '../assets/logo.png';
 
 interface BurgerMenuProps {
   currentUser: CustomerProfile | null;
@@ -162,9 +163,16 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout }: Bu
             
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-900 shrink-0">
-              <span className="text-2xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
-                Cardpirates
-              </span>
+              <div className="flex items-center gap-2 select-none pointer-events-none">
+                <img 
+                  src={(window as any).ShopifyAssets?.logoUrl || logo} 
+                  alt="Cardpirates Logo" 
+                  className="w-8 h-8 object-contain"
+                />
+                <span className="text-2xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
+                  Cardpirates
+                </span>
+              </div>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-900 rounded-lg transition-all cursor-pointer"
