@@ -264,6 +264,18 @@ export default function ScannerPage() {
     setAuthError('');
     setAuthLoading(true);
 
+    // Bypass real Supabase Auth for mock credentials to facilitate instant testing/demoing
+    if (authEmail === 'admin@cardpirates.de' && authPassword === 'password') {
+      setTimeout(() => {
+        const mockUser = { id: 'mock-staff-1', email: authEmail };
+        setUser(mockUser);
+        setUserRole('admin');
+        localStorage.setItem('mock_staff_session', JSON.stringify(mockUser));
+        setAuthLoading(false);
+      }, 500);
+      return;
+    }
+
     if (supabase) {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: authEmail,
@@ -279,16 +291,9 @@ export default function ScannerPage() {
         setAuthLoading(false);
       }
     } else {
-      // Mock Sandbox Login
+      // Mock Sandbox Login Fallback
       setTimeout(() => {
-        if (authEmail === 'admin@cardpirates.de' && authPassword === 'password') {
-          const mockUser = { id: 'mock-staff-1', email: authEmail };
-          setUser(mockUser);
-          setUserRole('admin');
-          localStorage.setItem('mock_staff_session', JSON.stringify(mockUser));
-        } else {
-          setAuthError('Falsche Zugangsdaten (Tipp: admin@cardpirates.de / password)');
-        }
+        setAuthError('Falsche Zugangsdaten (Tipp: admin@cardpirates.de / password)');
         setAuthLoading(false);
       }, 800);
     }
