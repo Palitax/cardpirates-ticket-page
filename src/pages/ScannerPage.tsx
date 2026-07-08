@@ -84,7 +84,7 @@ export default function ScannerPage() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
-          fetchUserRole(session.user.id, session.user.email || '');
+          fetchUserRole(session.user.id);
         }
       } else {
         // Retrieve local mock staff session if database config is not set
@@ -99,7 +99,7 @@ export default function ScannerPage() {
     checkSession();
   }, []);
 
-  const fetchUserRole = async (userId: string, email: string) => {
+  const fetchUserRole = async (userId: string) => {
     if (!supabase) return;
     try {
       const { data, error } = await supabase
@@ -109,15 +109,10 @@ export default function ScannerPage() {
         .single();
 
       if (error || !data) {
-        // Fallback for safety: if they logged in but are not in staff_members, check if email domain is cardpirates.de
-        if (email.endsWith('@cardpirates.de')) {
-          setUserRole('staff');
-        } else {
-          setUserRole(null);
-          setAuthError('Zugriff verweigert: Du bist nicht als Einlass-Mitarbeiter registriert.');
-          await supabase.auth.signOut();
-          setUser(null);
-        }
+        setUserRole(null);
+        setAuthError('Zugriff verweigert: Du bist nicht als Einlass-Mitarbeiter registriert.');
+        await supabase.auth.signOut();
+        setUser(null);
       } else {
         setUserRole(data.role as 'admin' | 'staff');
       }
@@ -296,8 +291,7 @@ export default function ScannerPage() {
           .eq('id', data.user.id)
           .single();
 
-        const email = data.user.email || '';
-        if (staffData || email.endsWith('@cardpirates.de')) {
+        if (staffData) {
           // Valid staff member. Reload page to trigger native password save prompt
           window.location.reload();
         } else {
