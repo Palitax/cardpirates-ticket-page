@@ -191,7 +191,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email,
         token: otpCode,
-        type: 'signup'
+        type: 'email'
       });
 
       if (verifyError) {
