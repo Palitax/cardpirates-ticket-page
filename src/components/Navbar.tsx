@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { UserCheck } from 'lucide-react';
 import { Button } from '@heroui/react';
 import type { CustomerProfile } from '../services/supabase';
+import WaterLogo from './WaterLogo';
 
 interface NavbarProps {
   onLoginTrigger: () => void;
@@ -16,9 +17,7 @@ export default function Navbar({ onLoginTrigger, currentUser, onLogout }: Navbar
         
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2.5 group select-none">
-          <span className="text-3xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
-            Cardpirates
-          </span>
+          <WaterLogo />
         </Link>
 
         {/* Navigation Actions */}
