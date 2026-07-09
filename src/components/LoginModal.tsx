@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Modal, 
   Tabs, 
@@ -28,6 +28,18 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  // Ticket Selection States
+  const [selectedVariantId, setSelectedVariantId] = useState('');
+  const [quantity, setQuantity] = useState(1);
+
+  // Initialize selectedVariantId when event changes
+  useEffect(() => {
+    if (event) {
+      setSelectedVariantId(event.variants.nodes[0]?.id || '');
+      setQuantity(1);
+    }
+  }, [event]);
 
   // Form States
   const [email, setEmail] = useState('');
@@ -65,45 +77,51 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
   const generateCheckoutAndCallSuccess = async (profileData: CustomerProfile) => {
     if (!event) return;
-    const ticketId = crypto.randomUUID();
     
-    if (supabase) {
-      try {
-        const { error: insertErr } = await supabase
-          .from('tickets')
-          .insert({
-            id: ticketId,
-            event_id: event.id,
-            holder_name: `${profileData.first_name} ${profileData.last_name}`,
-            status: 'open'
-          });
-        if (insertErr) {
-          console.error('Failed to insert ticket to Supabase:', insertErr);
-        }
-      } catch (err) {
-        console.warn('Network error writing ticket to Supabase:', err);
-      }
-    }
-
-    const savedTicketsRaw = localStorage.getItem(`purchased_tickets_${profileData.shopify_customer_id}`);
-    const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
-    
-    savedTickets.push({
-      id: ticketId,
-      event_id: event.id,
-      title: event.title,
-      date: event.eventDate?.value,
-      location: event.eventLocation?.value,
-      image: event.images.nodes[0]?.url,
-      purchaseDate: new Date().toISOString(),
-      status: 'active'
-    });
-    localStorage.setItem(`purchased_tickets_${profileData.shopify_customer_id}`, JSON.stringify(savedTickets));
-
-    const variantId = event.variants.nodes[0]?.id;
+    const variantId = selectedVariantId || event.variants.nodes[0]?.id;
     if (!variantId) {
       throw new Error('Ticket-Variante für dieses Event nicht gefunden.');
     }
+    const selectedVariant = event.variants.nodes.find(v => v.id === variantId) || event.variants.nodes[0];
+    
+    // Save quantity tickets
+    const savedTicketsRaw = localStorage.getItem(`purchased_tickets_${profileData.shopify_customer_id}`);
+    const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
+
+    for (let i = 0; i < quantity; i++) {
+      const ticketId = crypto.randomUUID();
+      
+      if (supabase) {
+        try {
+          const { error: insertErr } = await supabase
+            .from('tickets')
+            .insert({
+              id: ticketId,
+              event_id: event.id,
+              holder_name: `${profileData.first_name} ${profileData.last_name}`,
+              status: 'open'
+            });
+          if (insertErr) {
+            console.error('Failed to insert ticket to Supabase:', insertErr);
+          }
+        } catch (err) {
+          console.warn('Network error writing ticket to Supabase:', err);
+        }
+      }
+
+      savedTickets.push({
+        id: ticketId,
+        event_id: event.id,
+        title: `${event.title} - ${selectedVariant.title}`,
+        date: event.eventDate?.value,
+        location: event.eventLocation?.value,
+        image: event.images.nodes[0]?.url,
+        purchaseDate: new Date().toISOString(),
+        status: 'active'
+      });
+    }
+
+    localStorage.setItem(`purchased_tickets_${profileData.shopify_customer_id}`, JSON.stringify(savedTickets));
 
     const checkoutUrl = await shopifyService.createCheckoutLink(variantId, email, {
       firstName: profileData.first_name,
@@ -113,7 +131,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
       zip: profileData.zip_code || '10115',
       country: profileData.country || 'DE',
       company: profileData.company_name,
-    });
+    }, quantity);
 
     if (checkoutUrl) {
       onSuccess(checkoutUrl, profileData, activeTab === 'register' ? 'register' : 'login');
@@ -477,6 +495,46 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
             {/* Input Form Fields */}
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+              {/* Ticket Selection Area (Only when event is defined) */}
+              {event && (
+                <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-4 mb-2 select-none">
+                  <div className="text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-900 pb-2">
+                    Ticket-Auswahl
+                  </div>
+                  
+                  {/* Variant Selection (if there are multiple variants) */}
+                  {event.variants.nodes.length > 1 && (
+                    <div className="space-y-1.5 text-left">
+                      <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Ticket-Kategorie</label>
+                      <select
+                        value={selectedVariantId}
+                        onChange={(e) => setSelectedVariantId(e.target.value)}
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
+                      >
+                        {event.variants.nodes.map(v => (
+                          <option key={v.id} value={v.id}>
+                            {v.title} — {v.price.amount} {v.price.currencyCode}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Quantity Selection */}
+                  <div className="space-y-1.5 text-left">
+                    <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Anzahl Tickets</label>
+                    <select
+                      value={quantity}
+                      onChange={(e) => setQuantity(Number(e.target.value))}
+                      className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                        <option key={n} value={n}>{n} Ticket{n > 1 ? 's' : ''}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
               <TextField name="email" className="space-y-1.5 w-full">
                 <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('email') ? 'text-rose-500' : 'text-zinc-400'}`}>E-Mail-Adresse</Label>
                 <Input

@@ -212,11 +212,12 @@ export const shopifyService = {
       zip: string;
       country: string;
       company?: string;
-    }
+    },
+    quantity: number = 1
   ): Promise<string> {
     try {
       const input = {
-        lines: [{ quantity: 1, merchandiseId: variantId }],
+        lines: [{ quantity: quantity, merchandiseId: variantId }],
         buyerIdentity: {
           email: email,
           deliveryAddressPreferences: [{
@@ -282,8 +283,14 @@ function getMockEvents(): ShopifyProduct[] {
         nodes: [
           {
             id: 'gid://shopify/ProductVariant/mock-var-1',
-            title: 'Standard-Ticket',
+            title: 'Privat',
             price: { amount: '45.00', currencyCode: 'EUR' },
+            availableForSale: true
+          },
+          {
+            id: 'gid://shopify/ProductVariant/mock-var-1-exhibitor',
+            title: 'Aussteller',
+            price: { amount: '120.00', currencyCode: 'EUR' },
             availableForSale: true
           }
         ]

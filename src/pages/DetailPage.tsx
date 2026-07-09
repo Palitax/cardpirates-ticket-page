@@ -216,16 +216,29 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
 
           {/* Desktop Buy Ticket Card */}
           <div className="hidden md:block p-5 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-4 shadow-xl shadow-black/20 text-left">
-            <div className="flex justify-between items-center">
-              <div>
-                <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Ticketpreis</span>
-                <span className="text-2xl font-extrabold text-white">
-                  {priceAmount} <span className="text-xs text-zinc-400 font-semibold">{currency}</span>
-                </span>
-              </div>
-              <span className="text-[10px] text-white font-bold bg-zinc-950 border border-zinc-900 px-2 py-1 rounded-md">
-                Verfügbar
-              </span>
+            <div className="flex flex-col gap-2">
+              <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Ticketpreis</span>
+              {event.variants.nodes.length > 1 ? (
+                <div className="space-y-1.5 w-full">
+                  {event.variants.nodes.slice(0, 2).map((variant) => (
+                    <div key={variant.id} className="flex justify-between items-center text-sm font-bold text-white border-b border-zinc-850 pb-1.5 last:border-0 last:pb-0">
+                      <span className="text-xs text-zinc-400 uppercase font-semibold">{variant.title}</span>
+                      <span>
+                        {variant.price.amount} <span className="text-[10px] text-zinc-500 font-normal">{variant.price.currencyCode}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex justify-between items-center">
+                  <span className="text-2xl font-extrabold text-white">
+                    {priceAmount} <span className="text-xs text-zinc-400 font-semibold">{currency}</span>
+                  </span>
+                  <span className="text-[10px] text-white font-bold bg-zinc-950 border border-zinc-900 px-2 py-1 rounded-md">
+                    Verfügbar
+                  </span>
+                </div>
+              )}
             </div>
 
             <Button
@@ -233,7 +246,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
               onPress={() => onQuickBuy(event)}
               className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all select-none active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/5"
             >
-              Jetzt Ticket sichern
+              Ticket kaufen
             </Button>
           </div>
 
@@ -252,11 +265,25 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
 
       {/* Mobile Sticky Bottom CTA Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-900 p-4 pb-safe flex items-center justify-between max-w-4xl mx-auto sm:rounded-t-3xl sm:border-x md:hidden text-left">
-        <div className="flex flex-col">
-          <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Gesamtpreis</span>
-          <span className="text-2xl font-extrabold text-white">
-            {priceAmount} <span className="text-xs text-zinc-400 font-semibold">{currency}</span>
-          </span>
+        <div className="flex flex-col select-none">
+          {event.variants.nodes.length > 1 ? (
+            <div className="space-y-0.5">
+              <span className="block text-[8px] text-zinc-500 font-bold uppercase tracking-wider leading-none">Ticketpreise</span>
+              {event.variants.nodes.slice(0, 2).map((variant) => (
+                <div key={variant.id} className="text-[11px] font-black text-white leading-none flex items-center gap-1.5">
+                  <span className="text-zinc-400 font-semibold uppercase text-[9px]">{variant.title}:</span>
+                  <span>{variant.price.amount} <span className="text-[8px] text-zinc-500">{variant.price.currencyCode}</span></span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Gesamtpreis</span>
+              <span className="text-2xl font-extrabold text-white">
+                {priceAmount} <span className="text-xs text-zinc-400 font-semibold">{currency}</span>
+              </span>
+            </>
+          )}
         </div>
 
         <div className="flex gap-2">
@@ -276,7 +303,7 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             onPress={() => onQuickBuy(event)}
             className="py-3 px-8 rounded-xl bg-white hover:bg-zinc-200 text-black border border-white font-extrabold text-sm transition-all select-none active:scale-[0.98] cursor-pointer"
           >
-            Jetzt Ticket sichern
+            Ticket kaufen
           </Button>
         </div>
       </div>

@@ -1,20 +1,21 @@
-import { MapPin, Check, QrCode } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
-import { QRCodeSVG } from 'qrcode.react';
+import stampImg from '../assets/cardpirates-stempel.png';
 
 interface EventCardProps {
   event: ShopifyProduct;
   onQuickBuy: (event: ShopifyProduct) => void;
   purchasedTickets?: any[];
-  onShowQr?: (ticketId: string, title: string) => void;
+  onShowQr?: (ticketIds: string[], title: string) => void;
 }
 
 export default function EventCard({ event, onQuickBuy, purchasedTickets = [], onShowQr }: EventCardProps) {
   const navigate = useNavigate();
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
+  const stampImgUrl = (window as any).ShopifyAssets?.stampUrl || stampImg;
 
   const title = event.title;
   const location = event.eventLocation?.value || 'TBA';
@@ -26,8 +27,8 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
 
   const priceAmount = event.variants.nodes[0]?.price.amount || '0.00';
   const currency = event.variants.nodes[0]?.price.currencyCode || 'EUR';
-  const userTicket = purchasedTickets.find(t => t.event_id === event.id || t.id === event.id);
-  const isPurchased = !!userTicket;
+  const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
+  const isPurchased = matchingTickets.length > 0;
 
   return (
     <div className="w-full h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
@@ -98,57 +99,81 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
         <div className="absolute top-0 bottom-0 right-[180px] border-l border-dashed border-white/15 z-10 pointer-events-none" />
 
         {/* Right Part: Ticket Stub (Width 180px) */}
-        <div className="w-[180px] shrink-0 h-full flex flex-col items-center justify-between p-5 pt-6 z-10 relative bg-white/[0.01] rounded-r-3xl">
+        <div className={`w-[180px] shrink-0 h-full flex flex-col items-center justify-center p-5 pt-6 z-10 relative bg-white/[0.01] rounded-r-3xl ${isPurchased ? 'gap-3' : 'gap-5'}`}>
           {/* Left Glow effect behind QR */}
           <div className="absolute left-4 top-4 w-16 h-16 bg-white/[0.02] group-hover:bg-white/[0.08] group-hover:scale-125 rounded-full blur-xl pointer-events-none transition-all duration-350" />
           
-          {/* QR Code Graphic (Top) */}
-          {isPurchased && userTicket ? (
+          {isPurchased ? (
+            /* STAMP VIEW */
             <div 
               onClick={(e) => {
                 e.stopPropagation();
-                onShowQr?.(userTicket.id, event.title);
+                onShowQr?.(matchingTickets.map(t => t.id), event.title);
               }}
-              className="p-1.5 bg-white border border-white rounded-xl flex items-center justify-center shrink-0 shadow-lg z-10 hover:scale-[1.08] active:scale-[0.98] transition-all cursor-pointer"
-              title="Tippen zum Vergrößern"
+              className="relative w-24 h-24 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all"
+              title="Tippen zum Vorzeigen"
             >
-              <QRCodeSVG
-                value={userTicket.id}
-                size={80}
-                bgColor={"#ffffff"}
-                fgColor={"#09090b"}
-                level={"M"}
+              <img 
+                src={stampImgUrl} 
+                alt="Cardpirates Stempel" 
+                className="w-full h-full object-contain mix-blend-screen filter invert brightness-125" 
               />
+              
+              {/* Tilted overlay text: "Du bist dabei!" */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+                <span className="text-[10px] sm:text-[11px] font-black uppercase text-red-500 bg-zinc-950 border border-red-500/50 rounded px-1.5 py-0.5 rotate-[-12deg] tracking-wider shadow-lg shadow-black/80 font-mono leading-none">
+                  Du bist dabei!
+                </span>
+              </div>
+              
+              {/* Ticket Count Badge (if quantity > 1) */}
+              {matchingTickets.length > 1 && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 border border-zinc-900 text-white rounded-full flex items-center justify-center font-black text-xs shadow-md shadow-black/80">
+                  {matchingTickets.length}
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="p-2 bg-white/[0.04] group-hover:bg-white/[0.08] group-hover:border-white/20 border border-white/10 rounded-xl flex items-center justify-center shrink-0 shadow-inner z-10 transition-all duration-350">
-              <QrCode size={40} className="text-white/40 group-hover:text-white/80 transition-colors" />
-            </div>
-          )}
+          ) : null}
 
           {/* Price & Action Area (Bottom) */}
-          <div className="flex flex-col items-center text-center justify-center gap-1.5 w-full z-10">
-            <div className="flex flex-col items-center">
-              <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Ticketpreis</span>
-              <span className="text-base font-extrabold text-white leading-none mt-0.5">
-                {priceAmount} <span className="text-[10px] text-zinc-400 font-semibold">{currency}</span>
-              </span>
-            </div>
+          <div className="flex flex-col items-center text-center justify-center gap-2 w-full z-10">
+            {!isPurchased && (
+              <div className="flex flex-col items-center gap-0.5 text-center select-none">
+                {event.variants.nodes.length > 1 ? (
+                  <>
+                    <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest leading-none mb-1">Ticketpreise</span>
+                    {event.variants.nodes.slice(0, 2).map((variant) => (
+                      <div key={variant.id} className="text-xs font-black text-white leading-none flex items-center gap-1">
+                        <span className="text-[9px] text-zinc-400 uppercase font-semibold">{variant.title}:</span>
+                        <span>{variant.price.amount} <span className="text-[8px] text-zinc-500">{variant.price.currencyCode}</span></span>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Ticketpreis</span>
+                    <span className="text-base font-extrabold text-white leading-none mt-0.5">
+                      {priceAmount} <span className="text-[10px] text-zinc-400 font-semibold">{currency}</span>
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
 
             <div onClick={(e) => e.stopPropagation()} className="w-full">
-              {isPurchased && userTicket ? (
+              {isPurchased ? (
                 <button
-                  onClick={() => onShowQr?.(userTicket.id, event.title)}
-                  className="inline-flex items-center justify-center gap-1 w-full px-2.5 py-1.5 bg-green-500/15 hover:bg-green-500/25 border border-green-500/35 rounded-lg text-[10px] font-extrabold text-green-400 cursor-pointer transition-all active:scale-[0.98] animate-fade-in"
+                  onClick={() => onQuickBuy(event)}
+                  className="text-[10px] font-bold text-zinc-400 hover:text-white underline cursor-pointer transition-colors"
                 >
-                  <Check size={11} strokeWidth={3} /> QR ANZEIGEN
+                  weiteres Ticket kaufen
                 </button>
               ) : (
                 <button
                   onClick={() => onQuickBuy(event)}
                   className="w-full py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-white/5 border border-white"
                 >
-                  Sichern
+                  Ticket kaufen
                 </button>
               )}
             </div>
