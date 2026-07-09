@@ -8,7 +8,7 @@ import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
-import logoWater from '../assets/logo-ohne-watermark-wasser.mp4';
+import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 
 interface TicketTimerProps {
   targetDate: string;
@@ -60,7 +60,7 @@ interface LandingPageProps {
 export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger }: LandingPageProps) {
   const navigate = useNavigate();
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
-  const logoWaterUrl = (window as any).ShopifyAssets?.logoWaterUrl || logoWater;
+  const logoSchriftUrl = (window as any).ShopifyAssets?.logoSchriftUrl || logoSchrift;
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -162,20 +162,11 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
       <>
         <header className="text-center pt-1.5 pb-1.5 max-w-xl sm:max-w-3xl mx-auto space-y-2 flex flex-col items-center">
           <div className="flex flex-col items-center space-y-0.5">
-            <div className="relative w-[95%] max-w-[550px] aspect-video overflow-hidden flex justify-center items-center drop-shadow-[0_0_15px_rgba(0,0,0,0.4)] pointer-events-none select-none">
-              <video 
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute w-full h-full object-contain mix-blend-screen bg-transparent"
-                style={{
-                  background: 'transparent',
-                  filter: 'contrast(1.25) brightness(1.15) saturate(1.1)',
-                }}
-                src={logoWaterUrl}
-              />
-            </div>
+            <img 
+              src={logoSchriftUrl} 
+              alt="Cardpirates" 
+              className="w-[70%] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
+            />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
               Werde Teil der Crew!
             </h1>
