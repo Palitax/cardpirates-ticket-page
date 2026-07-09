@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
-import stampImg from '../assets/cardpirates-stempel.png';
 
 interface TicketTimerProps {
   targetDate: string;
@@ -62,7 +61,6 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
   const navigate = useNavigate();
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
   const logoSchriftUrl = (window as any).ShopifyAssets?.logoSchriftUrl || logoSchrift;
-  const stampImgUrl = (window as any).ShopifyAssets?.stampUrl || stampImg;
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -339,7 +337,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                 const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
                                 if (matchingTickets.length > 0) {
                                   return (
-                                    <div className="flex flex-col items-center gap-1.5 select-none mb-1 text-center shrink-0">
+                                    <div className="flex flex-col items-center gap-2 select-none mb-1 text-center shrink-0 w-full px-2">
                                       <div 
                                         onClick={(e) => {
                                           e.stopPropagation();
@@ -349,39 +347,34 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                             activeIndex: 0 
                                           });
                                         }}
-                                        className="relative w-18 h-18 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all"
+                                        className="relative w-20 h-10 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all"
                                         title="Tippen zum Vorzeigen"
                                       >
-                                        <img 
-                                          src={stampImgUrl} 
-                                          alt="Cardpirates Stempel" 
-                                          className="w-full h-full object-contain brightness-95" 
-                                        />
-                                        
                                         {/* Tilted overlay text: "Du bist dabei!" */}
                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                                          <span className="text-[7px] font-black uppercase text-red-600 bg-white/90 border border-red-600/40 rounded px-1.5 py-0.2 rotate-[-12deg] tracking-wider shadow-sm font-mono leading-none">
+                                          <span className="text-[8px] font-black uppercase text-red-600 bg-white/95 border border-red-600/40 rounded px-2 py-0.8 rotate-[-12deg] tracking-wider shadow-sm font-mono leading-none">
                                             Du bist dabei!
                                           </span>
                                         </div>
                                         
                                         {/* Ticket Count Badge (if quantity > 1) */}
                                         {matchingTickets.length > 1 && (
-                                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 border border-white text-white rounded-full flex items-center justify-center font-black text-[9px] shadow-sm">
+                                          <div className="absolute top-0 right-0 w-4 h-4 bg-red-600 border border-white text-white rounded-full flex items-center justify-center font-black text-[8px] shadow-sm z-20">
                                             {matchingTickets.length}
                                           </div>
                                         )}
                                       </div>
 
-                                      <button
+                                      <Button
+                                        variant="outline"
                                         onClick={(e) => {
                                           e.stopPropagation();
                                           onQuickBuy(event);
                                         }}
-                                        className="text-[9px] font-bold text-zinc-500 hover:text-zinc-800 underline cursor-pointer transition-colors"
+                                        className="w-full py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-black font-extrabold text-[11px] active:scale-98 transition-all flex items-center justify-center cursor-pointer border border-zinc-300"
                                       >
                                         weiteres Ticket kaufen
-                                      </button>
+                                      </Button>
                                     </div>
                                   );
                                 }
@@ -439,7 +432,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
               </div>
 
               {/* Desktop List View */}
-              <div className="hidden md:flex flex-col gap-6 w-full max-w-4xl mx-auto px-10 pb-6">
+              <div className="hidden md:grid grid-cols-1 grid-auto-rows-[1fr] gap-6 w-full max-w-4xl mx-auto px-10 pb-6">
                 {events.map((event) => (
                   <EventCard
                     key={event.id}

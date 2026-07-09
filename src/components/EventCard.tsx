@@ -3,7 +3,6 @@ import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
-import stampImg from '../assets/cardpirates-stempel.png';
 
 interface EventCardProps {
   event: ShopifyProduct;
@@ -15,7 +14,6 @@ interface EventCardProps {
 export default function EventCard({ event, onQuickBuy, purchasedTickets = [], onShowQr }: EventCardProps) {
   const navigate = useNavigate();
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
-  const stampImgUrl = (window as any).ShopifyAssets?.stampUrl || stampImg;
 
   const title = event.title;
   const location = event.eventLocation?.value || 'TBA';
@@ -31,20 +29,17 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
   const isPurchased = matchingTickets.length > 0;
 
   return (
-    <div className="w-full h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
+    <div className="w-full h-full min-h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
       <div 
         onClick={() => navigate(`/events/${event.handle}`)}
         style={{
-          mask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 50% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 50% no-repeat',
-          WebkitMask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 50% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 50% no-repeat'
+          mask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 51% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 51% no-repeat',
+          WebkitMask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 51% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 51% no-repeat'
         }}
-        className="relative w-full h-full flex flex-row rounded-3xl border border-white/[0.12] bg-white/[0.07] group-hover:bg-white/[0.12] group-hover:border-white/[0.35] backdrop-blur-xl group transition-all duration-350 cursor-pointer overflow-hidden"
+        className="relative w-full h-full flex flex-row rounded-3xl border-[1.5px] border-white/[0.15] bg-white/[0.07] group-hover:bg-white/[0.12] group-hover:border-white/[0.4] backdrop-blur-xl group transition-all duration-350 cursor-pointer overflow-hidden"
       >
         {/* Glossy Reflection Overlay */}
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/[0.02] via-transparent to-white/[0.08] group-hover:from-white/[0.08] group-hover:to-white/[0.22] pointer-events-none z-10 transition-all duration-350" />
-
-        {/* Edge highlight overlay */}
-        <div className="absolute inset-px rounded-[23px] border border-white/[0.06] group-hover:border-white/[0.15] pointer-events-none z-10 transition-all duration-350" />
 
         {/* Left Section: Video Cover (Merged) */}
         <div className="relative w-[220px] h-full overflow-hidden shrink-0">
@@ -72,7 +67,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
         {/* Middle Section: Details */}
         <div className="flex-1 p-6 pl-2 space-y-3.5 text-left flex flex-col justify-center min-h-0 z-10">
           <div className="space-y-1.5">
-            <h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-white/95 transition-colors uppercase font-mono line-clamp-1">
+            <h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-white/95 transition-colors uppercase font-mono">
               {title}
             </h3>
 
@@ -110,25 +105,19 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
                 e.stopPropagation();
                 onShowQr?.(matchingTickets.map(t => t.id), event.title);
               }}
-              className="relative w-24 h-24 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all"
+              className="relative w-24 h-12 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all"
               title="Tippen zum Vorzeigen"
             >
-              <img 
-                src={stampImgUrl} 
-                alt="Cardpirates Stempel" 
-                className="w-full h-full object-contain mix-blend-screen filter invert brightness-125" 
-              />
-              
               {/* Tilted overlay text: "Du bist dabei!" */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                <span className="text-[10px] sm:text-[11px] font-black uppercase text-red-500 bg-zinc-950 border border-red-500/50 rounded px-1.5 py-0.5 rotate-[-12deg] tracking-wider shadow-lg shadow-black/80 font-mono leading-none">
+                <span className="text-[10px] sm:text-[11px] font-black uppercase text-red-500 bg-zinc-950 border border-red-500/50 rounded px-2.5 py-1.5 rotate-[-12deg] tracking-wider shadow-lg shadow-black/80 font-mono leading-none">
                   Du bist dabei!
                 </span>
               </div>
               
               {/* Ticket Count Badge (if quantity > 1) */}
               {matchingTickets.length > 1 && (
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-red-600 border border-zinc-900 text-white rounded-full flex items-center justify-center font-black text-xs shadow-md shadow-black/80">
+                <div className="absolute top-0 right-0 w-6 h-6 bg-red-600 border border-zinc-900 text-white rounded-full flex items-center justify-center font-black text-xs shadow-md shadow-black/80 z-20">
                   {matchingTickets.length}
                 </div>
               )}
@@ -164,7 +153,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
               {isPurchased ? (
                 <button
                   onClick={() => onQuickBuy(event)}
-                  className="text-[10px] font-bold text-zinc-400 hover:text-white underline cursor-pointer transition-colors"
+                  className="w-full py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-black/20"
                 >
                   weiteres Ticket kaufen
                 </button>
