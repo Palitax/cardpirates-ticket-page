@@ -67,7 +67,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
         {/* Middle Section: Details */}
         <div className="flex-1 p-6 pl-2 space-y-3.5 text-left flex flex-col justify-center min-h-0 z-10">
           <div className="space-y-1.5">
-            <h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-white/95 transition-colors uppercase font-mono">
+            <h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-white/95 transition-colors uppercase font-mono line-clamp-1">
               {title}
             </h3>
 

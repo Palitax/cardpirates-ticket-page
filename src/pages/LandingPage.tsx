@@ -432,7 +432,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
               </div>
 
               {/* Desktop List View */}
-              <div className="hidden md:grid grid-cols-1 grid-auto-rows-[1fr] gap-6 w-full max-w-4xl mx-auto px-10 pb-6">
+              <div className="hidden md:grid grid-cols-1 grid-auto-rows-[1fr] gap-6 w-full max-w-5xl mx-auto px-10 pb-6">
                 {events.map((event) => (
                   <EventCard
                     key={event.id}
@@ -498,7 +498,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
 
   return (
     <div 
-      className="px-4 sm:px-6 pb-24 pt-1 max-w-4xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
+      className="px-4 sm:px-6 pb-24 pt-1 max-w-5xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
     >
       {renderMainContent()}
       
