@@ -7,7 +7,7 @@ import {
   Input, 
   Button 
 } from '@heroui/react';
-import { ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X, Eye, EyeOff } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import { profileService, supabase } from '../services/supabase';
@@ -44,6 +44,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   // Form States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [companyName, setCompanyName] = useState('');
@@ -210,7 +211,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
       const { error: verifyError } = await supabase.auth.verifyOtp({
         email,
         token: otpCode,
-        type: 'email'
+        type: 'signup'
       });
 
       if (verifyError) {
@@ -235,10 +236,15 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
       };
       await profileService.saveProfile(profileData);
 
-      setSuccessMessage('Konto erfolgreich verifiziert! Logge dich jetzt ein.');
+      setSuccessMessage('Konto erfolgreich verifiziert!');
       setShowOtpScreen(false);
-      setActiveTab('login');
       setOtpCode('');
+
+      if (event) {
+        await generateCheckoutAndCallSuccess(profileData);
+      } else {
+        onSuccess('', profileData, 'register');
+      }
     } catch (err: any) {
       setError(getErrorMessage(err));
     }
@@ -312,17 +318,27 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   };
 
   const handleResendOtp = async () => {
-    if (!supabase) return;
+    if (!supabase) {
+      setError('Supabase-Verbindung fehlt.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
     try {
       const { error: resendError } = await supabase.auth.resend({
         type: 'signup',
-        email
+        email,
+        options: {
+          emailRedirectTo: window.location.origin
+        }
       });
       if (resendError) throw resendError;
-      setSuccessMessage('Ein neuer Code wurde an deine E-Mail gesendet.');
-      setError(null);
+      setSuccessMessage('Ein neuer Bestätigungscode wurde an deine E-Mail-Adresse gesendet.');
     } catch (err: any) {
       setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -558,23 +574,32 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
               <TextField name="password" className="space-y-1.5 w-full">
                 <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('password') ? 'text-rose-500' : 'text-zinc-400'}`}>Passwort</Label>
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (validationErrors.includes('password')) {
-                      setValidationErrors(validationErrors.filter((f) => f !== 'password'));
-                    }
-                  }}
-                  required
-                  className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                    validationErrors.includes('password') 
-                      ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                      : 'border-zinc-800'
-                  }`}
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (validationErrors.includes('password')) {
+                        setValidationErrors(validationErrors.filter((f) => f !== 'password'));
+                      }
+                    }}
+                    required
+                    className={`w-full bg-zinc-950 border focus:border-white rounded-xl pl-4 pr-12 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                      validationErrors.includes('password') 
+                        ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                        : 'border-zinc-800'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors focus:outline-none cursor-pointer p-1"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </TextField>
 
               {activeTab === 'register' && (
@@ -807,6 +832,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       type="button"
                       onClick={() => {
                         setActiveTab('login');
+                        setShowPassword(false);
                         setError(null);
                         setSuccessMessage(null);
                         setValidationErrors([]);
@@ -823,6 +849,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                       type="button"
                       onClick={() => {
                         setActiveTab('register');
+                        setShowPassword(false);
                         setError(null);
                         setSuccessMessage(null);
                         setValidationErrors([]);
