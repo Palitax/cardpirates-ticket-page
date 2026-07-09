@@ -438,20 +438,20 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   <span className="text-[32px] block">✉️</span>
                   <p className="text-sm font-bold text-white">E-Mail verifizieren</p>
                   <p className="text-xs text-zinc-400 max-w-xs mx-auto leading-relaxed">
-                    Bitte gib den 6-stelligen Verifizierungscode ein, den wir dir an <span className="text-white font-semibold">{email}</span> gesendet haben.
+                    Bitte gib den Verifizierungscode ein, den wir dir an <span className="text-white font-semibold">{email}</span> gesendet haben.
                   </p>
                 </div>
 
                 <TextField name="otpCode" className="space-y-1.5 w-full">
-                  <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block text-center">6-Stelliger Code</Label>
+                  <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block text-center">Aktivierungscode</Label>
                   <Input
                     type="text"
-                    placeholder="123456"
-                    maxLength={6}
+                    placeholder="Code eingeben"
+                    maxLength={12}
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                     required
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-center text-lg font-black tracking-[10px] text-white outline-none transition-all placeholder:tracking-normal placeholder:font-normal"
+                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-center text-lg font-black tracking-[4px] text-white outline-none transition-all placeholder:tracking-normal placeholder:font-normal"
                   />
                 </TextField>
 
