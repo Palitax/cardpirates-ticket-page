@@ -347,19 +347,27 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                             activeIndex: 0 
                                           });
                                         }}
-                                        className="relative w-20 h-10 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all"
+                                        className="relative w-18 h-18 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all duration-300 group/seal select-none"
                                         title="Tippen zum Vorzeigen"
                                       >
-                                        {/* Tilted overlay text: "Du bist dabei!" */}
-                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                                          <span className="text-[8px] font-black uppercase text-red-600 bg-white/95 border border-red-600/40 rounded px-2 py-0.8 rotate-[-12deg] tracking-wider shadow-sm font-mono leading-none">
-                                            Du bist dabei!
-                                          </span>
+                                        {/* Outer irregular wobbly wax body */}
+                                        <div className="absolute inset-0 rounded-[50%_48%_52%_49%_/_49%_51%_48%_52%] bg-gradient-to-br from-red-650 via-red-700 to-red-950 shadow-[0_3px_8px_rgba(0,0,0,0.6),inset_0_1.5px_3px_rgba(255,255,255,0.3),inset_0_-3px_6px_rgba(0,0,0,0.6)] group-hover/seal:scale-105 transition-transform duration-300" />
+                                        
+                                        {/* Pressed inner circle */}
+                                        <div className="absolute w-[80%] h-[80%] rounded-[50%_49%_51%_48%_/_48%_50%_49%_52%] bg-gradient-to-br from-red-850 to-red-950 border border-red-900/60 shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),0_0.5px_1px_rgba(255,255,255,0.15)] flex flex-col items-center justify-center p-1.5 z-10 pointer-events-none">
+                                          <div className="rotate-[-10deg] text-center select-none flex flex-col items-center">
+                                            <span className="text-[8px] font-black uppercase tracking-wider text-red-100/90 font-mono leading-none [text-shadow:-0.5px_-0.5px_0px_rgba(0,0,0,0.9),0.5px_0.5px_0px_rgba(255,255,255,0.1)]">
+                                              Du bist
+                                            </span>
+                                            <span className="text-[9px] font-black uppercase tracking-wider text-red-200 font-mono leading-none [text-shadow:-0.5px_-0.5px_0px_rgba(0,0,0,0.9),0.5px_0.5px_0px_rgba(255,255,255,0.1)] mt-0.5">
+                                              Dabei!
+                                            </span>
+                                          </div>
                                         </div>
                                         
                                         {/* Ticket Count Badge (if quantity > 1) */}
                                         {matchingTickets.length > 1 && (
-                                          <div className="absolute top-0 right-0 w-4 h-4 bg-red-600 border border-white text-white rounded-full flex items-center justify-center font-black text-[8px] shadow-sm z-20">
+                                          <div className="absolute top-0 right-0 w-4.5 h-4.5 bg-red-600 border border-white text-white rounded-full flex items-center justify-center font-black text-[8px] shadow-sm z-20">
                                             {matchingTickets.length}
                                           </div>
                                         )}

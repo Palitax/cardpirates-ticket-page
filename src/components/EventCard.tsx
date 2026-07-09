@@ -99,25 +99,37 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
           <div className="absolute left-4 top-4 w-16 h-16 bg-white/[0.02] group-hover:bg-white/[0.08] group-hover:scale-125 rounded-full blur-xl pointer-events-none transition-all duration-350" />
           
           {isPurchased ? (
-            /* STAMP VIEW */
+            /* WAX SEAL VIEW */
             <div 
               onClick={(e) => {
                 e.stopPropagation();
                 onShowQr?.(matchingTickets.map(t => t.id), event.title);
               }}
-              className="relative w-24 h-12 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all"
+              className="relative w-20 h-20 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.08] active:scale-[0.96] transition-all duration-300 group/seal select-none"
               title="Tippen zum Vorzeigen"
             >
-              {/* Tilted overlay text: "Du bist dabei!" */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-                <span className="text-[10px] sm:text-[11px] font-black uppercase text-red-500 bg-zinc-950 border border-red-500/50 rounded px-2.5 py-1.5 rotate-[-12deg] tracking-wider shadow-lg shadow-black/80 font-mono leading-none">
-                  Du bist dabei!
-                </span>
+              {/* Outer irregular wobbly wax body */}
+              <div className="absolute inset-0 rounded-[50%_48%_52%_49%_/_49%_51%_48%_52%] bg-gradient-to-br from-red-650 via-red-700 to-red-950 shadow-[0_4px_12px_rgba(0,0,0,0.7),inset_0_2px_4px_rgba(255,255,255,0.35),inset_0_-4px_8px_rgba(0,0,0,0.6)] animate-[spin_40s_linear_infinite] opacity-95 group-hover/seal:scale-105 transition-transform duration-300" />
+              
+              {/* Second layer to add organic texture/mass */}
+              <div className="absolute inset-0.5 rounded-[48%_52%_49%_51%_/_51%_48%_52%_49%] bg-gradient-to-tr from-red-600 via-red-800 to-red-900 opacity-90 shadow-[inset_0_2px_3px_rgba(255,255,255,0.2)] pointer-events-none" />
+              
+              {/* Inner pressed area (stamped) */}
+              <div className="absolute w-[80%] h-[80%] rounded-[50%_49%_51%_48%_/_48%_50%_49%_52%] bg-gradient-to-br from-red-850 to-red-950 border border-red-900/60 shadow-[inset_0_4px_8px_rgba(0,0,0,0.8),0_1px_2px_rgba(255,255,255,0.15)] flex flex-col items-center justify-center p-1.5 z-10 pointer-events-none">
+                {/* Tilted embossed text */}
+                <div className="rotate-[-10deg] text-center select-none flex flex-col items-center">
+                  <span className="text-[9px] font-black uppercase tracking-wider text-red-100/90 font-mono leading-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.1)] [text-shadow:-1px_-1px_0px_rgba(0,0,0,0.9),1px_1px_0px_rgba(255,255,255,0.1)]">
+                    Du bist
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-red-200 font-mono leading-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.1)] [text-shadow:-1px_-1px_0px_rgba(0,0,0,0.9),1px_1px_0px_rgba(255,255,255,0.1)] mt-0.5">
+                    Dabei!
+                  </span>
+                </div>
               </div>
               
               {/* Ticket Count Badge (if quantity > 1) */}
               {matchingTickets.length > 1 && (
-                <div className="absolute top-0 right-0 w-6 h-6 bg-red-600 border border-zinc-900 text-white rounded-full flex items-center justify-center font-black text-xs shadow-md shadow-black/80 z-20">
+                <div className="absolute -top-1 -right-1 w-5.5 h-5.5 bg-red-600 border border-zinc-900 text-white rounded-full flex items-center justify-center font-black text-[10px] shadow-[0_2px_5px_rgba(0,0,0,0.5)] z-20 scale-90">
                   {matchingTickets.length}
                 </div>
               )}
@@ -125,7 +137,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
           ) : null}
 
           {/* Price & Action Area (Bottom) */}
-          <div className="flex flex-col items-center text-center justify-center gap-2 w-full z-10">
+          <div className="flex flex-col items-center text-center justify-center gap-[18px] w-full z-10">
             {!isPurchased && (
               <div className="flex flex-col items-center gap-0.5 text-center select-none">
                 {event.variants.nodes.length > 1 ? (
