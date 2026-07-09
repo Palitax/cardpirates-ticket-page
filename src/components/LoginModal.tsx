@@ -375,14 +375,14 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
     <Modal isOpen={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <Modal.Backdrop className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in hidden md:block" />
       <Modal.Container className="fixed inset-0 z-50 flex items-stretch md:items-center justify-stretch md:justify-center p-0 md:p-4">
-        <Modal.Dialog className="bg-zinc-950 md:bg-zinc-900 border-none md:border border-zinc-800 rounded-none md:rounded-3xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-lg overflow-hidden flex flex-col shadow-none md:shadow-2xl relative animate-fade-in md:animate-scale-up text-zinc-300">
+        <Modal.Dialog className="bg-zinc-950 md:bg-zinc-900 border-none md:border border-zinc-800 rounded-none md:rounded-3xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-2xl overflow-hidden flex flex-col shadow-none md:shadow-2xl relative animate-fade-in md:animate-scale-up text-zinc-300">
           
           {/* Close button */}
           <Modal.CloseTrigger 
             onClick={onClose}
-            className="absolute top-4 right-4 text-zinc-400 hover:text-white w-11 h-11 flex items-center justify-center p-0 hover:bg-zinc-850 rounded-xl transition-colors cursor-pointer z-10"
+            className="absolute top-4 right-4 bg-zinc-100 hover:bg-zinc-200 text-black w-11 h-11 flex items-center justify-center p-0 rounded-xl transition-colors cursor-pointer z-10"
           >
-            <X size={20} />
+            <X size={20} className="text-black" />
           </Modal.CloseTrigger>
 
           {/* Header */}
@@ -775,7 +775,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             )}
           </Modal.Body>
 
-          <Modal.Footer className="border-t border-zinc-800 bg-zinc-950/60 p-4 md:p-6 flex flex-col justify-center items-center gap-4 shrink-0">
+          <Modal.Footer className="p-4 md:p-6 flex flex-col justify-center items-center gap-4 shrink-0">
             <Button
               onPress={() => handleSubmit()}
               className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer"
