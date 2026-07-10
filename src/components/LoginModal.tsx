@@ -114,6 +114,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         }
       }
 
+      const ticketNumber = `CP-${Math.floor(100000 + Math.random() * 900000)}`;
       savedTickets.push({
         id: ticketId,
         event_id: event.id,
@@ -122,7 +123,10 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         location: event.eventLocation?.value,
         image: event.images.nodes[0]?.url,
         purchaseDate: new Date().toISOString(),
-        status: 'active'
+        status: 'active',
+        ticketNumber: ticketNumber,
+        firstName: profileData.first_name,
+        lastName: profileData.last_name
       });
     }
 

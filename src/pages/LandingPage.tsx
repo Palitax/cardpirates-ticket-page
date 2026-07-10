@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 
+const ENABLE_QR_CODE = false;
+
 interface TicketTimerProps {
   targetDate: string;
 }
@@ -525,52 +527,100 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
               <X size={24} />
             </button>
 
-            <div className="w-full max-w-xs flex flex-col items-center space-y-6 mt-4">
-              <div className="text-center space-y-1">
-                <span className="text-[9px] font-black text-red-600 uppercase tracking-widest">Cardpirates Einlass-Ticket</span>
-                <h2 className="text-lg font-black leading-tight text-zinc-950">{activeQrModal.title}</h2>
-              </div>
-              
-              <div className="bg-white p-4 rounded-3xl shadow-xl flex justify-center items-center border border-zinc-150/50">
-                <QRCodeSVG 
-                  value={activeQrModal.ticketIds[activeQrModal.activeIndex]}
-                  size={200}
-                  bgColor={"#ffffff"}
-                  fgColor={"#09090b"}
-                  level={"Q"}
-                />
-              </div>
-
-              {activeQrModal.ticketIds.length > 1 && (
-                <div className="flex items-center justify-between w-full px-2 mt-2 select-none">
-                  <button
-                    onClick={() => setActiveQrModal(prev => prev ? { ...prev, activeIndex: (prev.activeIndex - 1 + prev.ticketIds.length) % prev.ticketIds.length } : null)}
-                    className="bg-zinc-100 hover:bg-zinc-250 text-zinc-800 font-bold rounded-lg text-xs px-3 py-1 cursor-pointer transition-all active:scale-[0.95]"
-                  >
-                    &larr; Zurück
-                  </button>
-                  <span className="text-xs font-black text-zinc-500 font-mono">
-                    {activeQrModal.activeIndex + 1} / {activeQrModal.ticketIds.length}
+            <div className="w-full max-w-xs flex flex-col items-center mt-4">
+                <div className="text-center space-y-1.5 w-full">
+                  <span className="text-[10px] font-black text-red-650 uppercase tracking-widest block">
+                    Cardpirates Einlass-Ticket
                   </span>
-                  <button
-                    onClick={() => setActiveQrModal(prev => prev ? { ...prev, activeIndex: (prev.activeIndex + 1) % prev.ticketIds.length } : null)}
-                    className="bg-zinc-100 hover:bg-zinc-250 text-zinc-800 font-bold rounded-lg text-xs px-3 py-1 cursor-pointer transition-all active:scale-[0.95]"
-                  >
-                    Weiter &rarr;
-                  </button>
+                  <h2 className="text-base font-black leading-snug text-zinc-900 px-2">
+                    {activeQrModal.title}
+                  </h2>
                 </div>
-              )}
+                
+                {ENABLE_QR_CODE ? (
+                  <>
+                    <div className="my-6 bg-white p-4 rounded-3xl shadow-xl flex justify-center items-center border border-zinc-150/50">
+                      <QRCodeSVG 
+                        value={activeQrModal.ticketIds[activeQrModal.activeIndex]}
+                        size={200}
+                        bgColor={"#ffffff"}
+                        fgColor={"#09090b"}
+                        level={"Q"}
+                      />
+                    </div>
+                    <div className="text-center space-y-2 mb-4">
+                      <p className="text-xs font-bold text-zinc-800">Bitte zeige diesen QR-Code am Einlass vor.</p>
+                      <p className="text-[9px] text-zinc-500 max-w-[90%] mx-auto leading-relaxed">
+                        Stelle deine Display-Helligkeit für optimale Scanbarkeit auf das Maximum.
+                      </p>
+                    </div>
+                  </>
+                ) : (() => {
+                  const currentTicketId = activeQrModal.ticketIds[activeQrModal.activeIndex];
+                  const ticket = purchasedTickets.find(t => t.id === currentTicketId);
+                  if (!ticket) return null;
 
-              <div className="text-center space-y-2">
-                <p className="text-xs font-bold text-zinc-800">Bitte zeige diesen QR-Code am Einlass vor.</p>
-                <p className="text-[9px] text-zinc-500 max-w-[90%] mx-auto leading-relaxed">
-                  Stelle deine Display-Helligkeit für optimale Scanbarkeit auf das Maximum.
-                </p>
-              </div>
+                  const formattedDate = ticket.date 
+                    ? new Date(ticket.date).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : 'TBA';
+
+                  return (
+                    <div className="w-full space-y-4 my-6 p-5 bg-zinc-50 border border-zinc-150 rounded-2xl text-left">
+                      <div className="space-y-1">
+                        <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Ticket-Inhaber</span>
+                        <span className="block text-sm font-extrabold text-zinc-800">
+                          {ticket.firstName || currentUser?.first_name || ''} {ticket.lastName || currentUser?.last_name || ''}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 border-t border-zinc-200/60 pt-3">
+                        <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Ort & Datum</span>
+                        <span className="block text-[10px] text-zinc-700 font-extrabold leading-normal">
+                          {ticket.location || 'TBA'} <br />
+                          {formattedDate}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 border-t border-zinc-200/60 pt-3">
+                        <div className="space-y-1">
+                          <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Ticketnummer</span>
+                          <span className="block text-xs font-mono font-black text-red-650 uppercase tracking-wider">
+                            {ticket.ticketNumber || `CP-${ticket.id.substring(0, 6).toUpperCase()}`}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Status</span>
+                          <span className="block text-xs font-bold text-emerald-600 uppercase">Gültig</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {activeQrModal.ticketIds.length > 1 && (
+                  <div className="flex items-center justify-between w-full mt-2 select-none">
+                    <button
+                      onClick={() => setActiveQrModal(prev => prev ? { ...prev, activeIndex: (prev.activeIndex - 1 + prev.ticketIds.length) % prev.ticketIds.length } : null)}
+                      className="bg-zinc-100 hover:bg-zinc-250 text-zinc-800 font-bold rounded-lg text-[10px] px-3 py-1.5 cursor-pointer transition-all active:scale-[0.95]"
+                    >
+                      &larr; Zurück
+                    </button>
+                    <span className="text-xs font-black text-zinc-500 font-mono">
+                      {activeQrModal.activeIndex + 1} / {activeQrModal.ticketIds.length}
+                    </span>
+                    <button
+                      onClick={() => setActiveQrModal(prev => prev ? { ...prev, activeIndex: (prev.activeIndex + 1) % prev.ticketIds.length } : null)}
+                      className="bg-zinc-100 hover:bg-zinc-250 text-zinc-800 font-bold rounded-lg text-[10px] px-3 py-1.5 cursor-pointer transition-all active:scale-[0.95]"
+                    >
+                      Weiter &rarr;
+                    </button>
+                  </div>
+                 )}
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

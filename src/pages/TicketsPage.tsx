@@ -5,6 +5,8 @@ import { Button } from '@heroui/react';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion } from 'framer-motion';
 
+const ENABLE_QR_CODE = false;
+
 interface TicketItem {
   id: string;
   event_id: string;
@@ -14,6 +16,9 @@ interface TicketItem {
   image?: string;
   purchaseDate: string;
   status: string;
+  ticketNumber?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export default function TicketsPage({ currentUser }: { currentUser: any }) {
@@ -153,7 +158,7 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
                     </div>
 
                     <div className="text-[10px] font-black text-red-500 bg-red-950/20 border border-red-900/30 px-2.5 py-1 rounded-lg uppercase tracking-wider shrink-0 select-none">
-                      QR Code
+                      Ticket ansehen
                     </div>
                   </motion.div>
                 ))}
@@ -243,15 +248,47 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
               </div>
             </div>
 
-            {/* QR Code SVG */}
-            <div className="my-6 p-4 bg-white rounded-3xl border border-zinc-200 shadow-xl shadow-black/45">
-              <QRCodeSVG 
-                value={selectedTicket.id}
-                size={180}
-                level="H"
-                includeMargin={false}
-              />
-            </div>
+            {/* Conditional QR Code or Ticket Information Stub */}
+            {ENABLE_QR_CODE ? (
+              <div className="my-6 p-4 bg-white rounded-3xl border border-zinc-200 shadow-xl shadow-black/45">
+                <QRCodeSVG 
+                  value={selectedTicket.id}
+                  size={180}
+                  level="H"
+                  includeMargin={false}
+                />
+              </div>
+            ) : (
+              <div className="w-full space-y-4 my-6 p-5 bg-zinc-950/80 border border-zinc-800 rounded-2xl text-left">
+                <div className="space-y-1">
+                  <span className="block text-[8px] text-zinc-500 font-bold uppercase tracking-wider">Ticket-Inhaber</span>
+                  <span className="block text-sm font-extrabold text-white">
+                    {selectedTicket.firstName || currentUser?.first_name || ''} {selectedTicket.lastName || currentUser?.last_name || ''}
+                  </span>
+                </div>
+
+                <div className="space-y-1 border-t border-zinc-900 pt-3">
+                  <span className="block text-[8px] text-zinc-500 font-bold uppercase tracking-wider">Ort & Datum</span>
+                  <span className="block text-[10px] text-zinc-400 font-semibold leading-normal">
+                    {selectedTicket.location || 'TBA'} <br />
+                    {selectedTicket.date ? new Date(selectedTicket.date).toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'TBA'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 border-t border-zinc-900 pt-3">
+                  <div className="space-y-1">
+                    <span className="block text-[8px] text-zinc-500 font-bold uppercase tracking-wider">Ticketnummer</span>
+                    <span className="block text-xs font-mono font-black text-red-500 uppercase tracking-wider">
+                      {selectedTicket.ticketNumber || `CP-${selectedTicket.id.substring(0, 6).toUpperCase()}`}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <span className="block text-[8px] text-zinc-500 font-bold uppercase tracking-wider">Status</span>
+                    <span className="block text-xs font-bold text-emerald-500 uppercase">Gültig</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Bottom ID tag */}
             <div className="space-y-1 mt-auto">

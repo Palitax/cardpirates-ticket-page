@@ -6,3 +6,4 @@
 
 - **Automatic Git Push**: After successfully completing and verifying any requested coding task or implementation changes, always stage all modified files, create a concise and descriptive commit message following conventional commit guidelines, commit the changes, and push them to the remote Git repository before concluding your turn.
 
+- **Reactivating QR Codes**: If the user asks to reactivate/turn back on the QR Code feature for tickets, change `const ENABLE_QR_CODE = false;` to `true` in `src/pages/LandingPage.tsx` and `src/pages/TicketsPage.tsx`. This will instantly enable QRCodeSVG display and toggle the ticket stub views back to scanning mode.
