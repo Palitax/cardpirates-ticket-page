@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Mail, Shield, Scale, Info, FileText } from 'lucide-react';
 import { Button } from '@heroui/react';
 import type { CustomerProfile } from '../services/supabase';
-import logo from '../assets/logo.png';
+import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 
 interface BurgerMenuProps {
   currentUser: CustomerProfile | null;
@@ -14,6 +14,18 @@ interface BurgerMenuProps {
 export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onProfileUpdate }: BurgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSheet, setActiveSheet] = useState<'impressum' | 'agb' | 'datenschutz' | 'widerruf' | null>(null);
+
+  // Newsletter States
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newsletterEmail.trim()) {
+      setNewsletterSubmitted(true);
+      setNewsletterEmail('');
+    }
+  };
   
   // Profile Editing States
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -188,15 +200,12 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
             
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-900 shrink-0">
-              <div className="flex items-center gap-2 select-none pointer-events-none">
+              <div className="flex items-center select-none pointer-events-none">
                 <img 
-                  src={(window as any).ShopifyAssets?.logoUrl || logo} 
+                  src={logoSchrift} 
                   alt="Cardpirates Logo" 
-                  className="w-8 h-8 object-contain"
+                  className="h-6 w-auto object-contain"
                 />
-                <span className="text-2xl font-medium text-white font-[Qwigley] tracking-wide lowercase first-letter:uppercase">
-                  Cardpirates
-                </span>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
@@ -208,88 +217,122 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
             </div>
 
             {/* Drawer Scrollable Content */}
-            <div className="flex-1 px-4 py-4 space-y-5 overflow-y-auto">
+            <div className="flex-1 px-4 py-4 overflow-y-auto flex flex-col justify-between">
 
-              {/* Profile Context Section */}
-              {!currentUser ? (
-                /* LOGGED OUT USER VIEW - Card Wrapper Removed */
-                <div className="space-y-3 shrink-0 text-center px-1 py-2">
-                  <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Crew Profil</span>
-                  <p className="text-[11px] text-zinc-500 leading-normal mb-1">
-                    Logge dich ein, um deine Tickets und Profildetails einzusehen.
-                  </p>
-                  <Button
-                    variant="primary"
-                    onPress={() => {
-                      setIsOpen(false);
-                      onLoginTrigger();
-                    }}
-                    className="w-full py-3 rounded-lg bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98]"
-                  >
-                    Login / Registrieren
-                  </Button>
-                </div>
-              ) : (
-                /* LOGGED IN USER VIEW */
-                <div className="space-y-3 shrink-0">
-                  {/* User Profile Header Card */}
-                  <div className="p-3 bg-zinc-950 border border-zinc-900 rounded-xl flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center font-bold text-white uppercase text-xs shrink-0 border border-zinc-800">
-                        {currentUser.first_name[0]}{currentUser.last_name[0]}
-                      </div>
-                      <div className="text-left min-w-0">
-                        <h4 className="text-xs font-bold text-white truncate">Hallo, {currentUser.first_name}!</h4>
-                        <span className="block text-[8px] text-zinc-500 uppercase tracking-widest font-semibold truncate">
-                          {currentUser.user_type === 'business' ? 'Business' : 'Private'}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={onLogout}
-                      className="text-[9px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-md transition-all shrink-0"
+              {/* Profile Context Section (Top) */}
+              <div className="space-y-3 shrink-0">
+                {!currentUser ? (
+                  /* LOGGED OUT USER VIEW - Card Wrapper Removed */
+                  <div className="space-y-3 text-center px-1 py-2">
+                    <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-left">Crew Profil</span>
+                    <p className="text-[11px] text-zinc-500 leading-normal mb-1 text-left">
+                      Logge dich ein, um deine Tickets und Profildetails einzusehen.
+                    </p>
+                    <Button
+                      variant="primary"
+                      onPress={() => {
+                        setIsOpen(false);
+                        onLoginTrigger();
+                      }}
+                      className="w-full py-3 rounded-lg bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98]"
                     >
-                      Logout
-                    </button>
+                      Login / Registrieren
+                    </Button>
                   </div>
-                  
-                  {/* Edit Profile Button */}
-                  <Button
-                    variant="primary"
-                    onPress={() => setIsEditingProfile(true)}
-                    className="w-full py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-850 text-white font-extrabold text-xs cursor-pointer border border-zinc-800 transition-all active:scale-[0.98] flex items-center justify-center"
-                  >
-                    Profil bearbeiten
-                  </Button>
-                </div>
-              )}
-
-              {/* Discord Button Sektion (Unified size matching Login button, official logo path) */}
-              <div className="space-y-2 shrink-0">
-                <Button
-                  variant="primary"
-                  onPress={() => window.open('https://discord.gg/8yRykEdr4G', '_blank')}
-                  className="w-full py-3 rounded-lg bg-black hover:bg-zinc-950 text-white font-extrabold text-xs cursor-pointer border border-zinc-700 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-                >
-                  <svg className="w-4 h-4 fill-white shrink-0 block" viewBox="0 0 127.14 96.36">
-                    <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c1.07-.79,2.12-1.61,3.13-2.47a75.1,75.1,0,0,0,64.84,0c1,.86,2.06,1.68,3.13,2.47a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129.07,47,122.9,24.16,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.9,46,53.72,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.14,46,96,53,91,65.69,84.69,65.69Z"/>
-                  </svg>
-                  <span>Tritt unserem Discord bei</span>
-                </Button>
+                ) : (
+                  /* LOGGED IN USER VIEW */
+                  <div className="space-y-3">
+                    {/* User Profile Header Card */}
+                    <div className="p-3 bg-zinc-950 border border-zinc-900 rounded-xl flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center font-bold text-white uppercase text-xs shrink-0 border border-zinc-800">
+                          {currentUser.first_name[0]}{currentUser.last_name[0]}
+                        </div>
+                        <div className="text-left min-w-0">
+                          <h4 className="text-xs font-bold text-white truncate">Hallo, {currentUser.first_name}!</h4>
+                          <span className="block text-[8px] text-zinc-500 uppercase tracking-widest font-semibold truncate">
+                            {currentUser.user_type === 'business' ? 'Business' : 'Private'}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={onLogout}
+                        className="text-[9px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-md transition-all shrink-0"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                    
+                    {/* Edit Profile Button */}
+                    <Button
+                      variant="primary"
+                      onPress={() => setIsEditingProfile(true)}
+                      className="w-full py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-850 text-white font-extrabold text-xs cursor-pointer border border-zinc-800 transition-all active:scale-[0.98] flex items-center justify-center"
+                    >
+                      Profil bearbeiten
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              {/* Support & Kontakt */}
-              <div className="space-y-2 shrink-0">
-                <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5 text-left">
-                  Support
-                </span>
-                <a
-                  href="mailto:support@cardpirates.de?subject=Cardpirates%20Supportanfrage"
-                  className="w-full flex items-center justify-center gap-2 p-2.5 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-zinc-800 transition-all text-slate-300 text-xs font-bold text-center"
-                >
-                  <Mail size={13} className="text-white" />
-                  <span>Support kontaktieren</span>
-                </a>
+              {/* Socials & Support Section (Bottom) */}
+              <div className="space-y-5 pt-8 shrink-0">
+                {/* Discord Button Sektion (Unified size matching Login button, official logo path) */}
+                <div className="space-y-2">
+                  <Button
+                    variant="primary"
+                    onPress={() => window.open('https://discord.gg/8yRykEdr4G', '_blank')}
+                    className="w-full py-3 rounded-lg bg-black hover:bg-zinc-950 text-white font-extrabold text-xs cursor-pointer border border-zinc-700 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                  >
+                    <svg className="w-4 h-4 fill-white shrink-0 block" viewBox="0 0 127.14 96.36">
+                      <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c1.07-.79,2.12-1.61,3.13-2.47a75.1,75.1,0,0,0,64.84,0c1,.86,2.06,1.68,3.13,2.47a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129.07,47,122.9,24.16,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.9,46,53.72,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.14,46,96,53,91,65.69,84.69,65.69Z"/>
+                    </svg>
+                    <span>Tritt unserem Discord bei</span>
+                  </Button>
+                </div>
+
+                {/* Newsletter Input Section */}
+                <div className="space-y-2">
+                  <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5 text-left">
+                    Newsletter
+                  </span>
+                  {newsletterSubmitted ? (
+                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] rounded-lg text-center font-medium">
+                      Danke für dein Abonnement! 🎉
+                    </div>
+                  ) : (
+                    <form onSubmit={handleNewsletterSubmit} className="flex gap-1.5">
+                      <input
+                        type="email"
+                        required
+                        placeholder="Deine E-Mail-Adresse"
+                        value={newsletterEmail}
+                        onChange={(e) => setNewsletterEmail(e.target.value)}
+                        className="flex-1 bg-zinc-950 border border-zinc-900 focus:border-white rounded-lg px-3 py-2 text-[11px] text-white placeholder-zinc-700 outline-none transition-all"
+                      />
+                      <button
+                        type="submit"
+                        className="px-3 rounded-lg bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] cursor-pointer border border-white transition-all active:scale-95"
+                      >
+                        OK
+                      </button>
+                    </form>
+                  )}
+                </div>
+
+                {/* Support & Kontakt */}
+                <div className="space-y-2">
+                  <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5 text-left">
+                    Support
+                  </span>
+                  <a
+                    href="mailto:support@cardpirates.de?subject=Cardpirates%20Supportanfrage"
+                    className="w-full flex items-center justify-center gap-2 p-2.5 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-zinc-800 transition-all text-slate-300 text-xs font-bold text-center"
+                  >
+                    <Mail size={13} className="text-white" />
+                    <span>Support kontaktieren</span>
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -338,7 +381,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                 </button>
               </div>
               <p className="text-[9px] text-zinc-650 text-center mt-4">
-                &copy; {new Date().getFullYear()} Cardpirates.
+                &copy; {new Date().getFullYear()} Cardpirates x Rohde Media.
               </p>
             </div>
 
