@@ -8,10 +8,12 @@ import {
   Button 
 } from '@heroui/react';
 import { ArrowRight, X, Eye, EyeOff } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import { profileService, supabase } from '../services/supabase';
 import type { CustomerProfile } from '../services/supabase';
+import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -23,7 +25,7 @@ interface LoginModalProps {
 export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginModalProps) {
   if (!isOpen) return null;
 
-  const [activeTab, setActiveTab] = useState<string>('register');
+  const [activeTab, setActiveTab] = useState<string>('login');
   const [userType, setUserType] = useState<'private' | 'business'>('private');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,11 +51,11 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
   const [lastName, setLastName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [vatNumber, setVatNumber] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address1, setAddress1] = useState('');
-  const [address2, setAddress2] = useState('');
-  const [city, setCity] = useState('');
-  const [zip, setZip] = useState('');
+  const phone = '';
+  const address1 = '';
+  const address2 = '';
+  const city = '';
+  const zip = '';
   const country = 'DE';
 
   // OTP Verification States
@@ -360,10 +362,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
         if (!companyName.trim()) missingFields.push('companyName');
         if (!vatNumber.trim()) missingFields.push('vatNumber');
       }
-      if (!address1.trim()) missingFields.push('address1');
-      if (!zip.trim()) missingFields.push('zip');
-      if (!city.trim()) missingFields.push('city');
-      if (!phone.trim()) missingFields.push('phone');
+      // address1, zip, city, phone are no longer required during registration
 
       if (missingFields.length > 0) {
         setValidationErrors(missingFields);
@@ -401,8 +400,22 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
             <X size={20} className="text-black" />
           </Modal.CloseTrigger>
 
-          {/* Header */}
-          <Modal.Header className="border-b border-zinc-800/80 px-4 py-4 md:px-6 md:py-5 text-left">
+          {/* Mobile Header (Animated Logo) */}
+          <div className="md:hidden flex flex-col items-center justify-center pt-8 pb-3 shrink-0 select-none">
+            <div className="w-24 h-24 overflow-hidden rounded-full border border-white/10 shadow-lg shadow-black/40">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover grayscale brightness-150 contrast-125 scale-110"
+                src={logoAnimVideo}
+              />
+            </div>
+          </div>
+
+          {/* Desktop Header */}
+          <Modal.Header className="hidden md:block border-b border-zinc-800/80 px-6 py-5 text-left">
             <Modal.Heading className="text-lg font-bold text-white tracking-tight">
               {event 
                 ? (activeTab === 'register' ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
@@ -479,324 +492,327 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               </div>
             ) : (
               <>
-                {/* Account Type Toggle (only when registering) */}
-                {activeTab === 'register' && (
-                  <div className="space-y-2 animate-fade-in pt-2">
-                    <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Kontotyp</label>
-                    <Tabs 
-                      selectedKey={userType} 
-                      onSelectionChange={(key) => setUserType(key as 'private' | 'business')}
-                    >
-                      <Tabs.ListContainer className="w-full">
-                        <Tabs.List className="w-full flex bg-zinc-950 p-1 border border-zinc-800 rounded-xl">
-                          <Tabs.Tab 
-                            id="private" 
-                            className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
-                          >
-                            Privatperson
-                          </Tabs.Tab>
-                          <Tabs.Tab 
-                            id="business" 
-                            className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
-                          >
-                            Unternehmen
-                          </Tabs.Tab>
-                        </Tabs.List>
-                      </Tabs.ListContainer>
-                      <Tabs.Panel id="private" className="hidden"><div /></Tabs.Panel>
-                      <Tabs.Panel id="business" className="hidden"><div /></Tabs.Panel>
-                    </Tabs>
-                  </div>
-                )}
-
-            {/* Input Form Fields */}
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
-              {/* Ticket Selection Area (Only when event is defined) */}
-              {event && (
-                <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-4 mb-2 select-none">
-                  <div className="text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-900 pb-2">
-                    Ticket-Auswahl
-                  </div>
-                  
-                  {/* Variant Selection (if there are multiple variants) */}
-                  {event.variants.nodes.length > 1 && (
-                    <div className="space-y-1.5 text-left">
-                      <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Ticket-Kategorie</label>
-                      <select
-                        value={selectedVariantId}
-                        onChange={(e) => setSelectedVariantId(e.target.value)}
-                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
-                      >
-                        {event.variants.nodes.map(v => (
-                          <option key={v.id} value={v.id}>
-                            {v.title} — {v.price.amount} {v.price.currencyCode}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  )}
-
-                  {/* Quantity Selection */}
-                  <div className="space-y-1.5 text-left">
-                    <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Anzahl Tickets</label>
-                    <select
-                      value={quantity}
-                      onChange={(e) => setQuantity(Number(e.target.value))}
-                      className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
-                    >
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                        <option key={n} value={n}>{n} Ticket{n > 1 ? 's' : ''}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-              <TextField name="email" className="space-y-1.5 w-full">
-                <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('email') ? 'text-rose-500' : 'text-zinc-400'}`}>E-Mail-Adresse</Label>
-                <Input
-                  type="email"
-                  placeholder="name@firma.de"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (validationErrors.includes('email')) {
-                      setValidationErrors(validationErrors.filter((f) => f !== 'email'));
-                    }
-                  }}
-                  required
-                  className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                    validationErrors.includes('email') 
-                      ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                      : 'border-zinc-800'
-                  }`}
-                />
-              </TextField>
-
-              <TextField name="password" className="space-y-1.5 w-full">
-                <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('password') ? 'text-rose-500' : 'text-zinc-400'}`}>Passwort</Label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (validationErrors.includes('password')) {
-                        setValidationErrors(validationErrors.filter((f) => f !== 'password'));
-                      }
-                    }}
-                    required
-                    className={`w-full bg-zinc-950 border focus:border-white rounded-xl pl-4 pr-12 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                      validationErrors.includes('password') 
-                        ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                        : 'border-zinc-800'
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors focus:outline-none cursor-pointer p-1"
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              </TextField>
-
-              {activeTab === 'register' && (
-                <div className="space-y-4 md:space-y-5 animate-fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <TextField name="firstName" className="space-y-1.5">
-                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('firstName') ? 'text-rose-500' : 'text-zinc-400'}`}>Vorname</Label>
-                      <Input
-                        type="text"
-                        placeholder="Max"
-                        value={firstName}
-                        onChange={(e) => {
-                          setFirstName(e.target.value);
-                          if (validationErrors.includes('firstName')) {
-                            setValidationErrors(validationErrors.filter((f) => f !== 'firstName'));
-                          }
-                        }}
-                        required
-                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                          validationErrors.includes('firstName') 
-                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                            : 'border-zinc-800'
-                        }`}
-                      />
-                    </TextField>
-                    <TextField name="lastName" className="space-y-1.5">
-                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('lastName') ? 'text-rose-500' : 'text-zinc-400'}`}>Nachname</Label>
-                      <Input
-                        type="text"
-                        placeholder="Mustermann"
-                        value={lastName}
-                        onChange={(e) => {
-                          setLastName(e.target.value);
-                          if (validationErrors.includes('lastName')) {
-                            setValidationErrors(validationErrors.filter((f) => f !== 'lastName'));
-                          }
-                        }}
-                        required
-                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                          validationErrors.includes('lastName') 
-                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                            : 'border-zinc-800'
-                        }`}
-                      />
-                    </TextField>
-                  </div>
-
-                  {userType === 'business' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
-                      <TextField name="companyName" className="space-y-1.5">
-                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('companyName') ? 'text-rose-500' : 'text-zinc-400'}`}>Firmenname</Label>
-                        <Input
-                          type="text"
-                          placeholder="Cardpirates GmbH"
-                          value={companyName}
-                          onChange={(e) => {
-                            setCompanyName(e.target.value);
-                            if (validationErrors.includes('companyName')) {
-                              setValidationErrors(validationErrors.filter((f) => f !== 'companyName'));
-                            }
-                          }}
-                          required={userType === 'business'}
-                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                            validationErrors.includes('companyName') 
-                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                              : 'border-zinc-800'
-                          }`}
-                        />
-                      </TextField>
-                      
-                      <TextField name="vatNumber" className="space-y-1.5">
-                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('vatNumber') ? 'text-rose-500' : 'text-zinc-400'}`}>USt-IdNr.</Label>
-                        <Input
-                          type="text"
-                          placeholder="DE123456789"
-                          value={vatNumber}
-                          onChange={(e) => {
-                            setVatNumber(e.target.value);
-                            if (validationErrors.includes('vatNumber')) {
-                              setValidationErrors(validationErrors.filter((f) => f !== 'vatNumber'));
-                            }
-                          }}
-                          required={userType === 'business'}
-                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                            validationErrors.includes('vatNumber') 
-                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                              : 'border-zinc-800'
-                          }`}
-                        />
-                      </TextField>
-                    </div>
-                  )}
-
-                  {/* Address Section */}
-                  <div className="space-y-4 pt-3 border-t border-zinc-800/80">
-                    <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-left">Rechnungsadresse</span>
+                {/* Custom Sliding Tab Toggle */}
+                <div className="flex justify-center pb-3 shrink-0">
+                  <div className="relative flex bg-zinc-900 border border-zinc-800 p-1 rounded-full w-full max-w-[280px] select-none">
+                    {/* Sliding Background Pill */}
+                    <motion.div
+                      className="absolute top-1 bottom-1 bg-zinc-750 rounded-full"
+                      layoutId="modalTabBackground"
+                      transition={{ type: "spring", stiffness: 380, damping: 28 }}
+                      style={{
+                        left: activeTab === 'login' ? '4px' : 'calc(50% + 2px)',
+                        width: 'calc(50% - 6px)'
+                      }}
+                    />
                     
-                    <TextField name="address1" className="space-y-1.5">
-                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('address1') ? 'text-rose-500' : 'text-zinc-400'}`}>Straße und Hausnummer</Label>
-                      <Input
-                        type="text"
-                        placeholder="Musterstraße 12a"
-                        value={address1}
-                        onChange={(e) => {
-                          setAddress1(e.target.value);
-                          if (validationErrors.includes('address1')) {
-                            setValidationErrors(validationErrors.filter((f) => f !== 'address1'));
-                          }
-                        }}
-                        required
-                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                          validationErrors.includes('address1') 
-                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                            : 'border-zinc-800'
-                        }`}
-                      />
-                    </TextField>
-
-                    <TextField name="address2" className="space-y-1.5">
-                      <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block">Adresszusatz (optional)</Label>
-                      <Input
-                        type="text"
-                        placeholder="Wohnung, Etage, etc."
-                        value={address2}
-                        onChange={(e) => setAddress2(e.target.value)}
-                        className="w-full bg-zinc-950 border border-zinc-800 focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all"
-                      />
-                    </TextField>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <TextField name="zip" className="space-y-1.5">
-                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('zip') ? 'text-rose-500' : 'text-zinc-400'}`}>PLZ</Label>
-                        <Input
-                          type="text"
-                          placeholder="10115"
-                          value={zip}
-                          onChange={(e) => {
-                            setZip(e.target.value);
-                            if (validationErrors.includes('zip')) {
-                              setValidationErrors(validationErrors.filter((f) => f !== 'zip'));
-                            }
-                          }}
-                          required
-                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                            validationErrors.includes('zip') 
-                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                              : 'border-zinc-800'
-                          }`}
-                        />
-                      </TextField>
-                      <TextField name="city" className="space-y-1.5">
-                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('city') ? 'text-rose-500' : 'text-zinc-400'}`}>Ort</Label>
-                        <Input
-                          type="text"
-                          placeholder="Berlin"
-                          value={city}
-                          onChange={(e) => {
-                            setCity(e.target.value);
-                            if (validationErrors.includes('city')) {
-                              setValidationErrors(validationErrors.filter((f) => f !== 'city'));
-                            }
-                          }}
-                          required
-                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                            validationErrors.includes('city') 
-                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                              : 'border-zinc-800'
-                          }`}
-                        />
-                      </TextField>
-                    </div>
-
-                    <TextField name="phone" className="space-y-1.5">
-                      <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('phone') ? 'text-rose-500' : 'text-zinc-400'}`}>Telefonnummer</Label>
-                      <Input
-                        type="tel"
-                        placeholder="+49 170 1234567"
-                        value={phone}
-                        onChange={(e) => {
-                          setPhone(e.target.value);
-                          if (validationErrors.includes('phone')) {
-                            setValidationErrors(validationErrors.filter((f) => f !== 'phone'));
-                          }
-                        }}
-                        required
-                        className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
-                          validationErrors.includes('phone') 
-                            ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
-                            : 'border-zinc-800'
-                        }`}
-                      />
-                    </TextField>
+                    {/* Login Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setError(null);
+                        setValidationErrors([]);
+                        setActiveTab('login');
+                      }}
+                      className={`relative z-10 flex-1 py-1.5 text-center text-xs font-black transition-colors rounded-full cursor-pointer ${
+                        activeTab === 'login' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      Login
+                    </button>
+                    
+                    {/* Register/Sign Up Button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setError(null);
+                        setValidationErrors([]);
+                        setActiveTab('register');
+                      }}
+                      className={`relative z-10 flex-1 py-1.5 text-center text-xs font-black transition-colors rounded-full cursor-pointer ${
+                        activeTab === 'register' ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
+                      }`}
+                    >
+                      Sign up
+                    </button>
                   </div>
                 </div>
-              )}
-            </form>
-            </>
+
+                {/* Input Form Fields */}
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+                  {/* Ticket Selection Area (Only when event is defined) */}
+                  {event && (
+                    <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-4 mb-2 select-none">
+                      <div className="text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-900 pb-2">
+                        Ticket-Auswahl
+                      </div>
+                      
+                      {/* Variant Selection */}
+                      {event.variants.nodes.length > 1 && (
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Ticket-Kategorie</label>
+                          <select
+                            value={selectedVariantId}
+                            onChange={(e) => setSelectedVariantId(e.target.value)}
+                            className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
+                          >
+                            {event.variants.nodes.map(v => (
+                              <option key={v.id} value={v.id}>
+                                {v.title} — {v.price.amount} {v.price.currencyCode}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Quantity Selection */}
+                      <div className="space-y-1.5 text-left">
+                        <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Anzahl Tickets</label>
+                        <select
+                          value={quantity}
+                          onChange={(e) => setQuantity(Number(e.target.value))}
+                          className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
+                        >
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                            <option key={n} value={n}>{n} Ticket{n > 1 ? 's' : ''}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'login' ? (
+                    /* LOGIN FORM FIELDS */
+                    <div className="space-y-4 md:space-y-5 animate-fade-in">
+                      <TextField name="email" className="space-y-1.5 w-full">
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('email') ? 'text-rose-500' : 'text-zinc-400'}`}>E-Mail-Adresse</Label>
+                        <Input
+                          type="email"
+                          placeholder="name@firma.de"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (validationErrors.includes('email')) {
+                              setValidationErrors(validationErrors.filter((f) => f !== 'email'));
+                            }
+                          }}
+                          required
+                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                            validationErrors.includes('email') 
+                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                              : 'border-zinc-800'
+                          }`}
+                        />
+                      </TextField>
+
+                      <TextField name="password" className="space-y-1.5 w-full">
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('password') ? 'text-rose-500' : 'text-zinc-400'}`}>Passwort</Label>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => {
+                              setPassword(e.target.value);
+                              if (validationErrors.includes('password')) {
+                                setValidationErrors(validationErrors.filter((f) => f !== 'password'));
+                              }
+                            }}
+                            required
+                            className={`w-full bg-zinc-950 border focus:border-white rounded-xl pl-4 pr-12 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                              validationErrors.includes('password') 
+                                ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                                : 'border-zinc-800'
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors focus:outline-none cursor-pointer p-1"
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </TextField>
+                    </div>
+                  ) : (
+                    /* REGISTER FORM FIELDS */
+                    <div className="space-y-4 md:space-y-5 animate-fade-in">
+                      {/* Account Type Toggle */}
+                      <div className="space-y-2 pt-2">
+                        <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Kontotyp</label>
+                        <Tabs 
+                          selectedKey={userType} 
+                          onSelectionChange={(key) => setUserType(key as 'private' | 'business')}
+                        >
+                          <Tabs.ListContainer className="w-full">
+                            <Tabs.List className="w-full flex bg-zinc-950 p-1 border border-zinc-800 rounded-xl">
+                              <Tabs.Tab 
+                                id="private" 
+                                className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'private' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
+                              >
+                                Privatperson
+                              </Tabs.Tab>
+                              <Tabs.Tab 
+                                id="business" 
+                                className={`flex-1 py-2 text-center text-xs font-semibold rounded-lg cursor-pointer transition-all ${userType === 'business' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-white'}`}
+                              >
+                                Unternehmen
+                              </Tabs.Tab>
+                            </Tabs.List>
+                          </Tabs.ListContainer>
+                          <Tabs.Panel id="private" className="hidden"><div /></Tabs.Panel>
+                          <Tabs.Panel id="business" className="hidden"><div /></Tabs.Panel>
+                        </Tabs>
+                      </div>
+
+                      {/* Business fields */}
+                      {userType === 'business' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
+                          <TextField name="companyName" className="space-y-1.5">
+                            <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('companyName') ? 'text-rose-500' : 'text-zinc-400'}`}>Firmenname</Label>
+                            <Input
+                              type="text"
+                              placeholder="Cardpirates GmbH"
+                              value={companyName}
+                              onChange={(e) => {
+                                setCompanyName(e.target.value);
+                                if (validationErrors.includes('companyName')) {
+                                  setValidationErrors(validationErrors.filter((f) => f !== 'companyName'));
+                                }
+                              }}
+                              required={userType === 'business'}
+                              className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                                validationErrors.includes('companyName') 
+                                  ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                                  : 'border-zinc-800'
+                              }`}
+                            />
+                          </TextField>
+                          
+                          <TextField name="vatNumber" className="space-y-1.5">
+                            <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('vatNumber') ? 'text-rose-500' : 'text-zinc-400'}`}>USt-IdNr.</Label>
+                            <Input
+                              type="text"
+                              placeholder="DE123456789"
+                              value={vatNumber}
+                              onChange={(e) => {
+                                setVatNumber(e.target.value);
+                                if (validationErrors.includes('vatNumber')) {
+                                  setValidationErrors(validationErrors.filter((f) => f !== 'vatNumber'));
+                                }
+                              }}
+                              required={userType === 'business'}
+                              className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                                validationErrors.includes('vatNumber') 
+                                  ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                                  : 'border-zinc-800'
+                              }`}
+                            />
+                          </TextField>
+                        </div>
+                      )}
+
+                      {/* Names: Vorname, Nachname */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <TextField name="firstName" className="space-y-1.5">
+                          <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('firstName') ? 'text-rose-500' : 'text-zinc-400'}`}>Vorname</Label>
+                          <Input
+                            type="text"
+                            placeholder="Max"
+                            value={firstName}
+                            onChange={(e) => {
+                              setFirstName(e.target.value);
+                              if (validationErrors.includes('firstName')) {
+                                setValidationErrors(validationErrors.filter((f) => f !== 'firstName'));
+                              }
+                            }}
+                            required
+                            className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                              validationErrors.includes('firstName') 
+                                ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                                : 'border-zinc-800'
+                            }`}
+                          />
+                        </TextField>
+                        <TextField name="lastName" className="space-y-1.5">
+                          <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('lastName') ? 'text-rose-500' : 'text-zinc-400'}`}>Nachname</Label>
+                          <Input
+                            type="text"
+                            placeholder="Mustermann"
+                            value={lastName}
+                            onChange={(e) => {
+                              setLastName(e.target.value);
+                              if (validationErrors.includes('lastName')) {
+                                setValidationErrors(validationErrors.filter((f) => f !== 'lastName'));
+                              }
+                            }}
+                            required
+                            className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                              validationErrors.includes('lastName') 
+                                ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                                : 'border-zinc-800'
+                            }`}
+                          />
+                        </TextField>
+                      </div>
+
+                      {/* Email */}
+                      <TextField name="email" className="space-y-1.5 w-full">
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('email') ? 'text-rose-500' : 'text-zinc-400'}`}>E-Mail-Adresse</Label>
+                        <Input
+                          type="email"
+                          placeholder="name@firma.de"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (validationErrors.includes('email')) {
+                              setValidationErrors(validationErrors.filter((f) => f !== 'email'));
+                            }
+                          }}
+                          required
+                          className={`w-full bg-zinc-950 border focus:border-white rounded-xl px-4 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                            validationErrors.includes('email') 
+                              ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                              : 'border-zinc-800'
+                          }`}
+                        />
+                      </TextField>
+
+                      {/* Password */}
+                      <TextField name="password" className="space-y-1.5 w-full">
+                        <Label className={`text-xs font-bold uppercase tracking-wider block transition-colors ${validationErrors.includes('password') ? 'text-rose-500' : 'text-zinc-400'}`}>Passwort</Label>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => {
+                              setPassword(e.target.value);
+                              if (validationErrors.includes('password')) {
+                                setValidationErrors(validationErrors.filter((f) => f !== 'password'));
+                              }
+                            }}
+                            required
+                            className={`w-full bg-zinc-950 border focus:border-white rounded-xl pl-4 pr-12 py-3 text-base text-white placeholder-zinc-700 outline-none transition-all ${
+                              validationErrors.includes('password') 
+                                ? 'border-rose-500/50 shadow-[0_0_10px_rgba(244,63,94,0.15)] focus:border-rose-500' 
+                                : 'border-zinc-800'
+                            }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors focus:outline-none cursor-pointer p-1"
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </TextField>
+                    </div>
+                  )}
+                </form>
+              </>
             )}
           </Modal.Body>
 
