@@ -5,6 +5,7 @@ import BurgerMenu from './components/BurgerMenu';
 import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
 import ScannerPage from './pages/ScannerPage';
+import TicketsPage from './pages/TicketsPage';
 import LoginModal from './components/LoginModal';
 import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
@@ -192,6 +193,10 @@ function App() {
             <Route 
               path="/scan" 
               element={<ScannerPage />} 
+            />
+            <Route 
+              path="/meine-tickets" 
+              element={<TicketsPage currentUser={currentUser} />} 
             />
           </Routes>
         </main>

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Shield, Scale, Info, FileText } from 'lucide-react';
+import { X, Mail, Shield, Scale, Info, FileText, ChevronRight, Ticket } from 'lucide-react';
 import { Button } from '@heroui/react';
+import { useNavigate } from 'react-router-dom';
 import type { CustomerProfile } from '../services/supabase';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
-import { QRCodeSVG } from 'qrcode.react';
 
 interface BurgerMenuProps {
   currentUser: CustomerProfile | null;
@@ -16,36 +16,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
   const [isOpen, setIsOpen] = useState(false);
   const [activeSheet, setActiveSheet] = useState<'impressum' | 'agb' | 'datenschutz' | 'widerruf' | null>(null);
 
-  // Ticket States
-  interface PurchasedTicket {
-    id: string;
-    event_id: string;
-    event_title: string;
-    ticket_title: string;
-    ticket_price: string;
-    purchase_date: string;
-  }
-  const [purchasedTickets, setPurchasedTickets] = useState<PurchasedTicket[]>([]);
-  const [selectedTicket, setSelectedTicket] = useState<PurchasedTicket | null>(null);
-
-  // Fetch Purchased Tickets when user profile is loaded or side drawer is opened
-  useEffect(() => {
-    if (currentUser) {
-      const key = `purchased_tickets_${currentUser.shopify_customer_id}`;
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        try {
-          setPurchasedTickets(JSON.parse(saved));
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        setPurchasedTickets([]);
-      }
-    } else {
-      setPurchasedTickets([]);
-    }
-  }, [currentUser, isOpen]);
+  const navigate = useNavigate();
 
   // Newsletter States
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -301,34 +272,21 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                   </div>
                 )}
 
-                {/* Meine Tickets Section */}
-                {currentUser && purchasedTickets.length > 0 && (
-                  <div className="space-y-2 text-left animate-fade-in">
-                    <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5">
-                      Meine Tickets
-                    </span>
-                    <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
-                      {purchasedTickets.map((ticket) => (
-                        <button
-                          key={ticket.id}
-                          onClick={() => setSelectedTicket(ticket)}
-                          className="w-full p-2 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-zinc-800 transition-all text-left flex items-center justify-between gap-2.5 cursor-pointer active:scale-[0.98]"
-                        >
-                          <div className="min-w-0 flex-1">
-                            <h5 className="text-[10px] font-bold text-white truncate">
-                              {ticket.event_title}
-                            </h5>
-                            <span className="block text-[8px] text-zinc-500 font-bold uppercase tracking-wider truncate mt-0.5">
-                              {ticket.ticket_title} • {new Date(ticket.purchase_date).toLocaleDateString('de-DE')}
-                            </span>
-                          </div>
-                          <div className="text-[8px] font-black text-red-500 bg-red-950/20 border border-red-900/30 px-1.5 py-0.5 rounded-md uppercase tracking-wider shrink-0">
-                            QR
-                          </div>
-                        </button>
-                      ))}
+                {/* Link to Meine Tickets page */}
+                {currentUser && (
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      navigate('/meine-tickets');
+                    }}
+                    className="w-full flex items-center justify-between p-3 bg-zinc-950/40 border border-zinc-900 rounded-xl hover:border-zinc-850 transition-all text-left text-zinc-300 text-xs font-bold cursor-pointer active:scale-[0.98]"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Ticket size={14} className="text-white shrink-0" />
+                      <span>Meine Tickets</span>
                     </div>
-                  </div>
+                    <ChevronRight size={14} className="text-zinc-500 shrink-0" />
+                  </button>
                 )}
               </div>
 
@@ -470,59 +428,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
               </div>
             )}
 
-            {/* Active Ticket QR Code Slide-Up */}
-            {selectedTicket && (
-              <div className="fixed inset-0 z-50 bg-black flex flex-col animate-slide-up text-zinc-300">
-                <div className="flex items-center justify-between px-4 py-4 border-b border-zinc-900 shrink-0">
-                  <h3 className="text-sm font-bold text-white tracking-tight">
-                    Ticket QR-Code
-                  </h3>
-                  <button
-                    onClick={() => setSelectedTicket(null)}
-                    className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-900 rounded-lg transition-all cursor-pointer"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-                
-                <div className="flex-1 p-6 flex flex-col items-center justify-center text-center space-y-6">
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-black text-red-650 uppercase tracking-widest block">
-                      Cardpirates Einlass-Ticket
-                    </span>
-                    <h4 className="text-sm font-extrabold text-white">
-                      {selectedTicket.event_title}
-                    </h4>
-                    <span className="text-[11px] text-zinc-500 font-bold block uppercase tracking-wider">
-                      {selectedTicket.ticket_title}
-                    </span>
-                  </div>
 
-                  <div className="p-4.5 bg-white rounded-3xl shadow-xl shadow-black/45 border border-zinc-200">
-                    <QRCodeSVG 
-                      value={selectedTicket.id}
-                      size={180}
-                      level="H"
-                      includeMargin={false}
-                    />
-                  </div>
-
-                  <div className="text-zinc-500 text-[10px] space-y-1">
-                    <span className="block font-mono tracking-wider">ID: {selectedTicket.id}</span>
-                    <span className="block font-bold">Bitte am Einlass vorzeigen.</span>
-                  </div>
-                </div>
-
-                <div className="p-4 border-t border-zinc-900 bg-zinc-950/20">
-                  <Button
-                    onPress={() => setSelectedTicket(null)}
-                    className="w-full py-3.5 rounded-lg bg-zinc-800 hover:bg-zinc-750 text-white font-bold text-xs cursor-pointer"
-                  >
-                    Schließen
-                  </Button>
-                </div>
-              </div>
-            )}
 
             {/* Edit Profile Slide-Up Modal */}
             {isEditingProfile && (

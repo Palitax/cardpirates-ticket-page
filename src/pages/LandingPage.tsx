@@ -40,13 +40,13 @@ function TicketTimer({ targetDate }: TicketTimerProps) {
   }, [targetDate]);
 
   return (
-    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[9px] text-zinc-400 font-bold uppercase tracking-wider select-none shadow-md shadow-black/20">
+    <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider text-center mb-1 flex items-center justify-center gap-1.5 shrink-0 select-none">
       <span className="relative flex h-1.5 w-1.5">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
       </span>
       <span>Einlass in:</span>
-      <span className="font-mono text-white font-black">{timeLeft}</span>
+      <span className="font-mono text-zinc-800 font-extrabold">{timeLeft}</span>
     </div>
   );
 }
@@ -290,13 +290,6 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             />
                             <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
                             
-                            {/* Countdown Timer overlayed at the top of the video */}
-                            {event.eventDate?.value && (
-                              <div className="absolute top-2.5 inset-x-0 z-20 flex justify-center">
-                                <TicketTimer targetDate={event.eventDate.value} />
-                              </div>
-                            )}
-
                             {/* Event Title overlayed on image */}
                             <div className="absolute bottom-2 inset-x-0 px-3 text-center">
                               <h3 className="text-sm font-extrabold text-zinc-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)] tracking-tight leading-tight">
@@ -306,8 +299,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           </div>
 
                           {/* Card details */}
-                          <div className="flex-1 p-4 flex flex-col justify-between">
-                            <div className="grid grid-cols-2 gap-x-2 gap-y-3.5 text-left">
+                          <div className="flex-1 p-3.5 flex flex-col justify-between">
+                            <div className="grid grid-cols-2 gap-x-2 gap-y-2 text-left">
                               <div className="min-w-0">
                                 <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Ort</span>
                                 <span className="block text-[10px] text-zinc-800 font-extrabold truncate">{event.eventLocation?.value || 'TBA'}</span>
@@ -331,12 +324,15 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             </div>
 
                             {/* Perforation Line with CSS Notches */}
-                            <div className="relative my-3 shrink-0">
+                            <div className="relative my-2 shrink-0">
                               <div className="border-t border-dashed border-zinc-200 w-full" />
                             </div>
 
                             {/* Bottom Barcode or Buy Ticket Button */}
-                            <div className="flex flex-col items-center justify-center shrink-0 min-h-[50px] w-full">
+                            <div className="flex flex-col items-center justify-center shrink-0 min-h-[40px] w-full">
+                              {event.eventDate?.value && (
+                                <TicketTimer targetDate={event.eventDate.value} />
+                              )}
                               {(() => {
                                 const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
                                 if (matchingTickets.length > 0) {
