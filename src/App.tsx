@@ -179,7 +179,7 @@ function App() {
 
 
         {/* Main Content Area */}
-        <main className="relative z-10 flex-1 w-full max-w-4xl mx-auto py-6">
+        <main className={`relative z-10 flex-1 w-full max-w-4xl mx-auto py-6 ${modalOpen ? 'hidden md:block' : ''}`}>
           <Routes>
             <Route 
               path="/" 
@@ -227,7 +227,7 @@ function App() {
         />
 
         {/* Footer */}
-        <footer className="relative z-10 py-8 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full">
+        <footer className={`relative z-10 py-8 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full ${modalOpen ? 'hidden md:block' : ''}`}>
           &copy; {new Date().getFullYear()} Cardpirates x Rohde Media. All rights reserved. Powered by Shopify Storefront.
         </footer>
       </div>

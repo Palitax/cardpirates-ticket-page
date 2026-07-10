@@ -390,7 +390,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <Modal.Backdrop className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm animate-fade-in hidden md:block" />
+      <Modal.Backdrop className="fixed inset-0 z-40 bg-black md:bg-black/70 md:backdrop-blur-sm animate-fade-in block" />
       <Modal.Container className="fixed inset-0 z-50 flex flex-col !w-full items-stretch md:items-center justify-stretch md:justify-center p-0 md:p-4 bg-black md:bg-transparent">
         <Modal.Dialog className="bg-black md:bg-zinc-900 border-none md:border border-zinc-800 rounded-none md:rounded-3xl w-full h-full md:h-auto md:max-h-[90vh] md:max-w-2xl overflow-hidden flex flex-col shadow-none md:shadow-2xl relative animate-fade-in md:animate-scale-up text-zinc-300">
           
