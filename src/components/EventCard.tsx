@@ -29,12 +29,12 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
   const isPurchased = matchingTickets.length > 0;
 
   return (
-    <div className="w-full h-full min-h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
+    <div className="w-full h-auto aspect-[816/220] min-h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
       <div 
         onClick={() => navigate(`/events/${event.handle}`)}
         style={{
-          mask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 51% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 51% no-repeat',
-          WebkitMask: 'radial-gradient(circle at calc(100% - 180px) 0px, transparent 12px, black 13px) 0% 0% / 100% 51% no-repeat, radial-gradient(circle at calc(100% - 180px) 100%, transparent 12px, black 13px) 0% 100% / 100% 51% no-repeat'
+          mask: 'radial-gradient(circle at 78% 0px, transparent 12px, black 13px) 0% 0% / 100% 51% no-repeat, radial-gradient(circle at 78% 100%, transparent 12px, black 13px) 0% 100% / 100% 51% no-repeat',
+          WebkitMask: 'radial-gradient(circle at 78% 0px, transparent 12px, black 13px) 0% 0% / 100% 51% no-repeat, radial-gradient(circle at 78% 100%, transparent 12px, black 13px) 0% 100% / 100% 51% no-repeat'
         }}
         className="relative w-full h-full flex flex-row rounded-3xl border-[1.5px] border-white/[0.15] bg-white/[0.07] group-hover:bg-white/[0.12] group-hover:border-white/[0.4] backdrop-blur-xl group transition-all duration-350 cursor-pointer overflow-hidden"
       >
@@ -42,7 +42,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/[0.02] via-transparent to-white/[0.08] group-hover:from-white/[0.08] group-hover:to-white/[0.22] pointer-events-none z-10 transition-all duration-350" />
 
         {/* Left Section: Video Cover (Merged) */}
-        <div className="relative w-[220px] h-full overflow-hidden shrink-0">
+        <div className="relative w-[27%] h-full overflow-hidden shrink-0">
           <video
             autoPlay
             loop
@@ -64,7 +64,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
           )}
         </div>
 
-        <div className="flex-1 p-6 pl-2 space-y-3.5 text-left flex flex-col justify-center min-w-fit z-10">
+        <div className="flex-1 p-6 pl-2 pr-8 space-y-3.5 text-left flex flex-col justify-center min-w-fit z-10">
           <div className="space-y-1.5">
             <h3 className="text-xl font-black text-white tracking-tight leading-tight group-hover:text-white/95 transition-colors uppercase font-mono whitespace-nowrap">
               {title}
@@ -90,10 +90,10 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
         </div>
 
         {/* Dashed Tear-off Perforation Line */}
-        <div className="absolute top-0 bottom-0 right-[180px] border-l border-dashed border-white/15 z-10 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-[22%] border-l border-dashed border-white/15 z-10 pointer-events-none" />
 
-        {/* Right Part: Ticket Stub (Width 180px) */}
-        <div className={`w-[180px] shrink-0 h-full flex flex-col items-center justify-center p-5 pt-6 z-10 relative bg-white/[0.01] rounded-r-3xl ${isPurchased ? 'gap-3' : 'gap-5'}`}>
+        {/* Right Part: Ticket Stub (Width 22%) */}
+        <div className="w-[22%] shrink-0 h-full flex flex-col items-center justify-center p-5 pt-6 z-10 relative bg-white/[0.01] rounded-r-3xl gap-5">
           {/* Left Glow effect behind QR */}
           <div className="absolute left-4 top-4 w-16 h-16 bg-white/[0.02] group-hover:bg-white/[0.08] group-hover:scale-125 rounded-full blur-xl pointer-events-none transition-all duration-350" />
           

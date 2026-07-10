@@ -500,7 +500,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
 
   return (
     <div 
-      className="px-4 sm:px-6 pb-24 pt-1 max-w-5xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
+      className="px-4 sm:px-6 pb-24 pt-1 max-w-7xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
     >
       {renderMainContent()}
       
