@@ -168,7 +168,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
               className="w-[70%] h-auto object-contain select-none pointer-events-none drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]" 
             />
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">
-              Werde Teil der Crew!
+              {currentUser ? `Ahoi, ${currentUser.first_name}!` : 'Werde Teil der Crew!'}
             </h1>
           </div>
           <p className="text-sm text-zinc-400 leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.85)]">
