@@ -16,11 +16,12 @@ interface ConditionalBurgerMenuProps {
   currentUser: CustomerProfile | null;
   onLoginTrigger: () => void;
   onLogout: () => void;
+  onProfileUpdate: (profile: CustomerProfile) => void;
 }
 
 
 
-function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout }: ConditionalBurgerMenuProps) {
+function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout, onProfileUpdate }: ConditionalBurgerMenuProps) {
   const location = useLocation();
   if (location.pathname === '/scan') return null;
   return (
@@ -28,6 +29,7 @@ function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout }: Condit
       currentUser={currentUser} 
       onLoginTrigger={onLoginTrigger} 
       onLogout={onLogout} 
+      onProfileUpdate={onProfileUpdate}
     />
   );
 }
@@ -168,6 +170,10 @@ function App() {
           currentUser={currentUser} 
           onLoginTrigger={handleNavbarLoginTrigger} 
           onLogout={handleLogout} 
+          onProfileUpdate={(profile) => {
+            setCurrentUser(profile);
+            localStorage.setItem('currentUser', JSON.stringify(profile));
+          }}
         />
 
 
