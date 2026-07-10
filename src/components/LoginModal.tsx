@@ -468,6 +468,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   <Label className="text-zinc-400 text-xs font-bold uppercase tracking-wider block text-center">Aktivierungscode</Label>
                   <Input
                     type="text"
+                    inputMode="numeric"
                     placeholder="Code eingeben"
                     maxLength={12}
                     value={otpCode}
@@ -477,7 +478,24 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   />
                 </TextField>
 
-                <div className="text-center pt-2">
+                {/* Confirm Button */}
+                <button
+                  type="button"
+                  onClick={handleVerifyOtp}
+                  disabled={loading || otpCode.length < 4}
+                  className="w-full py-4 rounded-xl bg-white hover:bg-zinc-200 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {loading ? (
+                    <span>Code wird verifiziert...</span>
+                  ) : (
+                    <>
+                      <span>Konto verifizieren</span>
+                      <ArrowRight size={16} />
+                    </>
+                  )}
+                </button>
+
+                <div className="text-center">
                   <button
                     type="button"
                     onClick={handleResendOtp}
@@ -499,6 +517,7 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
                   </button>
                 </div>
               </div>
+
             ) : (
               <>
                 {/* Custom Sliding Tab Toggle */}
