@@ -79,12 +79,12 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 text-zinc-300 text-xs font-semibold">
+          <div className="flex items-center gap-1.5 text-zinc-300 text-xs font-semibold w-0 min-w-full">
             <MapPin size={13} className="text-white/60 shrink-0" />
             <span className="line-clamp-1">{location}</span>
           </div>
 
-          <p className="text-zinc-300/80 text-xs leading-relaxed line-clamp-2">
+          <p className="text-zinc-300/80 text-xs leading-relaxed line-clamp-2 w-0 min-w-full">
             {event.description}
           </p>
         </div>
