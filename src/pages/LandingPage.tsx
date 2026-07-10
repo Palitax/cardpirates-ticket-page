@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertCircle, X } from 'lucide-react';
+import { AlertCircle, X, Check } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
@@ -347,30 +347,24 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                             activeIndex: 0 
                                           });
                                         }}
-                                        className="relative w-18 h-18 flex items-center justify-center shrink-0 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all duration-300 group/seal select-none"
+                                        className="flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.05] active:scale-[0.97] transition-all select-none"
                                         title="Tippen zum Vorzeigen"
                                       >
-                                        {/* Outer irregular wobbly wax body */}
-                                        <div className="absolute inset-0 rounded-[50%_48%_52%_49%_/_49%_51%_48%_52%] bg-gradient-to-br from-red-650 via-red-700 to-red-950 shadow-[0_3px_8px_rgba(0,0,0,0.6),inset_0_1.5px_3px_rgba(255,255,255,0.3),inset_0_-3px_6px_rgba(0,0,0,0.6)] group-hover/seal:scale-105 transition-transform duration-300" />
-                                        
-                                        {/* Pressed inner circle */}
-                                        <div className="absolute w-[80%] h-[80%] rounded-[50%_49%_51%_48%_/_48%_50%_49%_52%] bg-gradient-to-br from-red-850 to-red-950 border border-red-900/60 shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),0_0.5px_1px_rgba(255,255,255,0.15)] flex flex-col items-center justify-center p-1.5 z-10 pointer-events-none">
-                                          <div className="rotate-[-10deg] text-center select-none flex flex-col items-center">
-                                            <span className="text-[8px] font-black uppercase tracking-wider text-red-100/90 font-mono leading-none [text-shadow:-0.5px_-0.5px_0px_rgba(0,0,0,0.9),0.5px_0.5px_0px_rgba(255,255,255,0.1)]">
-                                              Du bist
-                                            </span>
-                                            <span className="text-[9px] font-black uppercase tracking-wider text-red-200 font-mono leading-none [text-shadow:-0.5px_-0.5px_0px_rgba(0,0,0,0.9),0.5px_0.5px_0px_rgba(255,255,255,0.1)] mt-0.5">
-                                              Dabei!
-                                            </span>
-                                          </div>
+                                        {/* Glowing Green Circle with Checkmark */}
+                                        <div className="relative w-11 h-11 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                                          <Check size={20} className="text-emerald-500" strokeWidth={3} />
+                                          
+                                          {/* Ticket Count Badge (if quantity > 1) */}
+                                          {matchingTickets.length > 1 && (
+                                            <div className="absolute top-0 right-0 w-4.5 h-4.5 bg-emerald-600 border border-white text-white rounded-full flex items-center justify-center font-black text-[8px] shadow-sm z-20">
+                                              {matchingTickets.length}
+                                            </div>
+                                          )}
                                         </div>
                                         
-                                        {/* Ticket Count Badge (if quantity > 1) */}
-                                        {matchingTickets.length > 1 && (
-                                          <div className="absolute top-0 right-0 w-4.5 h-4.5 bg-red-600 border border-white text-white rounded-full flex items-center justify-center font-black text-[8px] shadow-sm z-20">
-                                            {matchingTickets.length}
-                                          </div>
-                                        )}
+                                        <span className="text-[9px] font-black uppercase text-emerald-600 tracking-wider">
+                                          Du bist an Board!
+                                        </span>
                                       </div>
 
                                       <Button
