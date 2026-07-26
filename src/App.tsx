@@ -6,6 +6,7 @@ import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
 import ScannerPage from './pages/ScannerPage';
 import TicketsPage from './pages/TicketsPage';
+import ProfilePage from './pages/ProfilePage';
 import LoginModal from './components/LoginModal';
 import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
@@ -197,6 +198,18 @@ function App() {
             <Route 
               path="/meine-tickets" 
               element={<TicketsPage currentUser={currentUser} />} 
+            />
+            <Route 
+              path="/profil" 
+              element={
+                <ProfilePage 
+                  currentUser={currentUser} 
+                  onProfileUpdate={(profile) => {
+                    setCurrentUser(profile);
+                    localStorage.setItem('currentUser', JSON.stringify(profile));
+                  }} 
+                />
+              } 
             />
           </Routes>
         </main>

@@ -356,40 +356,44 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
     setError(null);
     setValidationErrors([]);
 
-    if (showOtpScreen) {
-      await handleVerifyOtp();
-    } else if (activeTab === 'register') {
-      const missingFields: string[] = [];
-      if (!email.trim()) missingFields.push('email');
-      if (!password.trim()) missingFields.push('password');
-      if (!firstName.trim()) missingFields.push('firstName');
-      if (!lastName.trim()) missingFields.push('lastName');
-      if (userType === 'business') {
-        if (!companyName.trim()) missingFields.push('companyName');
-        if (!vatNumber.trim()) missingFields.push('vatNumber');
-      }
-      // address1, zip, city, phone are no longer required during registration
-
-      if (missingFields.length > 0) {
-        setValidationErrors(missingFields);
-        setError('Bitte fülle alle erforderlichen Felder aus.');
-        setLoading(false);
-        return;
-      }
-      await handleSignUp();
-    } else {
-      if (!email.trim() || !password.trim()) {
+    try {
+      if (showOtpScreen) {
+        await handleVerifyOtp();
+      } else if (activeTab === 'register') {
         const missingFields: string[] = [];
         if (!email.trim()) missingFields.push('email');
         if (!password.trim()) missingFields.push('password');
-        setValidationErrors(missingFields);
-        setError('Bitte fülle E-Mail und Passwort aus.');
-        setLoading(false);
-        return;
+        if (!firstName.trim()) missingFields.push('firstName');
+        if (!lastName.trim()) missingFields.push('lastName');
+        if (userType === 'business') {
+          if (!companyName.trim()) missingFields.push('companyName');
+          if (!vatNumber.trim()) missingFields.push('vatNumber');
+        }
+
+        if (missingFields.length > 0) {
+          setValidationErrors(missingFields);
+          setError('Bitte fülle alle erforderlichen Felder aus.');
+          setLoading(false);
+          return;
+        }
+        await handleSignUp();
+      } else {
+        if (!email.trim() || !password.trim()) {
+          const missingFields: string[] = [];
+          if (!email.trim()) missingFields.push('email');
+          if (!password.trim()) missingFields.push('password');
+          setValidationErrors(missingFields);
+          setError('Bitte fülle E-Mail und Passwort aus.');
+          setLoading(false);
+          return;
+        }
+        await handleSignIn();
       }
-      await handleSignIn();
+    } catch (err: any) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

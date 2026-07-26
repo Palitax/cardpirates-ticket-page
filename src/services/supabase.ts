@@ -19,6 +19,7 @@ export const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY)
 
 export interface CustomerProfile {
   shopify_customer_id: string;
+  email?: string;
   user_type: 'private' | 'business';
   company_name?: string;
   vat_number?: string;
