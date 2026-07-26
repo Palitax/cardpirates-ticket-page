@@ -112,10 +112,48 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
 
   return (
     <>
-      {/* Minimalist Floating Menu Button (Top Left - Floating glass circular button on desktop, borderless on mobile) */}
+      {/* Mobile Sticky Top Header Bar */}
+      <header className="md:hidden sticky top-0 z-40 w-full bg-zinc-950/85 backdrop-blur-md border-b border-zinc-900/60 px-4 py-3 flex items-center justify-between select-none">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsOpen(true)}
+            className="flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-2 rounded-xl bg-zinc-900/80 border border-zinc-800/80 min-w-[40px] min-h-[40px]"
+            aria-label="Menü öffnen"
+          >
+            <svg className="w-5 h-5 stroke-current text-white fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="4" x2="20" y1="12" y2="12" />
+              <line x1="4" x2="20" y1="6" y2="6" />
+              <line x1="4" x2="20" y1="18" y2="18" />
+            </svg>
+          </button>
+          <img 
+            src={(window as any).ShopifyAssets?.logoSchriftUrl || logoSchrift} 
+            alt="Cardpirates Logo" 
+            className="h-5 w-auto object-contain cursor-pointer"
+            onClick={() => navigate('/')}
+          />
+        </div>
+
+        {onOpenCart && (
+          <button
+            onClick={onOpenCart}
+            className="relative p-2 rounded-xl bg-zinc-900/80 border border-zinc-800/80 text-white transition-all cursor-pointer flex items-center justify-center min-w-[40px] min-h-[40px]"
+            aria-label="Warenkorb öffnen"
+          >
+            <ShoppingBag size={18} />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-white text-black font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        )}
+      </header>
+
+      {/* Desktop Floating Menu Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-6 left-6 z-40 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-1 md:p-3 rounded-xl md:bg-white/[0.04] md:backdrop-blur-md md:border md:border-white/10 md:hover:bg-white/[0.08] md:hover:border-white/20 md:shadow-lg md:shadow-black/20"
+        className="hidden md:flex fixed top-6 left-6 z-40 items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-3 rounded-xl bg-white/[0.04] backdrop-blur-md border border-white/10 hover:bg-white/[0.08] hover:border-white/20 shadow-lg shadow-black/20"
         aria-label="Menü öffnen"
       >
         <svg className="w-6 h-6 stroke-current text-white fill-none" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -124,22 +162,6 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
           <line x1="4" x2="20" y1="18" y2="18" />
         </svg>
       </button>
-
-      {/* Mobile Floating Cart Button (Top Right) */}
-      {onOpenCart && (
-        <button
-          onClick={onOpenCart}
-          className="md:hidden fixed top-5 right-5 z-40 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-2.5 rounded-xl bg-zinc-950/80 backdrop-blur-md border border-zinc-800 shadow-lg min-w-[44px] min-h-[44px]"
-          aria-label="Warenkorb öffnen"
-        >
-          <ShoppingBag size={18} />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-white text-black font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
-              {cartCount}
-            </span>
-          )}
-        </button>
-      )}
 
       {/* Slide-in Half Drawer Overlay */}
       {isOpen && (
