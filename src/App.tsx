@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import BurgerMenu from './components/BurgerMenu';
 import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
@@ -180,7 +181,7 @@ function App() {
     if (notification) {
       const timer = setTimeout(() => {
         setNotification(null);
-      }, 6000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [notification]);
@@ -311,26 +312,46 @@ function App() {
           </Routes>
         </main>
 
-        {notification && (
-          <div className="fixed bottom-6 right-6 z-[100] animate-fade-in max-w-sm">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-2xl flex items-start gap-3 text-left">
-              <span className="flex h-2 w-2 translate-y-1.5 shrink-0 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <div className="flex-1 space-y-1">
-                <p className="text-[10px] font-bold text-white uppercase tracking-wider">Benachrichtigung</p>
-                <p className="text-xs text-zinc-300 leading-normal">{notification.message}</p>
+        {/* Floating Toast Notification */}
+        <AnimatePresence>
+          {notification && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.7}
+              onDragEnd={(_, info) => {
+                if (Math.abs(info.offset.x) > 50 || Math.abs(info.velocity.x) > 200) {
+                  setNotification(null);
+                }
+              }}
+              className="fixed top-16 left-4 right-4 md:top-20 md:left-auto md:right-6 md:max-w-sm z-[100] cursor-grab active:cursor-grabbing select-none"
+            >
+              <div className="bg-zinc-950/95 backdrop-blur-md border border-zinc-800 rounded-2xl p-4 shadow-2xl flex items-center justify-between gap-3 text-left">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="flex h-2 w-2 shrink-0 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Benachrichtigung</p>
+                    <p className="text-xs text-white font-semibold leading-normal truncate">{notification.message}</p>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => setNotification(null)}
+                  className="text-zinc-500 hover:text-white p-1 rounded-lg transition-colors cursor-pointer shrink-0"
+                  aria-label="Benachrichtigung schließen"
+                >
+                  <X size={14} />
+                </button>
               </div>
-              <button 
-                onClick={() => setNotification(null)}
-                className="text-zinc-500 hover:text-white transition-colors cursor-pointer shrink-0"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <LoginModal
           isOpen={modalOpen}
