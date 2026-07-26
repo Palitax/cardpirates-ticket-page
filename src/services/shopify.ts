@@ -223,23 +223,29 @@ export const shopifyService = {
       throw new Error('Dies ist ein Demo-Event (Mock-Daten). Bitte lege ein echtes Produkt im Shopify-Admin an, um den realen Shopify-Checkout zu testen.');
     }
 
-    const input = {
-      lines: [{ quantity: quantity, merchandiseId: variantId }],
-      buyerIdentity: {
-        email: email,
+    const cleanEmail = email ? email.trim() : '';
+    const isValidEmail = Boolean(cleanEmail && cleanEmail.includes('@') && cleanEmail.includes('.'));
+
+    const input: any = {
+      lines: [{ quantity: quantity, merchandiseId: variantId }]
+    };
+
+    if (isValidEmail) {
+      input.buyerIdentity = {
+        email: cleanEmail,
         deliveryAddressPreferences: [{
           deliveryAddress: {
-            firstName: checkoutData.firstName,
-            lastName: checkoutData.lastName,
-            address1: checkoutData.address1,
-            city: checkoutData.city,
-            zip: checkoutData.zip,
-            country: checkoutData.country,
+            firstName: checkoutData.firstName || 'Gast',
+            lastName: checkoutData.lastName || 'Kunde',
+            address1: checkoutData.address1 || 'Hauptstraße 1',
+            city: checkoutData.city || 'Berlin',
+            zip: checkoutData.zip || '10115',
+            country: checkoutData.country || 'DE',
             company: checkoutData.company || null,
           }
         }]
-      }
-    };
+      };
+    }
 
     const data = await shopifyFetch<{
       cartCreate: {
