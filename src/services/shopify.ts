@@ -219,41 +219,44 @@ export const shopifyService = {
     },
     quantity: number = 1
   ): Promise<string> {
-    try {
-      const input = {
-        lines: [{ quantity: quantity, merchandiseId: variantId }],
-        buyerIdentity: {
-          email: email,
-          deliveryAddressPreferences: [{
-            deliveryAddress: {
-              firstName: checkoutData.firstName,
-              lastName: checkoutData.lastName,
-              address1: checkoutData.address1,
-              city: checkoutData.city,
-              zip: checkoutData.zip,
-              country: checkoutData.country,
-              company: checkoutData.company || null,
-            }
-          }]
-        }
-      };
-
-      const data = await shopifyFetch<{
-        cartCreate: {
-          cart: { checkoutUrl: string } | null;
-          userErrors: Array<{ message: string }>;
-        };
-      }>(CREATE_CART_MUTATION, { input });
-
-      if (data.cartCreate.userErrors.length > 0) {
-        throw new Error(data.cartCreate.userErrors[0].message);
-      }
-
-      return data.cartCreate.cart?.checkoutUrl || '';
-    } catch (e: any) {
-      console.warn("Shopify createCheckoutLink failed, using mock payment gateway URL:", e);
-      return `${window.location.origin}/?mock_checkout_success=true&email=${encodeURIComponent(email)}&variant=${encodeURIComponent(variantId)}`;
+    if (variantId.includes('mock-var')) {
+      throw new Error('Dies ist ein Demo-Event (Mock-Daten). Bitte lege ein echtes Produkt im Shopify-Admin an, um den realen Shopify-Checkout zu testen.');
     }
+
+    const input = {
+      lines: [{ quantity: quantity, merchandiseId: variantId }],
+      buyerIdentity: {
+        email: email,
+        deliveryAddressPreferences: [{
+          deliveryAddress: {
+            firstName: checkoutData.firstName,
+            lastName: checkoutData.lastName,
+            address1: checkoutData.address1,
+            city: checkoutData.city,
+            zip: checkoutData.zip,
+            country: checkoutData.country,
+            company: checkoutData.company || null,
+          }
+        }]
+      }
+    };
+
+    const data = await shopifyFetch<{
+      cartCreate: {
+        cart: { checkoutUrl: string } | null;
+        userErrors: Array<{ message: string }>;
+      };
+    }>(CREATE_CART_MUTATION, { input });
+
+    if (data.cartCreate?.userErrors && data.cartCreate.userErrors.length > 0) {
+      throw new Error(`Shopify Kassen-Fehler: ${data.cartCreate.userErrors[0].message}`);
+    }
+
+    if (!data.cartCreate?.cart?.checkoutUrl) {
+      throw new Error('Shopify konnte keinen Link zur Kasse erstellen.');
+    }
+
+    return data.cartCreate.cart.checkoutUrl;
   }
 };
 
