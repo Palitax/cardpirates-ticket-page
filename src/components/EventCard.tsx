@@ -1,4 +1,4 @@
-import { MapPin, Check } from 'lucide-react';
+import { MapPin, Check, ShoppingBag, XCircle } from 'lucide-react';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
   const currency = event.variants.nodes[0]?.price.currencyCode || 'EUR';
   const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
   const isPurchased = matchingTickets.length > 0;
+  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false);
 
   return (
     <div className="w-full h-auto aspect-[816/220] min-h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
@@ -110,22 +111,18 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
               {/* Glowing Green Circle with Checkmark */}
               <div className="relative w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)] group-hover:border-emerald-500/50 transition-colors">
                 <Check size={28} className="text-emerald-400 filter drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]" strokeWidth={3} />
-                
-                {/* Ticket Count Badge (if quantity > 1) */}
                 {matchingTickets.length > 1 && (
                   <div className="absolute -top-1 -right-1 w-5.5 h-5.5 bg-emerald-600 border border-zinc-900 text-white rounded-full flex items-center justify-center font-black text-[10px] shadow-md z-20">
                     {matchingTickets.length}
                   </div>
                 )}
               </div>
-              
               <span className="text-[10px] font-black uppercase text-emerald-400 tracking-wider">
                 Du bist an Board!
               </span>
             </div>
           ) : null}
 
-          {/* Price & Action Area (Bottom) */}
           <div className="flex flex-col items-center text-center justify-center gap-3.5 w-full z-10">
             {!isPurchased && (
               <div className="flex flex-col items-center justify-center w-full select-none">
@@ -159,19 +156,29 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
             )}
 
             <div onClick={(e) => e.stopPropagation()} className="w-full">
-              {isPurchased ? (
+              {isSoldOut ? (
+                <button
+                  disabled
+                  className="w-full py-2 rounded-xl bg-zinc-900 text-zinc-500 border border-zinc-800 font-extrabold text-[11px] cursor-not-allowed opacity-60 select-none flex items-center justify-center gap-1.5"
+                >
+                  <XCircle size={14} />
+                  <span>Ausverkauft</span>
+                </button>
+              ) : isPurchased ? (
                 <button
                   onClick={() => onQuickBuy(event)}
-                  className="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-black/20"
+                  className="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-black/20 flex items-center justify-center gap-1.5"
                 >
-                  weiteres Ticket kaufen
+                  <ShoppingBag size={14} />
+                  <span>weiteres Ticket</span>
                 </button>
               ) : (
                 <button
                   onClick={() => onQuickBuy(event)}
-                  className="w-full py-2 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-white/5 border border-white"
+                  className="w-full py-2 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-white/5 border border-white flex items-center justify-center gap-1.5"
                 >
-                  Ticket kaufen
+                  <ShoppingBag size={14} />
+                  <span>In den Warenkorb</span>
                 </button>
               )}
             </div>

@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
 import BurgerMenu from './components/BurgerMenu';
+import Navbar from './components/Navbar';
 import LandingPage from './pages/LandingPage';
 import DetailPage from './pages/DetailPage';
 import ScannerPage from './pages/ScannerPage';
 import TicketsPage from './pages/TicketsPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginModal from './components/LoginModal';
+import CartDrawer from './components/CartDrawer';
+import type { CartItem } from './components/CartDrawer';
+import { shopifyService } from './services/shopify';
 import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
 import { supabase, profileService } from './services/supabase';
@@ -19,11 +23,11 @@ interface ConditionalBurgerMenuProps {
   onLoginTrigger: () => void;
   onLogout: () => void;
   onProfileUpdate: (profile: CustomerProfile) => void;
+  cartCount: number;
+  onOpenCart: () => void;
 }
 
-
-
-function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout, onProfileUpdate }: ConditionalBurgerMenuProps) {
+function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout, onProfileUpdate, cartCount, onOpenCart }: ConditionalBurgerMenuProps) {
   const location = useLocation();
   if (location.pathname === '/scan') return null;
   return (
@@ -32,6 +36,8 @@ function ConditionalBurgerMenu({ currentUser, onLoginTrigger, onLogout, onProfil
       onLoginTrigger={onLoginTrigger} 
       onLogout={onLogout} 
       onProfileUpdate={onProfileUpdate}
+      cartCount={cartCount}
+      onOpenCart={onOpenCart}
     />
   );
 }
@@ -42,9 +48,91 @@ function App() {
   const [currentUser, setCurrentUser] = useState<CustomerProfile | null>(null);
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // Cart State
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('cardpirates_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [loadingCartCheckout, setLoadingCartCheckout] = useState(false);
+  const [cartCheckoutError, setCartCheckoutError] = useState<string | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('cardpirates_cart', JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleAddToCart = (item: CartItem) => {
+    setCartItems((prev) => {
+      const existingIndex = prev.findIndex((i) => i.variantId === item.variantId);
+      if (existingIndex > -1) {
+        const updated = [...prev];
+        updated[existingIndex].quantity += item.quantity;
+        return updated;
+      }
+      return [...prev, item];
+    });
+    setNotification({
+      message: `${item.eventTitle} wurde zum Warenkorb hinzugefügt! 🛒`,
+      type: 'success',
+    });
+    setIsCartOpen(true);
+  };
+
+  const handleUpdateCartQuantity = (variantId: string, quantity: number) => {
+    if (quantity <= 0) {
+      handleRemoveCartItem(variantId);
+      return;
+    }
+    setCartItems((prev) => prev.map((item) => (item.variantId === variantId ? { ...item, quantity } : item)));
+  };
+
+  const handleRemoveCartItem = (variantId: string) => {
+    setCartItems((prev) => prev.filter((item) => item.variantId !== variantId));
+  };
+
+  const handleCartCheckout = async () => {
+    if (cartItems.length === 0) return;
+    setLoadingCartCheckout(true);
+    setCartCheckoutError(null);
+
+    try {
+      const checkoutEmail = currentUser?.email || '';
+      const checkoutData = {
+        firstName: currentUser?.first_name || '',
+        lastName: currentUser?.last_name || '',
+        address1: currentUser?.address_line_1 || '',
+        city: currentUser?.city || '',
+        zip: currentUser?.zip_code || '',
+        country: currentUser?.country || 'DE',
+        company: currentUser?.company_name || '',
+      };
+
+      const checkoutUrl = await shopifyService.createCheckoutLink(
+        cartItems.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
+        checkoutEmail,
+        checkoutData
+      );
+
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        throw new Error('Fehler beim Erstellen der Kasse.');
+      }
+    } catch (err: any) {
+      setCartCheckoutError(err.message || 'Fehler beim Erstellen der Kasse.');
+    } finally {
+      setLoadingCartCheckout(false);
+    }
+  };
+
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
 
-  // 1. Initial State Check (reads active Supabase session or local storage fallback)
   useEffect(() => {
     const checkSession = async () => {
       if (supabase) {
@@ -76,7 +164,6 @@ function App() {
     checkSession();
   }, []);
 
-  // Parse query params for mock checkout success
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('mock_checkout_success') === 'true') {
@@ -85,12 +172,10 @@ function App() {
         message: `Kauf erfolgreich! Dein Ticket wurde an ${email} gesendet. 🎉`,
         type: 'success'
       });
-      // Clear URL search params
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
-  // Auto-dismiss notification after 6 seconds
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => {
@@ -100,14 +185,31 @@ function App() {
     }
   }, [notification]);
 
-  const handleQuickBuyTrigger = (event: ShopifyProduct) => {
-    setSelectedEvent(event);
-    setModalOpen(true);
-  };
-
   const handleNavbarLoginTrigger = () => {
     setSelectedEvent(null);
     setModalOpen(true);
+  };
+
+  const handleQuickBuyTrigger = (event: ShopifyProduct) => {
+    const defaultVariant = event.variants.nodes[0];
+    if (defaultVariant && defaultVariant.availableForSale !== false) {
+      handleAddToCart({
+        id: defaultVariant.id,
+        eventId: event.id,
+        eventTitle: event.title,
+        variantId: defaultVariant.id,
+        variantTitle: defaultVariant.title,
+        price: defaultVariant.price,
+        quantity: 1,
+        availableForSale: defaultVariant.availableForSale,
+        image: event.images.nodes[0]?.url,
+        date: event.eventDate?.value,
+        location: event.eventLocation?.value,
+      });
+    } else {
+      setSelectedEvent(event);
+      setModalOpen(true);
+    }
   };
 
   const handleLogout = async () => {
@@ -127,19 +229,11 @@ function App() {
     if (profile) {
       setCurrentUser(profile);
       localStorage.setItem('currentUser', JSON.stringify(profile));
-      
       if (!checkoutUrl) {
-        if (actionType === 'register') {
-          setNotification({
-            message: 'Registrierung erfolgreich! Willkommen in der Crew! Eine Bestätigungs-E-Mail wurde simuliert. 🎉',
-            type: 'success'
-          });
-        } else {
-          setNotification({
-            message: 'Erfolgreich eingeloggt! Willkommen zurück! 👋',
-            type: 'success'
-          });
-        }
+        setNotification({
+          message: actionType === 'register' ? 'Registrierung erfolgreich!' : 'Erfolgreich eingeloggt!',
+          type: 'success'
+        });
       }
     }
     if (checkoutUrl) {
@@ -151,7 +245,6 @@ function App() {
     <Router>
       <div className="flex flex-col min-h-screen bg-black text-zinc-100 antialiased selection:bg-white/20 selection:text-white relative overflow-x-hidden">
         
-        {/* Full Website Background Video (Only on Desktop) */}
         <div className="hidden md:block fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
           <video
             autoPlay
@@ -165,9 +258,14 @@ function App() {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/10" />
         </div>
 
+        <Navbar
+          onLoginTrigger={handleNavbarLoginTrigger}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          cartCount={totalCartCount}
+          onOpenCart={() => setIsCartOpen(true)}
+        />
 
-
-        {/* Mobile Burger Menu Button */}
         <ConditionalBurgerMenu 
           currentUser={currentUser} 
           onLoginTrigger={handleNavbarLoginTrigger} 
@@ -176,11 +274,10 @@ function App() {
             setCurrentUser(profile);
             localStorage.setItem('currentUser', JSON.stringify(profile));
           }}
+          cartCount={totalCartCount}
+          onOpenCart={() => setIsCartOpen(true)}
         />
 
-
-
-        {/* Main Content Area */}
         <main className={`relative z-10 flex-1 w-full max-w-4xl mx-auto py-6 ${modalOpen ? 'hidden md:block' : ''}`}>
           <Routes>
             <Route 
@@ -214,7 +311,6 @@ function App() {
           </Routes>
         </main>
 
-        {/* Floating Toast Notification */}
         {notification && (
           <div className="fixed bottom-6 right-6 z-[100] animate-fade-in max-w-sm">
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-2xl flex items-start gap-3 text-left">
@@ -236,7 +332,6 @@ function App() {
           </div>
         )}
 
-        {/* Unified Checkout Login/Registration Modal */}
         <LoginModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -244,9 +339,20 @@ function App() {
           currentUser={currentUser}
           onLogout={handleLogout}
           onSuccess={handleCheckoutSuccess}
+          onAddToCart={handleAddToCart}
         />
 
-        {/* Footer */}
+        <CartDrawer
+          isOpen={isCartOpen}
+          onClose={() => setIsCartOpen(false)}
+          cartItems={cartItems}
+          onUpdateQuantity={handleUpdateCartQuantity}
+          onRemoveItem={handleRemoveCartItem}
+          onCheckout={handleCartCheckout}
+          loadingCheckout={loadingCartCheckout}
+          checkoutError={cartCheckoutError}
+        />
+
         <footer className={`relative z-10 py-8 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full ${modalOpen ? 'hidden md:block' : ''}`}>
           &copy; {new Date().getFullYear()} Cardpirates x Rohde Media. All rights reserved. Powered by Shopify Storefront.
         </footer>

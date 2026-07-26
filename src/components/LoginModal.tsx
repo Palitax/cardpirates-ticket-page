@@ -7,13 +7,14 @@ import {
   Input, 
   Button 
 } from '@heroui/react';
-import { ArrowRight, X, Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, X, Eye, EyeOff, ShoppingBag, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import { profileService, supabase } from '../services/supabase';
 import type { CustomerProfile } from '../services/supabase';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
+import type { CartItem } from './CartDrawer';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -22,9 +23,10 @@ interface LoginModalProps {
   currentUser?: CustomerProfile | null;
   onLogout?: () => void;
   onSuccess: (checkoutUrl: string, profile?: CustomerProfile, actionType?: 'login' | 'register') => void;
+  onAddToCart?: (item: CartItem) => void;
 }
 
-export default function LoginModal({ isOpen, onClose, event, currentUser, onLogout, onSuccess }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, event, currentUser, onLogout, onSuccess, onAddToCart }: LoginModalProps) {
   if (!isOpen) return null;
 
   const [activeTab, setActiveTab] = useState<string>('login');
@@ -563,31 +565,51 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
 
                 {/* Direct Action Button */}
                 <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setLoading(true);
-                      setError(null);
-                      try {
-                        await generateCheckoutAndCallSuccess(currentUser);
-                      } catch (err: any) {
-                        setError(getErrorMessage(err));
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                    disabled={loading}
-                    className="w-full py-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98] disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <span>Kasse wird geladen...</span>
-                    ) : (
-                      <>
-                        <span>Weiter zur Kasse</span>
-                        <ArrowRight size={16} />
-                      </>
-                    )}
-                  </button>
+                  {(() => {
+                    const selectedVariant = event?.variants.nodes.find(v => v.id === selectedVariantId) || event?.variants.nodes[0];
+                    const isVariantSoldOut = selectedVariant?.availableForSale === false;
+
+                    if (isVariantSoldOut) {
+                      return (
+                        <button
+                          type="button"
+                          disabled
+                          className="w-full py-4 rounded-xl bg-zinc-900 text-zinc-500 font-extrabold text-sm border border-zinc-800 cursor-not-allowed opacity-60 flex items-center justify-center gap-2"
+                        >
+                          <XCircle size={16} />
+                          <span>Ausverkauft</span>
+                        </button>
+                      );
+                    }
+
+                    return (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (event && selectedVariant && onAddToCart) {
+                            onAddToCart({
+                              id: selectedVariant.id,
+                              eventId: event.id,
+                              eventTitle: event.title,
+                              variantId: selectedVariant.id,
+                              variantTitle: selectedVariant.title,
+                              price: selectedVariant.price,
+                              quantity: quantity,
+                              availableForSale: selectedVariant.availableForSale,
+                              image: event.images.nodes[0]?.url,
+                              date: event.eventDate?.value,
+                              location: event.eventLocation?.value,
+                            });
+                            onClose();
+                          }
+                        }}
+                        className="w-full py-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98]"
+                      >
+                        <ShoppingBag size={16} />
+                        <span>In den Warenkorb</span>
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             ) : showOtpScreen ? (

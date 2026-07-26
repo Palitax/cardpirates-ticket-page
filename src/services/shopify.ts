@@ -206,7 +206,7 @@ export const shopifyService = {
   },
 
   async createCheckoutLink(
-    variantId: string, 
+    variantIdOrItems: string | Array<{ variantId: string; quantity: number }>, 
     email: string, 
     checkoutData: {
       firstName: string;
@@ -219,16 +219,18 @@ export const shopifyService = {
     },
     quantity: number = 1
   ): Promise<string> {
-    if (variantId.includes('mock-var')) {
+    const lines = typeof variantIdOrItems === 'string'
+      ? [{ quantity: quantity, merchandiseId: variantIdOrItems }]
+      : variantIdOrItems.map(item => ({ quantity: item.quantity, merchandiseId: item.variantId }));
+
+    if (lines.some(l => l.merchandiseId.includes('mock-var'))) {
       throw new Error('Dies ist ein Demo-Event (Mock-Daten). Bitte lege ein echtes Produkt im Shopify-Admin an, um den realen Shopify-Checkout zu testen.');
     }
 
     const cleanEmail = email ? email.trim() : '';
     const isValidEmail = Boolean(cleanEmail && cleanEmail.includes('@') && cleanEmail.includes('.'));
 
-    const input: any = {
-      lines: [{ quantity: quantity, merchandiseId: variantId }]
-    };
+    const input: any = { lines };
 
     if (isValidEmail) {
       input.buyerIdentity = {

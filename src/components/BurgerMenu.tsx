@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Shield, Scale, Info, FileText, ChevronRight, Ticket } from 'lucide-react';
+import { X, Mail, Shield, Scale, Info, FileText, ChevronRight, Ticket, ShoppingBag } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useNavigate } from 'react-router-dom';
 import type { CustomerProfile } from '../services/supabase';
@@ -10,9 +10,11 @@ interface BurgerMenuProps {
   onLoginTrigger: () => void;
   onLogout: () => void;
   onProfileUpdate?: (profile: CustomerProfile) => void;
+  cartCount?: number;
+  onOpenCart?: () => void;
 }
 
-export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onProfileUpdate: _onProfileUpdate }: BurgerMenuProps) {
+export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onProfileUpdate: _onProfileUpdate, cartCount = 0, onOpenCart }: BurgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSheet, setActiveSheet] = useState<'impressum' | 'agb' | 'datenschutz' | 'widerruf' | null>(null);
 
@@ -122,6 +124,22 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
           <line x1="4" x2="20" y1="18" y2="18" />
         </svg>
       </button>
+
+      {/* Mobile Floating Cart Button (Top Right) */}
+      {onOpenCart && (
+        <button
+          onClick={onOpenCart}
+          className="md:hidden fixed top-5 right-5 z-40 flex items-center justify-center text-white active:scale-95 transition-all cursor-pointer p-2.5 rounded-xl bg-zinc-950/80 backdrop-blur-md border border-zinc-800 shadow-lg min-w-[44px] min-h-[44px]"
+          aria-label="Warenkorb öffnen"
+        >
+          <ShoppingBag size={18} />
+          {cartCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-white text-black font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+              {cartCount}
+            </span>
+          )}
+        </button>
+      )}
 
       {/* Slide-in Half Drawer Overlay */}
       {isOpen && (

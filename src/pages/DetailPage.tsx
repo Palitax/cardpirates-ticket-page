@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, CreditCard, ChevronRight, Video, Share2 } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, ChevronRight, Video, ShoppingBag, XCircle } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
@@ -15,106 +15,65 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
   const navigate = useNavigate();
   const [event, setEvent] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeImage, setActiveImage] = useState('');
-  const [isShareSupported, setIsShareSupported] = useState(false);
+  const [activeImage, setActiveImage] = useState<string>('');
 
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && !!(navigator as any).share) {
-      setIsShareSupported(true);
-    }
-  }, []);
-
-  const handleShare = async () => {
-    if (!event) return;
-    try {
-      await navigator.share({
-        title: event.title,
-        text: `Komm zu unserem Event: ${event.title}!`,
-        url: window.location.href,
-      });
-    } catch (err) {
-      console.log('Share failed or cancelled', err);
-    }
-  };
-
-  useEffect(() => {
-    async function loadEvent() {
-      if (!handle) return;
-      try {
-        const product = await shopifyService.getEventByHandle(handle);
-        setEvent(product);
-        if (product && product.images.nodes.length > 0) {
-          setActiveImage(product.images.nodes[0].url);
+    if (handle) {
+      setLoading(true);
+      shopifyService.getEventByHandle(handle).then((res) => {
+        setEvent(res);
+        if (res?.images.nodes[0]) {
+          setActiveImage(res.images.nodes[0].url);
         }
-      } catch (err) {
-        console.error('Failed to load event detail', err);
-      } finally {
         setLoading(false);
-      }
+      });
     }
-    loadEvent();
   }, [handle]);
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        <p className="text-zinc-400 text-sm font-semibold">Lade Event-Details...</p>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
       </div>
     );
   }
 
   if (!event) {
     return (
-      <div className="text-center py-20 space-y-4">
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4 text-center">
         <h2 className="text-xl font-bold text-white">Event nicht gefunden</h2>
-        <button
+        <button 
           onClick={() => navigate('/')}
-          className="inline-flex items-center gap-2 py-2.5 px-5 bg-zinc-800 text-white rounded-xl text-sm font-bold"
+          className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-xs font-bold text-white hover:bg-zinc-800 transition-all cursor-pointer"
         >
-          <ArrowLeft size={16} /> Zurück zum Zeitplan
+          Zurück zur Übersicht
         </button>
       </div>
     );
   }
 
-  const location = event.eventLocation?.value || 'TBA';
+  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false);
   const dateValue = event.eventDate?.value;
-  const formattedDate = dateValue 
-    ? new Date(dateValue).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-    : 'TBA';
-
+  const location = event.eventLocation?.value || 'TBA';
+  const videoUrl = event.eventVideoUrl?.value;
   const priceAmount = event.variants.nodes[0]?.price.amount || '0.00';
   const currency = event.variants.nodes[0]?.price.currencyCode || 'EUR';
-  const videoUrl = event.eventVideoUrl?.value;
 
   return (
-    <div className="px-4 sm:px-6 pb-32 pt-4 max-w-4xl mx-auto space-y-8 animate-fade-in text-zinc-300">
+    <div className="space-y-6 pb-24 md:pb-12 text-left max-w-4xl mx-auto px-4">
       
-      {/* Back Navigation & Breadcrumb */}
-      <nav className="flex items-center justify-between text-xs text-zinc-400 w-full">
+      {/* Top Breadcrumb Navigation & Actions Bar */}
+      <nav className="flex items-center justify-between py-2 border-b border-zinc-900 text-xs">
         <div className="flex items-center gap-2">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-1 hover:text-white transition-colors"
+            className="flex items-center gap-1 text-zinc-400 hover:text-white transition-colors font-bold cursor-pointer"
           >
             <ArrowLeft size={14} />
             Zeitplan
           </button>
           <ChevronRight size={12} className="text-zinc-650" />
-          <span className="text-zinc-300 font-medium truncate max-w-[150px] sm:max-w-xs">{event.title}</span>
         </div>
-
-        {/* Mobile-Only Share Button */}
-        {isShareSupported && (
-          <button
-            onClick={handleShare}
-            className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 active:bg-zinc-800 text-zinc-300 rounded-xl text-xs font-bold transition-all cursor-pointer"
-          >
-            <Share2 size={13} className="text-white" />
-            <span>Teilen</span>
-          </button>
-        )}
       </nav>
 
       {/* Main Grid: Media & Layout */}
@@ -154,77 +113,64 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
             </div>
           )}
 
-          {/* Promo Video Option */}
           {videoUrl && (
             <div className="p-4 bg-zinc-900/60 rounded-2xl border border-zinc-900/80 flex items-center gap-3">
               <div className="p-2.5 bg-zinc-800 text-white rounded-xl">
                 <Video size={18} />
               </div>
-              <div className="flex-1">
-                <h4 className="text-xs font-bold text-white">Promo-Video verfügbar</h4>
-                <p className="text-[11px] text-zinc-500">Klicke hier, um Event-Teaser und Highlights anzusehen.</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-white">Event Trailer verfügbar</p>
+                <a 
+                  href={videoUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-[11px] text-zinc-400 hover:text-white underline truncate block"
+                >
+                  Trailer auf YouTube ansehen
+                </a>
               </div>
-              <a
-                href={videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-bold text-white hover:underline"
-              >
-                Jetzt ansehen
-              </a>
             </div>
           )}
         </div>
 
-        {/* Content Column (Right) */}
+        {/* Content & Ticket Info Column (Right) */}
         <div className="md:col-span-5 space-y-6">
-          <div className="space-y-2 text-left">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+          <div className="space-y-3">
+            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
               {event.title}
             </h1>
-            <div className="flex items-center gap-1.5 text-xs text-white font-bold uppercase tracking-wider">
-              <Calendar size={13} />
-              Bevorstehendes Event
-            </div>
-          </div>
-
-          <div className="space-y-4 p-4.5 bg-zinc-900/40 rounded-2xl border border-zinc-900/50 text-left">
-            <div className="flex items-start gap-3 text-sm">
-              <Calendar size={18} className="text-zinc-500 shrink-0 mt-0.5" />
-              <div>
-                <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Datum & Uhrzeit</span>
-                <span className="text-zinc-200 font-semibold">{formattedDate}</span>
+            
+            <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
+              <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl font-semibold">
+                <Calendar size={13} className="text-white" />
+                <span>{dateValue ? new Date(dateValue).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : 'TBA'}</span>
               </div>
-            </div>
-
-            <div className="flex items-start gap-3 text-sm border-t border-zinc-900 pt-3.5">
-              <MapPin size={18} className="text-zinc-500 shrink-0 mt-0.5" />
-              <div>
-                <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Veranstaltungsort</span>
-                <span className="text-zinc-200 font-semibold">{location}</span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 text-sm border-t border-zinc-900 pt-3.5">
-              <CreditCard size={18} className="text-zinc-500 shrink-0 mt-0.5" />
-              <div>
-                <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Ticket-Zugang</span>
-                <span className="text-zinc-200 font-semibold">Sofortige digitale Zustellung per E-Mail nach Zahlung</span>
+              <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl font-semibold">
+                <MapPin size={13} className="text-white" />
+                <span>{location}</span>
               </div>
             </div>
           </div>
 
-          {/* Desktop Buy Ticket Card */}
-          <div className="hidden md:block p-5 bg-zinc-900 border border-zinc-800 rounded-2xl space-y-4 shadow-xl shadow-black/20 text-left">
-            <div className="flex flex-col gap-2">
-              <span className="block text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Ticketpreis</span>
+          {/* Ticket Buy Box */}
+          <div className="p-5 bg-zinc-950 border border-zinc-800/90 rounded-3xl space-y-5 shadow-2xl">
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 block">
+                Verfügbare Kategorien
+              </span>
+              
               {event.variants.nodes.length > 1 ? (
-                <div className="space-y-1.5 w-full">
-                  {event.variants.nodes.slice(0, 2).map((variant) => (
-                    <div key={variant.id} className="flex justify-between items-center text-sm font-bold text-white border-b border-zinc-850 pb-1.5 last:border-0 last:pb-0">
-                      <span className="text-xs text-zinc-400 uppercase font-semibold">{variant.title}</span>
-                      <span>
-                        {variant.price.amount} <span className="text-[10px] text-zinc-500 font-normal">{variant.price.currencyCode}</span>
+                <div className="space-y-2">
+                  {event.variants.nodes.map((v) => (
+                    <div key={v.id} className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
+                      <div>
+                        <span className="text-xs font-bold text-white block">{v.title}</span>
+                        <span className={`text-[10px] font-semibold ${v.availableForSale === false ? 'text-rose-400' : 'text-zinc-400'}`}>
+                          {v.availableForSale === false ? 'Ausverkauft' : 'Sofort verfügbar'}
+                        </span>
+                      </div>
+                      <span className="text-sm font-black text-white">
+                        {v.price.amount} <span className="text-[10px] text-zinc-400 font-semibold">{v.price.currencyCode}</span>
                       </span>
                     </div>
                   ))}
@@ -234,20 +180,31 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
                   <span className="text-2xl font-extrabold text-white">
                     {priceAmount} <span className="text-xs text-zinc-400 font-semibold">{currency}</span>
                   </span>
-                  <span className="text-[10px] text-white font-bold bg-zinc-950 border border-zinc-900 px-2 py-1 rounded-md">
-                    Verfügbar
+                  <span className={`text-[10px] font-bold border px-2 py-1 rounded-md ${isSoldOut ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-950 border-zinc-900 text-white'}`}>
+                    {isSoldOut ? 'Ausverkauft' : 'Verfügbar'}
                   </span>
                 </div>
               )}
             </div>
 
-            <Button
-              variant="primary"
-              onPress={() => onQuickBuy(event)}
-              className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all select-none active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/5"
-            >
-              Ticket kaufen
-            </Button>
+            {isSoldOut ? (
+              <button
+                disabled
+                className="w-full py-4 rounded-xl bg-zinc-900 text-zinc-500 font-extrabold text-sm border border-zinc-800 cursor-not-allowed opacity-60 flex items-center justify-center gap-2 select-none"
+              >
+                <XCircle size={16} />
+                <span>Ausverkauft</span>
+              </button>
+            ) : (
+              <Button
+                variant="primary"
+                onPress={() => onQuickBuy(event)}
+                className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all select-none active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/5"
+              >
+                <ShoppingBag size={16} />
+                <span>In den Warenkorb</span>
+              </Button>
+            )}
           </div>
 
           <div className="space-y-3 text-left">
@@ -264,48 +221,38 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
       </div>
 
       {/* Mobile Sticky Bottom CTA Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-900 p-4 pb-safe flex items-center justify-between max-w-4xl mx-auto sm:rounded-t-3xl sm:border-x md:hidden text-left">
-        <div className="flex flex-col select-none">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-900 p-4 pb-safe flex items-center justify-between md:hidden">
+        <div className="flex flex-col">
           {event.variants.nodes.length > 1 ? (
-            <div className="space-y-0.5">
-              <span className="block text-[8px] text-zinc-500 font-bold uppercase tracking-wider leading-none">Ticketpreise</span>
-              {event.variants.nodes.slice(0, 2).map((variant) => (
-                <div key={variant.id} className="text-[11px] font-black text-white leading-none flex items-center gap-1.5">
-                  <span className="text-zinc-400 font-semibold uppercase text-[9px]">{variant.title}:</span>
-                  <span>{variant.price.amount} <span className="text-[8px] text-zinc-500">{variant.price.currencyCode}</span></span>
-                </div>
-              ))}
-            </div>
+             <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Tickets ab</span>
           ) : (
             <>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Gesamtpreis</span>
-              <span className="text-2xl font-extrabold text-white">
-                {priceAmount} <span className="text-xs text-zinc-400 font-semibold">{currency}</span>
+              <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Ticketpreis</span>
+              <span className="text-lg font-extrabold text-white leading-none mt-0.5">
+                {priceAmount} <span className="text-[10px] text-zinc-400 font-semibold">{currency}</span>
               </span>
             </>
           )}
         </div>
 
-        <div className="flex gap-2">
-          {isShareSupported && (
-            <Button
-              variant="outline"
-              onPress={handleShare}
-              className="py-3 px-3.5 rounded-xl border border-zinc-800 bg-zinc-900 active:bg-zinc-850 text-zinc-300 flex items-center justify-center transition-all cursor-pointer"
-              aria-label="Event teilen"
-            >
-              <Share2 size={16} className="text-white" />
-            </Button>
-          )}
-
+        {isSoldOut ? (
+          <button
+            disabled
+            className="py-3 px-5 rounded-xl bg-zinc-900 text-zinc-500 font-extrabold text-xs border border-zinc-800 cursor-not-allowed opacity-60 flex items-center gap-1.5"
+          >
+            <XCircle size={14} />
+            <span>Ausverkauft</span>
+          </button>
+        ) : (
           <Button
             variant="primary"
             onPress={() => onQuickBuy(event)}
-            className="py-3 px-8 rounded-xl bg-white hover:bg-zinc-200 text-black border border-white font-extrabold text-sm transition-all select-none active:scale-[0.98] cursor-pointer"
+            className="py-3 px-5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs border border-white transition-all active:scale-[0.98] cursor-pointer shadow-lg flex items-center gap-1.5"
           >
-            Ticket kaufen
+            <ShoppingBag size={14} />
+            <span>In den Warenkorb</span>
           </Button>
-        </div>
+        )}
       </div>
 
     </div>
