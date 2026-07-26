@@ -93,7 +93,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
         <div className="absolute top-0 bottom-0 right-[22%] border-l border-dashed border-white/15 z-10 pointer-events-none" />
 
         {/* Right Part: Ticket Stub (Width 22%) */}
-        <div className="w-[22%] shrink-0 h-full flex flex-col items-center justify-center p-5 pt-6 z-10 relative bg-white/[0.01] rounded-r-3xl gap-5">
+        <div className="w-[22%] shrink-0 h-full flex flex-col items-center justify-center px-4 py-5 z-10 relative bg-white/[0.01] rounded-r-3xl gap-4">
           {/* Left Glow effect behind QR */}
           <div className="absolute left-4 top-4 w-16 h-16 bg-white/[0.02] group-hover:bg-white/[0.08] group-hover:scale-125 rounded-full blur-xl pointer-events-none transition-all duration-350" />
           
@@ -126,18 +126,26 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
           ) : null}
 
           {/* Price & Action Area (Bottom) */}
-          <div className="flex flex-col items-center text-center justify-center gap-[18px] w-full z-10">
+          <div className="flex flex-col items-center text-center justify-center gap-3.5 w-full z-10">
             {!isPurchased && (
-              <div className="flex flex-col items-center gap-0.5 text-center select-none">
+              <div className="flex flex-col items-center justify-center w-full select-none">
                 {event.variants.nodes.length > 1 ? (
                   <>
-                    <span className="text-[8px] text-zinc-500 font-black uppercase tracking-widest leading-none mb-1">Ticketpreise</span>
-                    {event.variants.nodes.slice(0, 2).map((variant) => (
-                      <div key={variant.id} className="text-xs font-black text-white leading-none flex items-center gap-1">
-                        <span className="text-[9px] text-zinc-400 uppercase font-semibold">{variant.title}:</span>
-                        <span>{variant.price.amount} <span className="text-[8px] text-zinc-500">{variant.price.currencyCode}</span></span>
-                      </div>
-                    ))}
+                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block text-center mb-1.5">
+                      Ticketpreise
+                    </span>
+                    <div className="inline-grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-1 items-baseline text-left">
+                      {event.variants.nodes.slice(0, 2).map((variant) => (
+                        <div key={variant.id} className="contents">
+                          <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider text-right">
+                            {variant.title}:
+                          </span>
+                          <span className="text-xs font-black text-white whitespace-nowrap text-left">
+                            {variant.price.amount} <span className="text-[9px] text-zinc-400 font-semibold">{variant.price.currencyCode}</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </>
                 ) : (
                   <>
@@ -154,14 +162,14 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
               {isPurchased ? (
                 <button
                   onClick={() => onQuickBuy(event)}
-                  className="w-full py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-black/20"
+                  className="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-black/20"
                 >
                   weiteres Ticket kaufen
                 </button>
               ) : (
                 <button
                   onClick={() => onQuickBuy(event)}
-                  className="w-full py-1.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-white/5 border border-white"
+                  className="w-full py-2 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-white/5 border border-white"
                 >
                   Ticket kaufen
                 </button>
