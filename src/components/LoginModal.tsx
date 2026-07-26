@@ -19,10 +19,12 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   event: ShopifyProduct | null;
+  currentUser?: CustomerProfile | null;
+  onLogout?: () => void;
   onSuccess: (checkoutUrl: string, profile?: CustomerProfile, actionType?: 'login' | 'register') => void;
 }
 
-export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, event, currentUser, onLogout, onSuccess }: LoginModalProps) {
   if (!isOpen) return null;
 
   const [activeTab, setActiveTab] = useState<string>('login');
@@ -132,7 +134,8 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
 
     localStorage.setItem(`purchased_tickets_${profileData.shopify_customer_id}`, JSON.stringify(savedTickets));
 
-    const checkoutUrl = await shopifyService.createCheckoutLink(variantId, email, {
+    const checkoutEmail = profileData.email || email || '';
+    const checkoutUrl = await shopifyService.createCheckoutLink(variantId, checkoutEmail, {
       firstName: profileData.first_name,
       lastName: profileData.last_name,
       address1: profileData.address_line_1 || 'Hauptstraße 1',
@@ -430,16 +433,27 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
           {/* Desktop Header */}
           <Modal.Header className="hidden md:block border-b border-zinc-800/80 px-6 py-5 text-left">
             <Modal.Heading className="text-lg font-bold text-white tracking-tight">
-              {event 
-                ? (activeTab === 'register' ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
-                : (activeTab === 'register' ? 'Konto erstellen' : 'Konto-Login')
+              {currentUser 
+                ? (event ? 'Kauf abschließen' : 'Dein Crew-Konto')
+                : (event 
+                    ? (activeTab === 'register' ? 'Registrieren & Kaufen' : 'Anmelden & Kaufen')
+                    : (activeTab === 'register' ? 'Konto erstellen' : 'Konto-Login')
+                  )
               }
             </Modal.Heading>
             <p className="text-xs text-zinc-400 font-normal mt-1">
-              {event ? (
-                <>Um Tickets zu kaufen für <span className="text-white font-semibold">{event.title}</span></>
+              {currentUser ? (
+                event ? (
+                  <>Ticket-Bestellung für <span className="text-white font-semibold">{event.title}</span></>
+                ) : (
+                  `Angemeldet als ${currentUser.first_name} ${currentUser.last_name}`
+                )
               ) : (
-                'Greife auf deine Cardpirates-Kämpfe und dein Profil zu'
+                event ? (
+                  <>Um Tickets zu kaufen für <span className="text-white font-semibold">{event.title}</span></>
+                ) : (
+                  'Greife auf deine Cardpirates-Kämpfe und dein Profil zu'
+                )
               )}
             </p>
           </Modal.Header>
@@ -458,7 +472,125 @@ export default function LoginModal({ isOpen, onClose, event, onSuccess }: LoginM
               </div>
             )}
 
-            {showOtpScreen ? (
+            {/* LOGGED IN USER QUICK CHECKOUT VIEW */}
+            {currentUser ? (
+              <div className="space-y-5 animate-fade-in text-left">
+                {/* User Info Card */}
+                <div className="flex items-center justify-between p-4 bg-zinc-950 border border-zinc-800 rounded-2xl">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-white font-black text-sm shrink-0">
+                      {currentUser.first_name?.[0]}{currentUser.last_name?.[0]}
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block text-xs font-bold text-white truncate">
+                        {currentUser.first_name} {currentUser.last_name}
+                      </span>
+                      <span className="block text-[11px] text-zinc-400 truncate">
+                        {currentUser.email || email || 'Crew-Mitglied'}
+                      </span>
+                    </div>
+                  </div>
+                  {onLogout && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onLogout();
+                      }}
+                      className="text-[10px] font-bold text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 px-2.5 py-1.5 rounded-lg transition-all shrink-0 cursor-pointer"
+                    >
+                      Konto wechseln
+                    </button>
+                  )}
+                </div>
+
+                {/* Ticket Selection Area */}
+                {event && (
+                  <div className="p-4 bg-zinc-950 border border-zinc-800 rounded-2xl space-y-4 select-none">
+                    <div className="text-zinc-400 text-[10px] font-black uppercase tracking-widest border-b border-zinc-900 pb-2">
+                      Ticket-Auswahl
+                    </div>
+                    
+                    {/* Variant Selection */}
+                    {event.variants.nodes.length > 1 && (
+                      <div className="space-y-1.5 text-left">
+                        <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Ticket-Kategorie</label>
+                        <select
+                          value={selectedVariantId}
+                          onChange={(e) => setSelectedVariantId(e.target.value)}
+                          className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer font-semibold"
+                        >
+                          {event.variants.nodes.map(v => (
+                            <option key={v.id} value={v.id}>
+                              {v.title} — {v.price.amount} {v.price.currencyCode}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Quantity Selection */}
+                    <div className="space-y-1.5 text-left">
+                      <label className="text-zinc-500 text-[10px] font-bold uppercase tracking-wider block">Anzahl Tickets</label>
+                      <select
+                        value={quantity}
+                        onChange={(e) => setQuantity(Number(e.target.value))}
+                        className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer font-semibold"
+                      >
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                          <option key={n} value={n}>{n} Ticket{n > 1 ? 's' : ''}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Total Summary */}
+                    {(() => {
+                      const selectedVariant = event.variants.nodes.find(v => v.id === selectedVariantId) || event.variants.nodes[0];
+                      const singlePrice = parseFloat(selectedVariant?.price.amount || '0');
+                      const totalPrice = (singlePrice * quantity).toFixed(2);
+                      const currencyCode = selectedVariant?.price.currencyCode || 'EUR';
+
+                      return (
+                        <div className="flex items-center justify-between border-t border-zinc-900 pt-3 text-xs font-bold">
+                          <span className="text-zinc-400">Gesamtsumme ({quantity}x):</span>
+                          <span className="text-white text-base font-black">
+                            {totalPrice} {currencyCode}
+                          </span>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
+
+                {/* Direct Action Button */}
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setLoading(true);
+                      setError(null);
+                      try {
+                        await generateCheckoutAndCallSuccess(currentUser);
+                      } catch (err: any) {
+                        setError(getErrorMessage(err));
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="w-full py-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98] disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <span>Kasse wird geladen...</span>
+                    ) : (
+                      <>
+                        <span>Weiter zur Kasse</span>
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : showOtpScreen ? (
               <div className="space-y-5 animate-fade-in pt-2">
                 <div className="text-center py-2 space-y-2 select-none">
                   <span className="text-[32px] block">✉️</span>

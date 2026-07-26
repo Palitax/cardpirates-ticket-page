@@ -241,6 +241,8 @@ function App() {
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           event={selectedEvent}
+          currentUser={currentUser}
+          onLogout={handleLogout}
           onSuccess={handleCheckoutSuccess}
         />
 
