@@ -4,9 +4,13 @@ import event3Img from '../assets/event3.jpg';
 
 const getShopifyConfig = () => {
   const globalConfig = (window as any).ShopifyStorefrontConfig || {};
+  const hostname = window.location.hostname;
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
   return {
-    domain: globalConfig.domain || import.meta.env.VITE_SHOPIFY_DOMAIN || window.location.hostname || 'cardpirates.myshopify.com',
-    token: globalConfig.token || import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || 'YOUR_STOREFRONT_TOKEN'
+    domain: (!isLocal && globalConfig.domain && globalConfig.domain !== 'localhost') 
+      ? globalConfig.domain 
+      : (import.meta.env.VITE_SHOPIFY_DOMAIN || 'cardpiratescrew.com'),
+    token: globalConfig.token || import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN || '4fb5c5e0cba28f099773e3d20c3393dc'
   };
 };
 
