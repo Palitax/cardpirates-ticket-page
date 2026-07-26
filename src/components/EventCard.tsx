@@ -74,7 +74,7 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
             {dateValue && (
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-white/[0.08] border border-white/[0.12] text-white text-[9px] font-black tracking-widest uppercase w-fit">
                 <span className="w-1 h-1 rounded-full bg-white/60 animate-pulse" />
-                <span>{day}. {dateObj ? dateObj.toLocaleDateString('de-DE', { month: 'long' }).toUpperCase() : month}</span>
+                <span>{day}. {dateObj ? dateObj.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' }).toUpperCase() : month}</span>
               </div>
             )}
           </div>
