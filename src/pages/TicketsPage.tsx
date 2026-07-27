@@ -5,6 +5,8 @@ import { Button } from '@heroui/react';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion } from 'framer-motion';
 import { syncService } from '../services/syncService';
+import { shopifyService } from '../services/shopify';
+import type { ShopifyProduct } from '../services/shopify';
 
 const ENABLE_QR_CODE = false;
 
@@ -26,6 +28,11 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState<TicketItem[]>([]);
   const [selectedTicket, setSelectedTicket] = useState<TicketItem | null>(null);
+  const [events, setEvents] = useState<ShopifyProduct[]>([]);
+
+  useEffect(() => {
+    shopifyService.getEvents().then(setEvents).catch(console.error);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -82,6 +89,13 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
     return (now - eventTime) > THREE_DAYS_MS;
   });
 
+  const getEventHandle = (ticket: TicketItem) => {
+    const rawTitle = ticket.title.split(' - ')[0];
+    const event = events.find(e => e.id === ticket.event_id || e.title.toLowerCase() === rawTitle.toLowerCase());
+    if (event) return event.handle;
+    return rawTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  };
+
   return (
     <div className="px-4 sm:px-6 pb-24 pt-20 md:pt-6 max-w-2xl mx-auto space-y-8 animate-fade-in text-zinc-300 text-left">
       
@@ -96,9 +110,10 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
         </button>
       </nav>
 
-      <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-          Meine Tickets
+      {/* Header Info */}
+      <div className="space-y-1">
+        <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center gap-2.5">
+          <span>Meine Tickets</span>
         </h1>
         <p className="text-xs text-zinc-400">
           Verwalte hier deine Einlass-Tickets für Cardpirates Crew-Events.
@@ -154,13 +169,16 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
                     key={ticket.id}
                     whileHover={{ y: -1 }}
                     whileTap={{ scale: 0.99 }}
-                    onClick={() => setSelectedTicket(ticket)}
-                    className="p-4 bg-zinc-900/40 border border-zinc-850 hover:border-zinc-800 rounded-2xl flex gap-4 items-center justify-between cursor-pointer transition-all relative overflow-hidden"
+                    onClick={() => {
+                      const handle = getEventHandle(ticket);
+                      navigate(`/events/${handle}`);
+                    }}
+                    className="p-4 bg-zinc-900/40 border border-zinc-850 hover:border-zinc-800 rounded-2xl flex gap-4 items-center justify-between cursor-pointer transition-all relative overflow-hidden group"
                   >
                     {/* Event Image or Fallback */}
                     <div className="w-14 h-14 rounded-xl overflow-hidden bg-zinc-950 border border-zinc-900 shrink-0">
                       {ticket.image ? (
-                        <img src={ticket.image} className="w-full h-full object-cover" alt="" />
+                        <img src={ticket.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-zinc-600">
                           <Ticket size={20} />
@@ -169,7 +187,7 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xs font-black text-white truncate uppercase tracking-wide leading-tight">
+                      <h3 className="text-xs font-black text-white truncate uppercase tracking-wide leading-tight group-hover:text-red-500 transition-colors">
                         {ticket.title}
                       </h3>
                       <div className="flex flex-col gap-0.5 mt-1 text-[10px] text-zinc-400 font-semibold">
@@ -184,9 +202,16 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
                       </div>
                     </div>
 
-                    <div className="text-[10px] font-black text-red-500 bg-red-950/20 border border-red-900/30 px-2.5 py-1 rounded-lg uppercase tracking-wider shrink-0 select-none">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTicket(ticket);
+                      }}
+                      className="text-[10px] font-black text-red-500 bg-red-950/30 hover:bg-red-900/50 border border-red-900/40 px-3 py-2 rounded-xl uppercase tracking-wider shrink-0 select-none cursor-pointer transition-all active:scale-95"
+                    >
                       Ticket ansehen
-                    </div>
+                    </button>
                   </motion.div>
                 ))}
               </div>
