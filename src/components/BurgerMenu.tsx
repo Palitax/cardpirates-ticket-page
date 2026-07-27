@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Shield, Scale, Info, FileText, ChevronRight, Ticket, ShoppingBag } from 'lucide-react';
+import { X, Mail, Shield, Scale, Info, FileText, Ticket, ShoppingBag, User, LogOut } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useNavigate } from 'react-router-dom';
 import type { CustomerProfile } from '../services/supabase';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
+import { WHATNOT_LOGO_BASE64 } from '../assets/whatnotLogoData';
 
 interface BurgerMenuProps {
   currentUser: CustomerProfile | null;
@@ -175,11 +176,11 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
             {/* Drawer Scrollable Content */}
             <div className="flex-1 px-4 py-4 overflow-y-auto flex flex-col justify-between">
 
-              {/* Profile Context Section (Top) */}
-              <div className="space-y-6 shrink-0">
+              {/* Profile Context Section (Top - Highest Priority) */}
+              <div className="space-y-4 shrink-0">
                 {!currentUser ? (
-                  /* LOGGED OUT USER VIEW - Card Wrapper Removed */
-                  <div className="space-y-3 text-center px-1 py-2">
+                  /* LOGGED OUT USER VIEW */
+                  <div className="space-y-3 text-center px-1 py-1">
                     <span className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest text-left">Crew Profil</span>
                     <p className="text-[11px] text-zinc-500 leading-normal mb-1 text-left">
                       Logge dich ein, um deine Tickets und Profildetails einzusehen.
@@ -190,76 +191,107 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                         setIsOpen(false);
                         onLoginTrigger();
                       }}
-                      className="w-full py-3 rounded-lg bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98]"
+                      className="w-full py-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98]"
                     >
                       Login / Registrieren
                     </Button>
                   </div>
                 ) : (
-                  /* LOGGED IN USER VIEW */
-                  <div className="space-y-3">
-                    {/* User Profile Header (No box, no profile picture) */}
-                    <div className="flex items-center justify-between gap-2 py-1 px-1 text-left">
+                  /* LOGGED IN USER VIEW - High Visibility Profile & Tickets */
+                  <div className="space-y-2.5 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-900">
+                    {/* User Info Header & Direct Logout */}
+                    <div className="flex items-center justify-between gap-2 text-left pb-1">
                       <div className="min-w-0">
-                        <h4 className="text-xs font-bold text-white truncate">Hallo, {currentUser.first_name}!</h4>
-                        <span className="block text-[8px] text-zinc-500 uppercase tracking-widest font-semibold truncate">
-                          {currentUser.user_type === 'business' ? 'Business' : 'Private'}
+                        <h4 className="text-xs font-black text-white truncate">Hallo, {currentUser.first_name}!</h4>
+                        <span className="block text-[8px] text-zinc-500 uppercase tracking-widest font-bold truncate">
+                          {currentUser.user_type === 'business' ? 'Business Account' : 'Private Account'}
                         </span>
                       </div>
                       <button
                         onClick={onLogout}
-                        className="text-[9px] font-bold text-zinc-400 hover:text-white uppercase tracking-wider px-2 py-1 bg-zinc-900 border border-zinc-800 rounded-md transition-all shrink-0 cursor-pointer"
+                        className="text-[9px] font-extrabold text-red-400 hover:text-red-300 bg-red-950/30 hover:bg-red-900/40 border border-red-900/50 px-2.5 py-1.5 rounded-lg uppercase tracking-wider shrink-0 cursor-pointer transition-all flex items-center gap-1 active:scale-95"
                       >
-                        Logout
+                        <LogOut size={10} />
+                        <span>Logout</span>
                       </button>
                     </div>
-                    
-                    {/* Edit Profile Button */}
+
+                    {/* Meine Tickets Button (Prominent) */}
                     <Button
                       variant="primary"
                       onPress={() => {
                         setIsOpen(false);
+                        navigate('/meine-tickets');
+                      }}
+                      className="w-full py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md"
+                    >
+                      <Ticket size={15} />
+                      <span>Meine Tickets</span>
+                    </Button>
+                    
+                    {/* Profil bearbeiten Button */}
+                    <Button
+                      variant="outline"
+                      onPress={() => {
+                        setIsOpen(false);
                         navigate('/profil');
                       }}
-                      className="w-full py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-850 text-white font-extrabold text-xs cursor-pointer border border-zinc-800 transition-all active:scale-[0.98] flex items-center justify-center"
+                      className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-850 text-white font-extrabold text-xs cursor-pointer border border-zinc-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                     >
-                      Profil bearbeiten
+                      <User size={14} />
+                      <span>Profil bearbeiten</span>
                     </Button>
                   </div>
                 )}
-
-                {/* Link to Meine Tickets page */}
-                {currentUser && (
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate('/meine-tickets');
-                    }}
-                    className="w-full flex items-center justify-between p-3 bg-zinc-950/40 border border-zinc-900 rounded-xl hover:border-zinc-850 transition-all text-left text-zinc-300 text-xs font-bold cursor-pointer active:scale-[0.98]"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Ticket size={14} className="text-white shrink-0" />
-                      <span>Meine Tickets</span>
-                    </div>
-                    <ChevronRight size={14} className="text-zinc-500 shrink-0" />
-                  </button>
-                )}
               </div>
 
-              {/* Socials & Support Section (Bottom) */}
-              <div className="space-y-5 pt-8 shrink-0">
-                {/* Discord Button Sektion (Unified size matching Login button, official logo path) */}
+              {/* Socials & Community Section */}
+              <div className="space-y-4 pt-4 shrink-0">
                 <div className="space-y-2">
+                  <span className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-900 pb-1.5 text-left">
+                    Community & Socials
+                  </span>
+                  
+                  {/* Discord Button */}
                   <Button
                     variant="primary"
                     onPress={() => window.open('https://discord.gg/8yRykEdr4G', '_blank')}
-                    className="w-full py-3 rounded-lg bg-black hover:bg-zinc-950 text-white font-extrabold text-xs cursor-pointer border border-zinc-700 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                    className="w-full py-2.5 rounded-xl bg-black hover:bg-zinc-950 text-white font-extrabold text-xs cursor-pointer border border-zinc-800 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                   >
                     <svg className="w-4 h-4 fill-white shrink-0 block" viewBox="0 0 127.14 96.36">
                       <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c1.07-.79,2.12-1.61,3.13-2.47a75.1,75.1,0,0,0,64.84,0c1,.86,2.06,1.68,3.13,2.47a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129.07,47,122.9,24.16,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.9,46,53.72,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.14,46,96,53,91,65.69,84.69,65.69Z"/>
                     </svg>
-                    <span>Tritt unserem Discord bei</span>
+                    <span>Discord Server</span>
                   </Button>
+
+                  {/* Instagram & WhatNot Grid */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <a
+                      href="https://www.instagram.com/cardpiratesofficial/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 bg-zinc-950 border border-zinc-850 hover:border-zinc-750 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer group active:scale-[0.98]"
+                    >
+                      <div className="w-4.5 h-4.5 rounded-md bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white shrink-0 flex items-center justify-center p-0.5">
+                        <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                      </div>
+                      <span className="text-[11px] font-extrabold text-white group-hover:text-rose-400 transition-colors">Instagram</span>
+                    </a>
+
+                    <a
+                      href="https://www.whatnot.com/de-DE/user/cardpirates/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 bg-zinc-950 border border-zinc-850 hover:border-zinc-750 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer group active:scale-[0.98]"
+                    >
+                      <div className="w-4.5 h-4.5 rounded-md overflow-hidden shrink-0 flex items-center justify-center">
+                        <img src={WHATNOT_LOGO_BASE64} alt="WhatNot" className="w-full h-full object-contain" />
+                      </div>
+                      <span className="text-[11px] font-extrabold text-white group-hover:text-amber-400 transition-colors">WhatNot</span>
+                    </a>
+                  </div>
                 </div>
 
                 {/* Newsletter Input Section */}
@@ -268,7 +300,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                     Newsletter
                   </span>
                   {newsletterSubmitted ? (
-                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] rounded-lg text-center font-medium">
+                    <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] rounded-xl text-center font-medium">
                       Danke für dein Abonnement! 🎉
                     </div>
                   ) : (
@@ -279,11 +311,11 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                         placeholder="Deine E-Mail-Adresse"
                         value={newsletterEmail}
                         onChange={(e) => setNewsletterEmail(e.target.value)}
-                        className="flex-1 bg-zinc-950 border border-zinc-900 focus:border-white rounded-lg px-3 py-2 text-[11px] text-white placeholder-zinc-700 outline-none transition-all"
+                        className="flex-1 bg-zinc-950 border border-zinc-900 focus:border-white rounded-xl px-3 py-2 text-[11px] text-white placeholder-zinc-700 outline-none transition-all"
                       />
                       <button
                         type="submit"
-                        className="px-3 rounded-lg bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] cursor-pointer border border-white transition-all active:scale-95"
+                        className="px-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] cursor-pointer border border-white transition-all active:scale-95"
                       >
                         OK
                       </button>
@@ -298,7 +330,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                   </span>
                   <a
                     href="mailto:support@cardpirates.de?subject=Cardpirates%20Supportanfrage"
-                    className="w-full flex items-center justify-center gap-2 p-2.5 bg-zinc-950 border border-zinc-900 rounded-lg hover:border-zinc-800 transition-all text-slate-300 text-xs font-bold text-center"
+                    className="w-full flex items-center justify-center gap-2 p-2.5 bg-zinc-950 border border-zinc-900 rounded-xl hover:border-zinc-800 transition-all text-slate-300 text-xs font-bold text-center"
                   >
                     <Mail size={13} className="text-white" />
                     <span>Support kontaktieren</span>
