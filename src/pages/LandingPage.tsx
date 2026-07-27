@@ -221,7 +221,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
               <div className="md:hidden flex flex-col items-center select-none">
                 
                 {/* Stack Wrapper */}
-                <div className="relative w-full h-[415px] flex items-center justify-center overflow-visible touch-pan-y">
+                <div className="relative w-full h-[455px] flex items-center justify-center overflow-visible touch-pan-y">
                   {events.map((event, idx) => {
                     const offset = idx - carouselIndex;
                     const absOffset = Math.abs(offset);
@@ -266,7 +266,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             setCarouselIndex(idx);
                           }
                         }}
-                        className={`absolute left-1/2 -ml-[115px] w-[230px] h-[395px] bg-transparent border-none outline-none select-none ${offset === 0 ? 'cursor-default' : 'cursor-pointer'}`}
+                        className={`absolute left-1/2 -ml-[115px] w-[230px] h-[435px] bg-transparent border-none outline-none select-none ${offset === 0 ? 'cursor-default' : 'cursor-pointer'}`}
                       >
                         {/* Soft Premium Shadow Layer to fix Safari GPU drop-shadow clipping/pixelation bugs */}
                         <div 
@@ -280,12 +280,12 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                         {/* Inner Card Container clipped into physical ticket for hardware-accelerated animations */}
                         <div 
                           style={{
-                            clipPath: "path('M 0 16 A 16 16 0 0 1 16 0 L 214 0 A 16 16 0 0 1 230 16 L 230 227 A 8 8 0 0 0 230 243 L 230 379 A 16 16 0 0 1 214 395 L 16 395 A 16 16 0 0 1 0 379 L 0 243 A 8 8 0 0 0 0 227 Z')"
+                            clipPath: "path('M 0 16 A 16 16 0 0 1 16 0 L 214 0 A 16 16 0 0 1 230 16 L 230 252 A 8 8 0 0 0 230 268 L 230 419 A 16 16 0 0 1 214 435 L 16 435 A 16 16 0 0 1 0 419 L 0 268 A 8 8 0 0 0 0 252 Z')"
                           }}
                           className="w-full h-full bg-black rounded-[24px] overflow-hidden flex flex-col justify-between relative z-10"
                         >
                           {/* Card Cover image/video with fading gradient blend */}
-                          <div className="relative h-[130px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
+                          <div className="relative h-[175px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
                             {/* Event Cover Video */}
                             <video
                               autoPlay
@@ -297,8 +297,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                               src={event.eventVideoUrl?.value || logoAnimVideoUrl}
                             />
 
-                            {/* Seamless Top Fadeout Overlay blending smoothly into black page background */}
-                            <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none z-20" />
+                            {/* Balanced Top Fadeout Overlay blending smoothly into black page background */}
+                            <div className="absolute inset-x-0 top-0 h-14 bg-gradient-to-b from-black via-black/85 to-transparent pointer-events-none z-20" />
 
                             {/* Bottom Fadeout Overlay blending into white ticket stub */}
                             <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-20" />
