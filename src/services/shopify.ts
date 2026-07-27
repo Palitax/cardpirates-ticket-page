@@ -82,6 +82,39 @@ export interface ShopifyProduct {
   eventVideoUrl?: { value: string };
 }
 
+// Helper to parse media (videos and images) from Shopify Storefront API
+function mapShopifyProduct(rawProduct: any): ShopifyProduct {
+  if (!rawProduct) return rawProduct;
+
+  let videoUrl = rawProduct.eventVideoUrl?.value || undefined;
+  const images: ShopifyImage[] = rawProduct.images?.nodes ? [...rawProduct.images.nodes] : [];
+
+  if (rawProduct.media?.nodes) {
+    for (const item of rawProduct.media.nodes) {
+      if (item.sources && item.sources.length > 0) {
+        const mp4Source = item.sources.find((s: any) => s.mimeType?.includes('mp4') || s.format === 'mp4') || item.sources[0];
+        if (mp4Source?.url && !videoUrl) {
+          videoUrl = mp4Source.url;
+        }
+      } else if (item.embedUrl && !videoUrl) {
+        videoUrl = item.embedUrl;
+      }
+
+      if (item.previewImage?.url) {
+        if (!images.some(img => img.url === item.previewImage.url)) {
+          images.push({ url: item.previewImage.url, altText: item.alt || null });
+        }
+      }
+    }
+  }
+
+  return {
+    ...rawProduct,
+    images: { nodes: images },
+    eventVideoUrl: videoUrl ? { value: videoUrl } : rawProduct.eventVideoUrl
+  };
+}
+
 // Queries
 const GET_PRODUCTS_QUERY = `
   query GetProducts($first: Int!) {
@@ -95,6 +128,36 @@ const GET_PRODUCTS_QUERY = `
           nodes {
             url
             altText
+          }
+        }
+        media(first: 10) {
+          nodes {
+            mediaContentType
+            alt
+            previewImage {
+              url
+            }
+            ... on MediaVideo {
+              id
+              sources {
+                url
+                mimeType
+                format
+              }
+            }
+            ... on Video {
+              id
+              sources {
+                url
+                mimeType
+                format
+              }
+            }
+            ... on ExternalVideo {
+              id
+              embedUrl
+              host
+            }
           }
         }
         variants(first: 5) {
@@ -114,6 +177,9 @@ const GET_PRODUCTS_QUERY = `
         eventLocation: metafield(namespace: "custom", key: "event_location") {
           value
         }
+        eventVideoUrl: metafield(namespace: "custom", key: "event_video_url") {
+          value
+        }
       }
     }
   }
@@ -131,6 +197,36 @@ const GET_PRODUCT_BY_HANDLE_QUERY = `
         nodes {
           url
           altText
+        }
+      }
+      media(first: 10) {
+        nodes {
+          mediaContentType
+          alt
+          previewImage {
+            url
+          }
+          ... on MediaVideo {
+            id
+            sources {
+              url
+              mimeType
+              format
+            }
+          }
+          ... on Video {
+            id
+            sources {
+              url
+              mimeType
+              format
+            }
+          }
+          ... on ExternalVideo {
+            id
+            embedUrl
+            host
+          }
         }
       }
       variants(first: 5) {
@@ -175,7 +271,7 @@ const CREATE_CART_MUTATION = `
 export const shopifyService = {
   async getEvents(limit = 10): Promise<ShopifyProduct[]> {
     try {
-      const data = await shopifyFetch<{ products: { nodes: ShopifyProduct[] } }>(
+      const data = await shopifyFetch<{ products: { nodes: any[] } }>(
         GET_PRODUCTS_QUERY,
         { first: limit }
       );
@@ -183,7 +279,7 @@ export const shopifyService = {
         console.warn("Shopify returned 0 products. Falling back to mock events for staging.");
         return getMockEvents();
       }
-      return data.products.nodes;
+      return data.products.nodes.map(mapShopifyProduct);
     } catch {
       // Fallback Mock Data for demo purposes if Shopify is empty/unreachable
       return getMockEvents();
@@ -192,14 +288,14 @@ export const shopifyService = {
 
   async getEventByHandle(handle: string): Promise<ShopifyProduct | null> {
     try {
-      const data = await shopifyFetch<{ product: ShopifyProduct | null }>(
+      const data = await shopifyFetch<{ product: any | null }>(
         GET_PRODUCT_BY_HANDLE_QUERY,
         { handle }
       );
       if (!data.product) {
         return getMockEvents().find(e => e.handle === handle) || null;
       }
-      return data.product;
+      return mapShopifyProduct(data.product);
     } catch {
       return getMockEvents().find(e => e.handle === handle) || null;
     }
