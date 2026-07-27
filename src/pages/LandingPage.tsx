@@ -288,15 +288,15 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                             {event.images.nodes[0]?.url ? (
                               <img
                                 src={event.images.nodes[0].url}
-                                className="w-full h-full object-cover grayscale brightness-110 contrast-125"
+                                className="w-full h-full object-cover"
                                 alt=""
                               />
                             ) : (
                               <div className="w-full h-full bg-zinc-900" />
                             )}
 
-                            {/* Strong Top Fadeout Overlay blending smoothly into black page background */}
-                            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none z-20" />
+                            {/* Subtle & Light Top Fadeout Overlay blending smoothly into black page background */}
+                            <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-black/30 via-black/10 to-transparent pointer-events-none z-20" />
 
                             {/* Bottom Fadeout Overlay blending into white ticket stub */}
                             <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-20" />
