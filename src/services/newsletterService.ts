@@ -10,7 +10,7 @@ export interface NewsletterSubscriber {
 
 export const newsletterService = {
   /**
-   * Subscribes an email to the newsletter in Supabase (with localStorage fallback for dev).
+   * Subscribes an email to the newsletter in Supabase and triggers a welcome email via Resend.
    */
   async subscribe(email: string, source: 'landing_page' | 'checkout' | 'footer' = 'landing_page'): Promise<{ success: boolean; message: string }> {
     const cleanEmail = email.trim().toLowerCase();
@@ -19,6 +19,23 @@ export const newsletterService = {
       return { success: false, message: 'Bitte gib eine gültige E-Mail-Adresse ein.' };
     }
 
+    // 1. ALWAYS trigger Welcome Email via Edge Function with await so it completes reliably
+    try {
+      if (supabase) {
+        const { data, error: fnErr } = await supabase.functions.invoke('send-booking-notification', {
+          body: { type: 'newsletter_welcome', email: cleanEmail }
+        });
+        if (fnErr) {
+          console.warn('Edge Function invoke returned error:', fnErr);
+        } else {
+          console.log('Newsletter welcome email dispatched successfully:', data);
+        }
+      }
+    } catch (fnErr) {
+      console.warn('Could not trigger welcome email via Supabase Edge Function:', fnErr);
+    }
+
+    // 2. Save/Upsert subscriber in Supabase database
     try {
       if (supabase) {
         const { error } = await supabase
@@ -35,21 +52,13 @@ export const newsletterService = {
 
         if (error) {
           console.error('Error saving newsletter subscriber to Supabase:', error);
-          throw error;
         }
-
-        // Trigger Welcome Email via Edge Function
-        supabase.functions.invoke('send-booking-notification', {
-          body: { type: 'newsletter_welcome', email: cleanEmail }
-        }).catch(err => console.warn('Could not send newsletter welcome email:', err));
-
-        return { success: true, message: 'Vielen Dank für deine Anmeldung zum Newsletter!' };
       }
     } catch (e) {
       console.warn('Network error or Supabase offline, saving subscriber locally:', e);
     }
 
-    // LocalStorage Fallback for dev / offline mode
+    // LocalStorage Fallback
     try {
       const existing = localStorage.getItem('cardpirates_newsletter_subscribers');
       const subscribers: string[] = existing ? JSON.parse(existing) : [];
@@ -57,10 +66,9 @@ export const newsletterService = {
         subscribers.push(cleanEmail);
         localStorage.setItem('cardpirates_newsletter_subscribers', JSON.stringify(subscribers));
       }
-      return { success: true, message: 'Vielen Dank für deine Anmeldung zum Newsletter!' };
-    } catch (err) {
-      return { success: false, message: 'Fehler beim Speichern der Anmeldung.' };
-    }
+    } catch (err) {}
+
+    return { success: true, message: 'Vielen Dank für deine Anmeldung zum Newsletter!' };
   },
 
   /**
@@ -84,10 +92,7 @@ export const newsletterService = {
 
         if (error) {
           console.error('Error unsubscribing newsletter recipient:', error);
-          throw error;
         }
-
-        return { success: true, message: 'Du wurdest erfolgreich vom Newsletter abgemeldet.' };
       }
     } catch (e) {
       console.warn('Network error during unsubscribe:', e);
