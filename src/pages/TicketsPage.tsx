@@ -83,7 +83,7 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
   });
 
   return (
-    <div className="px-4 sm:px-6 pb-24 pt-4 max-w-2xl mx-auto space-y-8 animate-fade-in text-zinc-300 text-left">
+    <div className="px-4 sm:px-6 pb-24 pt-20 md:pt-6 max-w-2xl mx-auto space-y-8 animate-fade-in text-zinc-300 text-left">
       
       {/* Header & Back Button */}
       <nav className="flex items-center gap-2 text-xs text-zinc-400">
@@ -257,9 +257,10 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
             {/* Close button */}
             <button
               onClick={() => setSelectedTicket(null)}
-              className="absolute top-4 right-4 text-zinc-500 hover:text-white p-1 hover:bg-zinc-800 rounded-lg transition-all cursor-pointer"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-750 transition-all flex items-center justify-center cursor-pointer shadow-md z-50 active:scale-95"
+              aria-label="Schließen"
             >
-              <X size={18} />
+              <X size={20} strokeWidth={2.5} />
             </button>
 
             <div className="space-y-1.5 mt-4">
@@ -318,13 +319,17 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
             )}
 
             {/* Bottom ID tag */}
-            <div className="space-y-1 mt-auto">
+            <div className="space-y-3 mt-auto w-full pt-2">
               <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest">
                 Ticket-ID: {selectedTicket.id}
               </p>
-              <p className="text-xs text-white font-extrabold">
-                Bitte beim Einlass vorzeigen.
-              </p>
+              <Button
+                variant="primary"
+                onPress={() => setSelectedTicket(null)}
+                className="w-full py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold text-xs cursor-pointer border border-zinc-700 active:scale-[0.98] shadow-lg flex items-center justify-center gap-1.5"
+              >
+                Schließen
+              </Button>
             </div>
 
           </div>

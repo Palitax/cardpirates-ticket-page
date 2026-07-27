@@ -213,7 +213,7 @@ export default function ProfilePage({ currentUser, onProfileUpdate }: ProfilePag
   if (!currentUser) return null;
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-6 md:py-8 space-y-6 text-zinc-100 animate-fade-in text-left">
+    <div className="w-full max-w-2xl mx-auto px-4 pt-20 pb-8 md:py-8 space-y-6 text-zinc-100 animate-fade-in text-left">
       
       {/* Top Header Navigation */}
       <div className="flex items-center justify-between border-b border-zinc-800/80 pb-5">

@@ -539,18 +539,18 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
           
           {/* Modal Container */}
           <div 
-            className="relative bg-white text-zinc-950 w-full h-full md:h-auto md:max-w-md md:rounded-3xl flex flex-col items-center justify-center p-8 select-none shadow-2xl animate-fade-in z-10"
+            className="relative bg-white text-zinc-950 w-full h-full md:h-auto md:max-w-md md:rounded-3xl flex flex-col items-center justify-between p-6 sm:p-8 select-none shadow-2xl animate-fade-in z-10 overflow-y-auto overscroll-contain"
           >
-            {/* Close X Button (Visible on mobile fullscreen, and useful for desktop too) */}
+            {/* Close X Button (Highly visible & 44x44px touch target) */}
             <button 
               onClick={() => setActiveQrModal(null)}
-              className="absolute top-5 right-5 text-zinc-400 hover:text-zinc-950 p-2 rounded-full hover:bg-zinc-100 transition-colors cursor-pointer"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-11 h-11 rounded-full bg-zinc-100 border border-zinc-250 text-zinc-800 hover:bg-zinc-200 transition-all flex items-center justify-center cursor-pointer shadow-md z-50 active:scale-95"
               aria-label="Schließen"
             >
-              <X size={24} />
+              <X size={22} strokeWidth={2.5} />
             </button>
 
-            <div className="w-full max-w-xs flex flex-col items-center mt-4">
+            <div className="w-full max-w-xs flex flex-col items-center my-auto py-4">
                 <div className="text-center space-y-1.5 w-full">
                   <span className="text-[10px] font-black text-red-650 uppercase tracking-widest block">
                     Cardpirates Einlass-Ticket
@@ -639,6 +639,15 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                     </button>
                   </div>
                  )}
+
+                {/* Bottom Close Button */}
+                <Button
+                  variant="primary"
+                  onPress={() => setActiveQrModal(null)}
+                  className="w-full mt-5 py-3 rounded-2xl bg-zinc-950 hover:bg-black text-white font-extrabold text-xs cursor-pointer border border-zinc-900 active:scale-[0.98] shadow-lg flex items-center justify-center gap-1.5"
+                >
+                  Schließen
+                </Button>
             </div>
           </div>
         </div>

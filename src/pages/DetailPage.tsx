@@ -63,7 +63,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
   const currency = event.variants.nodes[0]?.price.currencyCode || 'EUR';
 
   return (
-    <div className="space-y-6 pb-24 md:pb-12 text-left max-w-4xl mx-auto px-4">
+    <div className="space-y-6 pb-24 md:pb-12 text-left max-w-4xl mx-auto px-4 pt-20 md:pt-4">
       
       {/* Top Breadcrumb Navigation & Actions Bar */}
       <nav className="flex items-center justify-between py-2 border-b border-zinc-900 text-xs">
