@@ -6,6 +6,7 @@ import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
 import { Button } from '@heroui/react';
 import { formatPrice } from '../utils/formatters';
+import whatnotLogo from '../assets/whatnot-logo.png';
 
 interface DetailPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -16,6 +17,7 @@ interface DetailPageProps {
 export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger }: DetailPageProps) {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
+  const whatnotLogoUrl = (window as any).ShopifyAssets?.whatnotLogoUrl || whatnotLogo;
   const [event, setEvent] = useState<ShopifyProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState<string>('');
@@ -163,7 +165,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
               className="p-3.5 bg-gradient-to-r from-zinc-900/90 to-zinc-900/50 hover:from-zinc-850 hover:to-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-2xl flex items-center gap-3 transition-all cursor-pointer group active:scale-[0.98] shadow-sm"
             >
               <div className="w-9 h-9 rounded-xl bg-zinc-950 border border-zinc-800 p-1 shrink-0 shadow-md flex items-center justify-center overflow-hidden">
-                <img src="/whatnot-logo.png" alt="WhatNot" className="w-full h-full object-contain rounded-lg" />
+                <img src={whatnotLogoUrl} alt="WhatNot" className="w-full h-full object-contain rounded-lg" />
               </div>
               <div className="min-w-0 text-left">
                 <span className="block text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Live Streams auf</span>
