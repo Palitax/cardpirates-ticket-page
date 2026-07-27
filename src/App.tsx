@@ -327,7 +327,7 @@ function App() {
                   setNotification(null);
                 }
               }}
-              className="fixed top-16 left-4 right-4 md:top-20 md:left-auto md:right-6 md:max-w-sm z-[100] cursor-grab active:cursor-grabbing select-none"
+              className="fixed top-16 left-4 right-4 md:top-6 md:left-1/2 md:-translate-x-1/2 md:right-auto md:max-w-md w-[calc(100%-2rem)] md:w-auto z-[100] cursor-grab active:cursor-grabbing select-none"
             >
               <div className="bg-zinc-950/95 backdrop-blur-md border border-zinc-800 rounded-2xl p-4 shadow-2xl flex items-center justify-between gap-3 text-left">
                 <div className="flex items-center gap-3 min-w-0">
