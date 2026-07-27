@@ -270,7 +270,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                       >
                         {/* Soft Premium Shadow Layer to fix Safari GPU drop-shadow clipping/pixelation bugs */}
                         <div 
-                          className={`absolute pointer-events-none transition-all duration-300 rounded-b-[24px] bg-black ${
+                          className={`absolute pointer-events-none transition-all duration-300 rounded-[24px] bg-black ${
                             offset === 0 
                               ? 'inset-1.5 opacity-60 blur-xl' 
                               : 'inset-3.5 opacity-40 blur-md'
@@ -280,9 +280,9 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                         {/* Inner Card Container clipped into physical ticket for hardware-accelerated animations */}
                         <div 
                           style={{
-                            clipPath: "path('M 0 0 L 230 0 L 230 227 A 8 8 0 0 0 230 243 L 230 395 L 0 395 L 0 243 A 8 8 0 0 0 0 227 Z')"
+                            clipPath: "path('M 0 16 A 16 16 0 0 1 16 0 L 214 0 A 16 16 0 0 1 230 16 L 230 227 A 8 8 0 0 0 230 243 L 230 379 A 16 16 0 0 1 214 395 L 16 395 A 16 16 0 0 1 0 379 L 0 243 A 8 8 0 0 0 0 227 Z')"
                           }}
-                          className="w-full h-full bg-white text-zinc-800 rounded-b-[24px] overflow-hidden flex flex-col justify-between relative z-10"
+                          className="w-full h-full bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between relative z-10"
                         >
                           {/* Card Cover image/video with fading gradient blend */}
                           <div className="relative h-[130px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
@@ -297,8 +297,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                               src={event.eventVideoUrl?.value || logoAnimVideoUrl}
                             />
 
-                            {/* Top Fadeout Overlay blending smoothly into black page background */}
-                            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none z-20" />
+                            {/* Seamless Top Fadeout Overlay blending smoothly into black page background */}
+                            <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none z-20" />
 
                             {/* Bottom Fadeout Overlay blending into white ticket stub */}
                             <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-20" />
