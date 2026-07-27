@@ -284,18 +284,36 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           }}
                           className="w-full h-full bg-white text-zinc-800 rounded-b-[24px] overflow-hidden flex flex-col justify-between relative z-10"
                         >
-                          {/* Card Cover image with fading gradient blend */}
+                          {/* Card Cover image with fading gradient blend & centered animated logo overlay */}
                           <div className="relative h-[130px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
+                            {/* Background Cover Video */}
                             <video
                               autoPlay
                               loop
                               muted
                               playsInline
                               poster={event.images.nodes[0]?.url}
-                              className="w-full h-full object-cover grayscale brightness-150 contrast-125"
+                              className="w-full h-full object-cover grayscale brightness-125 contrast-125 opacity-70"
                               src={event.eventVideoUrl?.value || logoAnimVideoUrl}
                             />
-                            <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
+
+                            {/* Minimal Top Fadeout Overlay */}
+                            <div className="absolute inset-x-0 top-0 h-5 bg-gradient-to-b from-black/45 to-transparent pointer-events-none z-10" />
+
+                            {/* Centered Animated Skull Logo Overlay */}
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                              <video
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
+                                src={logoAnimVideoUrl}
+                                className="w-24 h-24 object-contain brightness-150 drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)]"
+                              />
+                            </div>
+
+                            {/* Bottom Fadeout Overlay */}
+                            <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
                           </div>
 
                           {/* Card details */}
