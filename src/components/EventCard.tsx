@@ -57,12 +57,13 @@ export default function EventCard({
             loop
             muted
             playsInline
+            poster={event.images.nodes[0]?.url}
             style={{
               maskImage: 'linear-gradient(to right, black 55%, transparent 100%)',
               WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 100%)'
             }}
             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300 grayscale brightness-150 contrast-125"
-            src={logoAnimVideoUrl}
+            src={event.eventVideoUrl?.value || logoAnimVideoUrl}
           />
 
           {/* Countdown Badge (Bottom-Left of Video) */}

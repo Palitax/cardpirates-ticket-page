@@ -85,17 +85,38 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
         {/* Media Column (Left) */}
         <div className="md:col-span-7 space-y-4">
           <div className="relative aspect-video rounded-3xl overflow-hidden border border-zinc-900 bg-zinc-950">
-            {activeImage && (
+            {videoUrl ? (
+              <div className="w-full h-full relative">
+                {videoUrl.includes('youtube') || videoUrl.includes('vimeo') || videoUrl.includes('youtu.be') ? (
+                  <iframe
+                    src={videoUrl.includes('watch?v=') ? videoUrl.replace('watch?v=', 'embed/') : videoUrl}
+                    className="w-full h-full border-0"
+                    allow="autoplay; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video 
+                    src={videoUrl} 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline 
+                    poster={activeImage || event.images.nodes[0]?.url}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
+            ) : activeImage ? (
               <img 
                 src={activeImage} 
                 alt={event.title}
                 className="w-full h-full object-cover"
               />
-            )}
+            ) : null}
 
             {/* Countdown Badge overlay */}
             {dateValue && (
-              <div className="absolute bottom-4 left-4 right-4 max-w-sm">
+              <div className="absolute bottom-4 left-4 right-4 max-w-sm z-20">
                 <CountdownTimer targetDate={dateValue} />
               </div>
             )}

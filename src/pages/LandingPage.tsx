@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertCircle, X, Check } from 'lucide-react';
+import { AlertCircle, Check } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import EventCard from '../components/EventCard';
@@ -291,8 +291,9 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                               loop
                               muted
                               playsInline
+                              poster={event.images.nodes[0]?.url}
                               className="w-full h-full object-cover grayscale brightness-150 contrast-125"
-                              src={logoAnimVideoUrl}
+                              src={event.eventVideoUrl?.value || logoAnimVideoUrl}
                             />
                             <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
                           </div>
@@ -525,7 +526,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
 
   return (
     <div 
-      className="px-4 sm:px-6 pb-24 pt-1 max-w-7xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
+      className="px-4 sm:px-6 pb-24 pt-16 md:pt-4 max-w-7xl mx-auto space-y-12 animate-fade-in text-zinc-300 transition-opacity duration-150 overflow-x-hidden"
     >
       {renderMainContent()}
       
@@ -541,21 +542,6 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
           <div 
             className="relative bg-white text-zinc-950 w-full h-full md:h-auto md:max-w-md md:rounded-3xl flex flex-col items-center justify-between p-6 sm:p-8 select-none shadow-2xl animate-fade-in z-10 overflow-y-auto overscroll-contain"
           >
-            {/* Top Modal Header Bar with Close Button */}
-            <div className="w-full flex items-center justify-between pb-3 border-b border-zinc-150 shrink-0">
-              <span className="text-[10px] font-black text-red-650 uppercase tracking-widest block">
-                Cardpirates Einlass-Ticket
-              </span>
-              <button 
-                onClick={() => setActiveQrModal(null)}
-                className="px-3.5 py-1.5 rounded-full bg-zinc-900 text-white font-extrabold text-xs flex items-center gap-1.5 hover:bg-black transition-all cursor-pointer shadow-md active:scale-95 min-h-[36px]"
-                aria-label="Schließen"
-              >
-                <X size={16} strokeWidth={2.5} />
-                <span>Schließen</span>
-              </button>
-            </div>
-
             <div className="w-full max-w-xs flex flex-col items-center my-auto py-4">
                 <div className="text-center space-y-1.5 w-full">
                   <h2 className="text-base font-black leading-snug text-zinc-900 px-2">
