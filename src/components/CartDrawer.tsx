@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatPrice } from '../utils/formatters';
@@ -18,6 +18,7 @@ export interface CartItem {
   image?: string;
   date?: string;
   location?: string;
+  organizerEmail?: string;
 }
 
 interface CartDrawerProps {
@@ -26,7 +27,7 @@ interface CartDrawerProps {
   cartItems: CartItem[];
   onUpdateQuantity: (variantId: string, quantity: number) => void;
   onRemoveItem: (variantId: string) => void;
-  onCheckout: () => void;
+  onCheckout: (subscribeNewsletter?: boolean) => void;
   loadingCheckout?: boolean;
   checkoutError?: string | null;
 }
@@ -41,6 +42,7 @@ export default function CartDrawer({
   loadingCheckout = false,
   checkoutError = null,
 }: CartDrawerProps) {
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(true);
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -209,9 +211,22 @@ export default function CartDrawer({
                 </p>
               </div>
 
+              {/* Newsletter Opt-In Checkbox */}
+              <label className="flex items-start gap-2.5 p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-xs text-zinc-300 cursor-pointer hover:border-zinc-700 transition-all select-none">
+                <input
+                  type="checkbox"
+                  checked={subscribeNewsletter}
+                  onChange={(e) => setSubscribeNewsletter(e.target.checked)}
+                  className="mt-0.5 rounded border-zinc-700 text-white focus:ring-0 accent-red-600 shrink-0 cursor-pointer"
+                />
+                <span className="leading-snug text-[11px] text-zinc-300">
+                  Ich möchte den Cardpirates Newsletter abonnieren, um exklusive Event-Updates zu erhalten.
+                </span>
+              </label>
+
               <button
                 type="button"
-                onClick={onCheckout}
+                onClick={() => onCheckout(subscribeNewsletter)}
                 disabled={loadingCheckout}
                 className="w-full py-4 rounded-xl bg-white hover:bg-zinc-200 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed text-black font-extrabold text-sm border border-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-[0.98]"
               >

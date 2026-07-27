@@ -11,7 +11,7 @@ import { ArrowRight, X, Eye, EyeOff, ShoppingBag, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
-import { profileService, supabase } from '../services/supabase';
+import { profileService, supabase, notificationService } from '../services/supabase';
 import { formatPrice } from '../utils/formatters';
 import type { CustomerProfile } from '../services/supabase';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
@@ -98,8 +98,13 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
     const savedTicketsRaw = localStorage.getItem(`purchased_tickets_${profileData.shopify_customer_id}`);
     const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
 
+    let firstTicketId = '';
+    const holderName = `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() || 'Gast';
+    const organizerEmail = event.organizerEmail?.value;
+
     for (let i = 0; i < quantity; i++) {
       const ticketId = crypto.randomUUID();
+      if (!firstTicketId) firstTicketId = ticketId;
       
       if (supabase) {
         try {
@@ -108,8 +113,9 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
             .insert({
               id: ticketId,
               event_id: event.id,
-              holder_name: `${profileData.first_name} ${profileData.last_name}`,
-              status: 'open'
+              holder_name: holderName,
+              status: 'open',
+              organizer_email: organizerEmail || null
             });
           if (insertErr) {
             console.error('Failed to insert ticket to Supabase:', insertErr);
@@ -135,9 +141,20 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
       });
     }
 
-    localStorage.setItem(`purchased_tickets_${profileData.shopify_customer_id}`, JSON.stringify(savedTickets));
-
+    // Trigger booking notification email to Event Organizer
     const checkoutEmail = profileData.email || email || '';
+    notificationService.sendBookingNotification({
+      ticketId: firstTicketId,
+      eventTitle: event.title,
+      eventDate: event.eventDate?.value,
+      holderName,
+      buyerEmail: checkoutEmail,
+      quantity,
+      price: `${(parseFloat(selectedVariant.price.amount) * quantity).toFixed(2)} ${selectedVariant.price.currencyCode || 'EUR'}`,
+      organizerEmail
+    }).catch(err => console.warn('Notification send failed:', err));
+
+    localStorage.setItem(`purchased_tickets_${profileData.shopify_customer_id}`, JSON.stringify(savedTickets));
     const checkoutUrl = await shopifyService.createCheckoutLink(variantId, checkoutEmail, {
       firstName: profileData.first_name,
       lastName: profileData.last_name,
@@ -602,6 +619,7 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
                               image: event.images.nodes[0]?.url,
                               date: event.eventDate?.value,
                               location: event.eventLocation?.value,
+                              organizerEmail: event.organizerEmail?.value,
                             });
                             onClose();
                           }

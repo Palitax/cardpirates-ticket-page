@@ -12,6 +12,8 @@ import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import { syncService } from '../services/syncService';
 import { formatPrice } from '../utils/formatters';
 
+import { newsletterService } from '../services/newsletterService';
+
 const ENABLE_QR_CODE = false;
 
 interface TicketTimerProps {
@@ -151,11 +153,14 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
     loadEvents();
   }, []);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newsletterEmail.trim()) {
-      setNewsletterSubmitted(true);
-      setNewsletterEmail('');
+      const res = await newsletterService.subscribe(newsletterEmail, 'landing_page');
+      if (res.success) {
+        setNewsletterSubmitted(true);
+        setNewsletterEmail('');
+      }
     }
   };
 

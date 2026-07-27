@@ -15,7 +15,8 @@ import type { CartItem } from './components/CartDrawer';
 import { shopifyService } from './services/shopify';
 import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
-import { supabase, profileService } from './services/supabase';
+import { supabase, profileService, notificationService } from './services/supabase';
+import { newsletterService } from './services/newsletterService';
 import logoAnimVideo from './assets/cardpirates-logo-kleiner.mp4';
 import './App.css';
 
@@ -97,7 +98,7 @@ function App() {
     setCartItems((prev) => prev.filter((item) => item.variantId !== variantId));
   };
 
-  const handleCartCheckout = async () => {
+  const handleCartCheckout = async (subscribeNewsletter: boolean = true) => {
     if (cartItems.length === 0) return;
 
     if (!currentUser) {
@@ -110,14 +111,24 @@ function App() {
     setCartCheckoutError(null);
 
     try {
+      // 0. Handle Newsletter Opt-In if checked
+      const checkoutEmail = currentUser?.email || '';
+      if (subscribeNewsletter && checkoutEmail) {
+        newsletterService.subscribe(checkoutEmail, 'checkout').catch((e) => console.warn(e));
+      }
+
       // 1. Generate & Save tickets for user in Supabase & LocalStorage
       const key = `purchased_tickets_${currentUser.shopify_customer_id}`;
       const savedTicketsRaw = localStorage.getItem(key);
       const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
 
+      const holderName = `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'Gast';
+
       for (const item of cartItems) {
+        let firstTicketId = '';
         for (let i = 0; i < item.quantity; i++) {
           const ticketId = crypto.randomUUID();
+          if (!firstTicketId) firstTicketId = ticketId;
 
           if (supabase) {
             try {
@@ -126,8 +137,9 @@ function App() {
                 .insert({
                   id: ticketId,
                   event_id: item.eventId,
-                  holder_name: `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'Gast',
-                  status: 'open'
+                  holder_name: holderName,
+                  status: 'open',
+                  organizer_email: item.organizerEmail || null
                 });
               if (insertErr) {
                 console.error('Failed to insert ticket to Supabase:', insertErr);
@@ -154,12 +166,23 @@ function App() {
             lastName: currentUser.last_name
           });
         }
+
+        // Trigger booking notification email to Event Organizer
+        notificationService.sendBookingNotification({
+          ticketId: firstTicketId,
+          eventTitle: item.eventTitle,
+          eventDate: item.date,
+          holderName,
+          buyerEmail: checkoutEmail,
+          quantity: item.quantity,
+          price: `${(parseFloat(item.price.amount) * item.quantity).toFixed(2)} ${item.price.currencyCode || 'EUR'}`,
+          organizerEmail: item.organizerEmail
+        }).catch(err => console.warn('Notification send failed:', err));
       }
 
       localStorage.setItem(key, JSON.stringify(savedTickets));
 
       // 2. Create Shopify Checkout Link
-      const checkoutEmail = currentUser?.email || '';
       const checkoutData = {
         firstName: currentUser?.first_name || '',
         lastName: currentUser?.last_name || '',

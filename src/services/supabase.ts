@@ -82,3 +82,37 @@ export const profileService = {
     return profile;
   }
 };
+
+export const notificationService = {
+  /**
+   * Invokes the send-booking-notification Supabase Edge Function to send a booking email to the event organizer.
+   */
+  async sendBookingNotification(params: {
+    ticketId: string;
+    eventTitle: string;
+    eventDate?: string;
+    holderName: string;
+    buyerEmail?: string;
+    quantity?: number;
+    price?: string;
+    organizerEmail?: string;
+  }) {
+    try {
+      if (supabase) {
+        const { data, error } = await supabase.functions.invoke('send-booking-notification', {
+          body: params
+        });
+        if (error) {
+          console.warn('Could not trigger booking notification function:', error);
+        } else {
+          console.log('Booking notification sent successfully:', data);
+        }
+      } else {
+        console.log('Mock Mode: Booking notification simulated for organizer:', params);
+      }
+    } catch (err) {
+      console.warn('Error invoking send-booking-notification:', err);
+    }
+  }
+};
+

@@ -76,6 +76,7 @@ export interface ShopifyProduct {
   eventDate?: { value: string };
   eventLocation?: { value: string };
   eventVideoUrl?: { value: string };
+  organizerEmail?: { value: string };
 }
 
 // Helper to parse media (videos and images) from Shopify Storefront API
@@ -168,6 +169,9 @@ const GET_PRODUCTS_QUERY = `
         eventVideoUrl: metafield(namespace: "custom", key: "event_video_url") {
           value
         }
+        organizerEmail: metafield(namespace: "custom", key: "organizer_email") {
+          value
+        }
       }
     }
   }
@@ -227,6 +231,9 @@ const GET_PRODUCT_BY_HANDLE_QUERY = `
         value
       }
       eventVideoUrl: metafield(namespace: "custom", key: "event_video_url") {
+        value
+      }
+      organizerEmail: metafield(namespace: "custom", key: "organizer_email") {
         value
       }
     }
