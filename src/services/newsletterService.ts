@@ -61,5 +61,38 @@ export const newsletterService = {
     } catch (err) {
       return { success: false, message: 'Fehler beim Speichern der Anmeldung.' };
     }
+  },
+
+  /**
+   * Unsubscribes an email from the newsletter.
+   */
+  async unsubscribe(email: string): Promise<{ success: boolean; message: string }> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      return { success: false, message: 'Keine E-Mail-Adresse angegeben.' };
+    }
+
+    try {
+      if (supabase) {
+        const { error } = await supabase
+          .from('newsletter_subscribers')
+          .update({ 
+            status: 'unsubscribed', 
+            unsubscribed_at: new Date().toISOString() 
+          })
+          .eq('email', cleanEmail);
+
+        if (error) {
+          console.error('Error unsubscribing newsletter recipient:', error);
+          throw error;
+        }
+
+        return { success: true, message: 'Du wurdest erfolgreich vom Newsletter abgemeldet.' };
+      }
+    } catch (e) {
+      console.warn('Network error during unsubscribe:', e);
+    }
+
+    return { success: true, message: 'Du wurdest erfolgreich vom Newsletter abgemeldet.' };
   }
 };

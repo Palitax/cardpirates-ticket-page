@@ -1,5 +1,5 @@
 // Supabase Edge Function: send-booking-notification
-// Handles automated email dispatch via Resend for Booking Alerts & Newsletter Welcome emails
+// Handles automated email dispatch via Resend for Booking Alerts & Newsletter Welcome emails with Unsubscribe headers
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
@@ -52,6 +52,7 @@ serve(async (req) => {
     let recipientEmail = ""
     let subject = ""
     let emailHtml = ""
+    const emailHeaders: Record<string, string> = {}
 
     if (type === 'newsletter_welcome') {
       recipientEmail = email || buyerEmail
@@ -59,6 +60,11 @@ serve(async (req) => {
         throw new Error("Gültige Empfänger-E-Mail erforderlich.")
       }
       subject = "🏴‍☠️ Willkommen beim Cardpirates Newsletter!"
+      
+      const unsubscribeUrl = `https://cardpiratescrew.com/#/unsubscribe?email=${encodeURIComponent(recipientEmail)}`
+      emailHeaders["List-Unsubscribe"] = `<${unsubscribeUrl}>, <mailto:unsubscribe@cardpiratescrew.com?subject=unsubscribe>`
+      emailHeaders["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
+
       emailHtml = `
         <!DOCTYPE html>
         <html>
@@ -73,6 +79,7 @@ serve(async (req) => {
               .content { line-height: 1.6; font-size: 14px; color: #d4d4d8; text-align: center; }
               .card { background-color: #09090b; border: 1px solid #27272a; border-radius: 12px; padding: 24px; margin: 20px 0; }
               .footer { border-top: 1px solid #27272a; padding-top: 20px; margin-top: 28px; text-align: center; font-size: 12px; color: #71717a; }
+              .unsub-link { color: #ef4444; text-decoration: underline; font-weight: 600; font-size: 11px; }
             </style>
           </head>
           <body>
@@ -88,7 +95,15 @@ serve(async (req) => {
                 </div>
               </div>
               <div class="footer">
-                Cardpirates Crew &bull; Exklusive Event Updates
+                <p style="margin: 0 0 6px 0;">Cardpirates Crew &bull; Exklusive Event Updates</p>
+                <p style="margin: 0 0 10px 0; font-size: 11px; color: #71717a;">
+                  Du erhältst diese E-Mail, weil du dich auf cardpiratescrew.com für den Newsletter angemeldet hast.
+                </p>
+                <p style="margin: 0;">
+                  <a href="${unsubscribeUrl}" class="unsub-link">
+                    Vom Newsletter abmelden (Unsubscribe)
+                  </a>
+                </p>
               </div>
             </div>
           </body>
@@ -176,20 +191,26 @@ serve(async (req) => {
       `
     }
 
+    const resendBody: any = {
+      from: type === 'newsletter_welcome' 
+        ? "Cardpirates <newsletter@cardpiratescrew.com>" 
+        : "Cardpirates <tickets@cardpiratescrew.com>",
+      to: [recipientEmail],
+      subject: subject,
+      html: emailHtml
+    }
+
+    if (Object.keys(emailHeaders).length > 0) {
+      resendBody.headers = emailHeaders
+    }
+
     const resendResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        from: type === 'newsletter_welcome' 
-          ? "Cardpirates <newsletter@cardpiratescrew.com>" 
-          : "Cardpirates <tickets@cardpiratescrew.com>",
-        to: [recipientEmail],
-        subject: subject,
-        html: emailHtml
-      })
+      body: JSON.stringify(resendBody)
     })
 
     const resendData = await resendResponse.json()
