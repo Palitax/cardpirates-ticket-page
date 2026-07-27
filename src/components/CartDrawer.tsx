@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatPrice } from '../utils/formatters';
 
 export interface CartItem {
   id: string; // unique cart item id (e.g. variantId)
@@ -54,9 +55,7 @@ export default function CartDrawer({
   if (!isOpen) return null;
 
   const totalItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems
-    .reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0)
-    .toFixed(2);
+  const totalPriceNum = cartItems.reduce((sum, item) => sum + parseFloat(item.price.amount) * item.quantity, 0);
   const currencyCode = cartItems[0]?.price.currencyCode || 'EUR';
 
   return (
@@ -125,7 +124,11 @@ export default function CartDrawer({
               </div>
             ) : (
               cartItems.map((item) => {
-                const itemSubtotal = (parseFloat(item.price.amount) * item.quantity).toFixed(2);
+                const itemSubtotalNum = parseFloat(item.price.amount) * item.quantity;
+                const displayVariantTitle = item.variantTitle.toLowerCase().includes('privat')
+                  ? 'Einzelticket'
+                  : item.variantTitle;
+
                 return (
                   <div
                     key={item.variantId}
@@ -156,7 +159,7 @@ export default function CartDrawer({
                       </div>
 
                       <div className="inline-block px-2 py-0.5 bg-white/5 border border-white/10 rounded-md text-[10px] font-bold text-zinc-300">
-                        {item.variantTitle}
+                        {displayVariantTitle}
                       </div>
 
                       <div className="flex items-center justify-between pt-1">
@@ -181,7 +184,7 @@ export default function CartDrawer({
 
                         {/* Price */}
                         <span className="text-xs font-black text-white">
-                          {itemSubtotal} {item.price.currencyCode}
+                          {formatPrice(itemSubtotalNum, item.price.currencyCode)}
                         </span>
                       </div>
                     </div>
@@ -198,7 +201,7 @@ export default function CartDrawer({
                 <div className="flex items-center justify-between text-xs font-bold text-zinc-400">
                   <span>Zwischensumme:</span>
                   <span className="text-white text-base font-black">
-                    {totalPrice} {currencyCode}
+                    {formatPrice(totalPriceNum, currencyCode)}
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-500 leading-normal">

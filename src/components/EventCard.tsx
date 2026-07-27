@@ -3,15 +3,25 @@ import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
+import { formatPrice } from '../utils/formatters';
 
 interface EventCardProps {
   event: ShopifyProduct;
   onQuickBuy: (event: ShopifyProduct) => void;
   purchasedTickets?: any[];
   onShowQr?: (ticketIds: string[], title: string) => void;
+  currentUser?: any | null;
+  onRegisterTrigger?: () => void;
 }
 
-export default function EventCard({ event, onQuickBuy, purchasedTickets = [], onShowQr }: EventCardProps) {
+export default function EventCard({ 
+  event, 
+  onQuickBuy, 
+  purchasedTickets = [], 
+  onShowQr, 
+  currentUser, 
+  onRegisterTrigger 
+}: EventCardProps) {
   const navigate = useNavigate();
   const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
 
@@ -23,8 +33,6 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
   const day = dateObj ? dateObj.getDate() : '--';
   const month = dateObj ? dateObj.toLocaleDateString('de-DE', { month: 'short' }).toUpperCase() : 'TBA';
 
-  const priceAmount = event.variants.nodes[0]?.price.amount || '0.00';
-  const currency = event.variants.nodes[0]?.price.currencyCode || 'EUR';
   const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
   const isPurchased = matchingTickets.length > 0;
   const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false);
@@ -125,30 +133,71 @@ export default function EventCard({ event, onQuickBuy, purchasedTickets = [], on
 
           <div className="flex flex-col items-center text-center justify-center gap-3.5 w-full z-10">
             {!isPurchased && (
-              <div className="flex flex-col items-center justify-center w-full select-none">
+              <div className="flex flex-col items-center justify-center w-full select-none text-center">
                 {event.variants.nodes.length > 1 ? (
-                  <>
-                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block text-center mb-1.5">
-                      Ticketpreise
-                    </span>
-                    <div className="inline-grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-1 items-baseline text-left">
-                      {event.variants.nodes.slice(0, 2).map((variant) => (
-                        <div key={variant.id} className="contents">
-                          <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider text-right">
-                            {variant.title}:
+                  currentUser ? (
+                    // LOGGED IN USER: Show only the matching variant for account type
+                    (() => {
+                      const isBusiness = currentUser.user_type === 'business';
+                      const matchingVariant = event.variants.nodes.find(v => 
+                        isBusiness 
+                          ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+                          : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+                      ) || event.variants.nodes[0];
+
+                      const displayTitle = matchingVariant.title.toLowerCase().includes('privat')
+                        ? 'Einzelticket'
+                        : matchingVariant.title;
+
+                      return (
+                        <div className="flex flex-col items-center justify-center">
+                          <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">
+                            {displayTitle}
                           </span>
-                          <span className="text-xs font-black text-white whitespace-nowrap text-left">
-                            {variant.price.amount} <span className="text-[9px] text-zinc-400 font-semibold">{variant.price.currencyCode}</span>
+                          <span className="text-sm font-extrabold text-white leading-tight mt-0.5">
+                            {formatPrice(matchingVariant.price.amount, matchingVariant.price.currencyCode)}
                           </span>
                         </div>
-                      ))}
-                    </div>
-                  </>
+                      );
+                    })()
+                  ) : (
+                    // NOT LOGGED IN: Show Einzelticket ("ab 45,00€") and Aussteller ("registriere dich für eine Preisübersicht")
+                    (() => {
+                      const privateVariant = event.variants.nodes.find(v => 
+                        v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel')
+                      ) || event.variants.nodes[0];
+
+                      return (
+                        <div className="flex flex-col items-center text-center space-y-1">
+                          <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">
+                            Ticketpreise
+                          </span>
+                          <div className="flex flex-col items-center text-[10px] text-zinc-300 font-semibold leading-tight space-y-1">
+                            <div>
+                              <span className="text-zinc-400 font-bold uppercase">Einzelticket: </span>
+                              <span className="text-white font-extrabold">ab {formatPrice(privateVariant.price.amount, privateVariant.price.currencyCode)}</span>
+                            </div>
+                            <div 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRegisterTrigger?.();
+                              }}
+                              className="cursor-pointer hover:underline text-[9px] text-zinc-400 hover:text-white"
+                              title="Klicke hier, um dich zu registrieren"
+                            >
+                              <span className="font-bold uppercase text-zinc-400">Aussteller: </span>
+                              <span className="text-zinc-400 underline">registriere dich für eine Preisübersicht</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  )
                 ) : (
                   <>
                     <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Ticketpreis</span>
                     <span className="text-base font-extrabold text-white leading-none mt-0.5">
-                      {priceAmount} <span className="text-[10px] text-zinc-400 font-semibold">{currency}</span>
+                      {formatPrice(event.variants.nodes[0]?.price.amount, event.variants.nodes[0]?.price.currencyCode)}
                     </span>
                   </>
                 )}

@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import { profileService, supabase } from '../services/supabase';
+import { formatPrice } from '../utils/formatters';
 import type { CustomerProfile } from '../services/supabase';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import type { CartItem } from './CartDrawer';
@@ -521,11 +522,14 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
                           onChange={(e) => setSelectedVariantId(e.target.value)}
                           className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer font-semibold"
                         >
-                          {event.variants.nodes.map(v => (
-                            <option key={v.id} value={v.id}>
-                              {v.title} — {v.price.amount} {v.price.currencyCode}
-                            </option>
-                          ))}
+                          {event.variants.nodes.map(v => {
+                            const title = v.title.toLowerCase().includes('privat') ? 'Einzelticket' : v.title;
+                            return (
+                              <option key={v.id} value={v.id}>
+                                {title} — {formatPrice(v.price.amount, v.price.currencyCode)}
+                              </option>
+                            );
+                          })}
                         </select>
                       </div>
                     )}
@@ -548,14 +552,13 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
                     {(() => {
                       const selectedVariant = event.variants.nodes.find(v => v.id === selectedVariantId) || event.variants.nodes[0];
                       const singlePrice = parseFloat(selectedVariant?.price.amount || '0');
-                      const totalPrice = (singlePrice * quantity).toFixed(2);
                       const currencyCode = selectedVariant?.price.currencyCode || 'EUR';
 
                       return (
                         <div className="flex items-center justify-between border-t border-zinc-900 pt-3 text-xs font-bold">
                           <span className="text-zinc-400">Gesamtsumme ({quantity}x):</span>
                           <span className="text-white text-base font-black">
-                            {totalPrice} {currencyCode}
+                            {formatPrice(singlePrice * quantity, currencyCode)}
                           </span>
                         </div>
                       );
@@ -754,11 +757,14 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
                             onChange={(e) => setSelectedVariantId(e.target.value)}
                             className="w-full bg-zinc-900 border border-zinc-800 focus:border-white rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors cursor-pointer"
                           >
-                            {event.variants.nodes.map(v => (
-                              <option key={v.id} value={v.id}>
-                                {v.title} — {v.price.amount} {v.price.currencyCode}
-                              </option>
-                            ))}
+                            {event.variants.nodes.map(v => {
+                              const title = v.title.toLowerCase().includes('privat') ? 'Einzelticket' : v.title;
+                              return (
+                                <option key={v.id} value={v.id}>
+                                  {title} — {formatPrice(v.price.amount, v.price.currencyCode)}
+                                </option>
+                              );
+                            })}
                           </select>
                         </div>
                       )}

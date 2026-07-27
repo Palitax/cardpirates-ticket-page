@@ -5,12 +5,15 @@ import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
 import { Button } from '@heroui/react';
+import { formatPrice } from '../utils/formatters';
 
 interface DetailPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
+  currentUser?: any | null;
+  onRegisterTrigger?: () => void;
 }
 
-export default function DetailPage({ onQuickBuy }: DetailPageProps) {
+export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger }: DetailPageProps) {
   const { handle } = useParams<{ handle: string }>();
   const navigate = useNavigate();
   const [event, setEvent] = useState<ShopifyProduct | null>(null);
@@ -160,25 +163,69 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
               </span>
               
               {event.variants.nodes.length > 1 ? (
-                <div className="space-y-2">
-                  {event.variants.nodes.map((v) => (
-                    <div key={v.id} className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
-                      <div>
-                        <span className="text-xs font-bold text-white block">{v.title}</span>
-                        <span className={`text-[10px] font-semibold ${v.availableForSale === false ? 'text-rose-400' : 'text-zinc-400'}`}>
-                          {v.availableForSale === false ? 'Ausverkauft' : 'Sofort verfügbar'}
+                currentUser ? (
+                  // LOGGED IN: Show matching variant for account type
+                  (() => {
+                    const isBusiness = currentUser.user_type === 'business';
+                    const matchingVariant = event.variants.nodes.find(v => 
+                      isBusiness 
+                        ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+                        : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+                    ) || event.variants.nodes[0];
+
+                    const displayTitle = matchingVariant.title.toLowerCase().includes('privat') ? 'Einzelticket' : matchingVariant.title;
+
+                    return (
+                      <div className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
+                        <div>
+                          <span className="text-xs font-bold text-white block">{displayTitle}</span>
+                          <span className={`text-[10px] font-semibold ${matchingVariant.availableForSale === false ? 'text-rose-400' : 'text-zinc-400'}`}>
+                            {matchingVariant.availableForSale === false ? 'Ausverkauft' : 'Sofort verfügbar'}
+                          </span>
+                        </div>
+                        <span className="text-sm font-black text-white">
+                          {formatPrice(matchingVariant.price.amount, matchingVariant.price.currencyCode)}
                         </span>
                       </div>
-                      <span className="text-sm font-black text-white">
-                        {v.price.amount} <span className="text-[10px] text-zinc-400 font-semibold">{v.price.currencyCode}</span>
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                    );
+                  })()
+                ) : (
+                  // NOT LOGGED IN: Show Einzelticket + Aussteller info note
+                  <div className="space-y-2">
+                    {event.variants.nodes.map((v) => {
+                      const isPrivat = v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel');
+                      const displayTitle = isPrivat ? 'Einzelticket' : v.title;
+                      const isAussteller = v.title.toLowerCase().includes('aussteller');
+
+                      return (
+                        <div key={v.id} className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
+                          <div>
+                            <span className="text-xs font-bold text-white block">{displayTitle}</span>
+                            <span className={`text-[10px] font-semibold ${v.availableForSale === false ? 'text-rose-400' : 'text-zinc-400'}`}>
+                              {v.availableForSale === false ? 'Ausverkauft' : 'Sofort verfügbar'}
+                            </span>
+                          </div>
+                          <span className="text-xs font-bold text-white">
+                            {isAussteller ? (
+                              <button 
+                                onClick={() => onRegisterTrigger?.()}
+                                className="text-[10px] text-zinc-400 hover:text-white underline cursor-pointer"
+                              >
+                                registriere dich für eine Preisübersicht
+                              </button>
+                            ) : (
+                              formatPrice(v.price.amount, v.price.currencyCode)
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )
               ) : (
                 <div className="flex justify-between items-center">
                   <span className="text-2xl font-extrabold text-white">
-                    {priceAmount} <span className="text-xs text-zinc-400 font-semibold">{currency}</span>
+                    {formatPrice(priceAmount, currency)}
                   </span>
                   <span className={`text-[10px] font-bold border px-2 py-1 rounded-md ${isSoldOut ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-950 border-zinc-900 text-white'}`}>
                     {isSoldOut ? 'Ausverkauft' : 'Verfügbar'}
@@ -224,12 +271,14 @@ export default function DetailPage({ onQuickBuy }: DetailPageProps) {
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-900 p-4 pb-safe flex items-center justify-between md:hidden">
         <div className="flex flex-col">
           {event.variants.nodes.length > 1 ? (
-             <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Tickets ab</span>
+             <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">
+               {currentUser ? (currentUser.user_type === 'business' ? 'Aussteller' : 'Einzelticket') : 'Tickets ab'}
+             </span>
           ) : (
             <>
               <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Ticketpreis</span>
               <span className="text-lg font-extrabold text-white leading-none mt-0.5">
-                {priceAmount} <span className="text-[10px] text-zinc-400 font-semibold">{currency}</span>
+                {formatPrice(priceAmount, currency)}
               </span>
             </>
           )}

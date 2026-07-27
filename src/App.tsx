@@ -287,7 +287,7 @@ function App() {
             />
             <Route 
               path="/events/:handle" 
-              element={<DetailPage onQuickBuy={handleQuickBuyTrigger} />} 
+              element={<DetailPage onQuickBuy={handleQuickBuyTrigger} currentUser={currentUser} onRegisterTrigger={handleNavbarLoginTrigger} />} 
             />
             <Route 
               path="/scan" 

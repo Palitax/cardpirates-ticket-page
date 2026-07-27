@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 import { syncService } from '../services/syncService';
+import { formatPrice } from '../utils/formatters';
 
 const ENABLE_QR_CODE = false;
 
@@ -386,6 +387,23 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                   );
                                 }
                                 const isMultiVariant = event.variants.nodes.length > 1;
+                                const selectedVariant = currentUser ? (
+                                  (() => {
+                                    const isBusiness = currentUser.user_type === 'business';
+                                    return event.variants.nodes.find(v => 
+                                      isBusiness 
+                                        ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+                                        : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+                                    ) || event.variants.nodes[0];
+                                  })()
+                                ) : event.variants.nodes[0];
+
+                                const formattedPriceStr = currentUser 
+                                  ? formatPrice(selectedVariant.price.amount, selectedVariant.price.currencyCode)
+                                  : (isMultiVariant 
+                                      ? `ab ${formatPrice(event.variants.nodes[0]?.price.amount, event.variants.nodes[0]?.price.currencyCode)}`
+                                      : formatPrice(event.variants.nodes[0]?.price.amount, event.variants.nodes[0]?.price.currencyCode));
+
                                 return (
                                   <Button
                                     variant="primary"
@@ -395,7 +413,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                     }}
                                     className="w-full py-2.5 rounded-full bg-black hover:bg-zinc-950 text-white font-extrabold text-xs shadow-md active:scale-98 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-black"
                                   >
-                                    Ticket kaufen ({isMultiVariant ? 'ab ' : ''}{event.variants.nodes[0]?.price.amount} {event.variants.nodes[0]?.price.currencyCode})
+                                    Ticket kaufen ({formattedPriceStr})
                                   </Button>
                                 );
                               })()}
@@ -447,6 +465,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                     onQuickBuy={onQuickBuy}
                     purchasedTickets={purchasedTickets}
                     onShowQr={(ticketIds, title) => setActiveQrModal({ ticketIds, title, activeIndex: 0 })}
+                    currentUser={currentUser}
+                    onRegisterTrigger={onRegisterTrigger}
                   />
                 ))}
               </div>
