@@ -541,20 +541,23 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
           <div 
             className="relative bg-white text-zinc-950 w-full h-full md:h-auto md:max-w-md md:rounded-3xl flex flex-col items-center justify-between p-6 sm:p-8 select-none shadow-2xl animate-fade-in z-10 overflow-y-auto overscroll-contain"
           >
-            {/* Close X Button (Highly visible & 44x44px touch target) */}
-            <button 
-              onClick={() => setActiveQrModal(null)}
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-11 h-11 rounded-full bg-zinc-100 border border-zinc-250 text-zinc-800 hover:bg-zinc-200 transition-all flex items-center justify-center cursor-pointer shadow-md z-50 active:scale-95"
-              aria-label="Schließen"
-            >
-              <X size={22} strokeWidth={2.5} />
-            </button>
+            {/* Top Modal Header Bar with Close Button */}
+            <div className="w-full flex items-center justify-between pb-3 border-b border-zinc-150 shrink-0">
+              <span className="text-[10px] font-black text-red-650 uppercase tracking-widest block">
+                Cardpirates Einlass-Ticket
+              </span>
+              <button 
+                onClick={() => setActiveQrModal(null)}
+                className="px-3.5 py-1.5 rounded-full bg-zinc-900 text-white font-extrabold text-xs flex items-center gap-1.5 hover:bg-black transition-all cursor-pointer shadow-md active:scale-95 min-h-[36px]"
+                aria-label="Schließen"
+              >
+                <X size={16} strokeWidth={2.5} />
+                <span>Schließen</span>
+              </button>
+            </div>
 
             <div className="w-full max-w-xs flex flex-col items-center my-auto py-4">
                 <div className="text-center space-y-1.5 w-full">
-                  <span className="text-[10px] font-black text-red-650 uppercase tracking-widest block">
-                    Cardpirates Einlass-Ticket
-                  </span>
                   <h2 className="text-base font-black leading-snug text-zinc-900 px-2">
                     {activeQrModal.title}
                   </h2>

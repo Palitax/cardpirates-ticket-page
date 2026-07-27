@@ -252,21 +252,24 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
       {/* Ticket QR Code Modal Overlay */}
       {selectedTicket && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-6 animate-fade-in select-none">
-          <div className="w-full max-w-sm bg-zinc-900 border border-zinc-850 rounded-3xl p-6 relative flex flex-col items-center justify-between min-h-[440px] text-center shadow-2xl">
+          <div className="w-full max-w-sm bg-zinc-900 border border-zinc-850 rounded-3xl p-6 relative flex flex-col items-center justify-between min-h-[440px] text-center shadow-2xl overflow-y-auto">
             
-            {/* Close button */}
-            <button
-              onClick={() => setSelectedTicket(null)}
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-750 transition-all flex items-center justify-center cursor-pointer shadow-md z-50 active:scale-95"
-              aria-label="Schließen"
-            >
-              <X size={20} strokeWidth={2.5} />
-            </button>
-
-            <div className="space-y-1.5 mt-4">
+            {/* Top Modal Header Bar with Close Button */}
+            <div className="w-full flex items-center justify-between pb-3 border-b border-zinc-800 shrink-0">
               <span className="text-[10px] font-black text-red-650 uppercase tracking-widest block">
                 Cardpirates Einlass-Ticket
               </span>
+              <button
+                onClick={() => setSelectedTicket(null)}
+                className="px-3.5 py-1.5 rounded-full bg-zinc-800 border border-zinc-700 text-zinc-200 hover:text-white hover:bg-zinc-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-md text-xs font-bold active:scale-95 min-h-[36px]"
+                aria-label="Schließen"
+              >
+                <X size={16} strokeWidth={2.5} />
+                <span>Schließen</span>
+              </button>
+            </div>
+
+            <div className="space-y-1.5 my-auto py-3">
               <h2 className="text-base font-extrabold text-white leading-snug px-4">
                 {selectedTicket.title}
               </h2>
