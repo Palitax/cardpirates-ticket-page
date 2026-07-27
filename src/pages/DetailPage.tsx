@@ -6,7 +6,7 @@ import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
 import { Button } from '@heroui/react';
 import { formatPrice } from '../utils/formatters';
-import whatnotLogo from '../assets/whatnot-logo.png';
+import whatnotLogo from '../assets/whatnot_logo.webp';
 
 interface DetailPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
