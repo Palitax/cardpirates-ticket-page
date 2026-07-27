@@ -6,7 +6,7 @@ import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
 import { Button } from '@heroui/react';
 import { formatPrice } from '../utils/formatters';
-import whatnotLogo from '../assets/whatnot_logo.webp';
+import { WHATNOT_LOGO_BASE64 } from '../assets/whatnotLogoData';
 
 interface DetailPageProps {
   onQuickBuy: (event: ShopifyProduct) => void;
@@ -165,11 +165,8 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
             >
               <div className="w-9 h-9 rounded-xl bg-zinc-950 border border-zinc-800 p-0.5 shrink-0 shadow-md flex items-center justify-center overflow-hidden">
                 <img 
-                  src={whatnotLogo} 
+                  src={WHATNOT_LOGO_BASE64} 
                   alt="WhatNot" 
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/whatnot_logo.webp';
-                  }}
                   className="w-full h-full object-contain rounded-lg" 
                 />
               </div>
