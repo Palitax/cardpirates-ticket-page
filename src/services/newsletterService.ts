@@ -38,6 +38,11 @@ export const newsletterService = {
           throw error;
         }
 
+        // Trigger Welcome Email via Edge Function
+        supabase.functions.invoke('send-booking-notification', {
+          body: { type: 'newsletter_welcome', email: cleanEmail }
+        }).catch(err => console.warn('Could not send newsletter welcome email:', err));
+
         return { success: true, message: 'Vielen Dank für deine Anmeldung zum Newsletter!' };
       }
     } catch (e) {
