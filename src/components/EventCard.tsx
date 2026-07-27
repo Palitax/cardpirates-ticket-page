@@ -50,7 +50,7 @@ export default function EventCard({
         {/* Glossy Reflection Overlay */}
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-white/[0.02] via-transparent to-white/[0.08] group-hover:from-white/[0.08] group-hover:to-white/[0.22] pointer-events-none z-10 transition-all duration-350" />
 
-        {/* Left Section: Video Cover (Merged) */}
+        {/* Left Section: Video Cover (Full Color, No Fadeout Mask) */}
         <div className="relative w-[27%] h-full overflow-hidden shrink-0">
           <video
             autoPlay
@@ -58,11 +58,7 @@ export default function EventCard({
             muted
             playsInline
             poster={event.images.nodes[0]?.url}
-            style={{
-              maskImage: 'linear-gradient(to right, black 55%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to right, black 55%, transparent 100%)'
-            }}
-            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300 grayscale brightness-150 contrast-125"
+            className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-300"
             src={event.eventVideoUrl?.value || logoAnimVideoUrl}
           />
 
