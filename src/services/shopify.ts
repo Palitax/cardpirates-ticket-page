@@ -1,7 +1,3 @@
-import event1Img from '../assets/event1.jpg';
-import event2Img from '../assets/event2.jpg';
-import event3Img from '../assets/event3.jpg';
-
 const getShopifyConfig = () => {
   const globalConfig = (window as any).ShopifyStorefrontConfig || {};
   const hostname = window.location.hostname;
@@ -137,14 +133,6 @@ const GET_PRODUCTS_QUERY = `
             previewImage {
               url
             }
-            ... on MediaVideo {
-              id
-              sources {
-                url
-                mimeType
-                format
-              }
-            }
             ... on Video {
               id
               sources {
@@ -205,14 +193,6 @@ const GET_PRODUCT_BY_HANDLE_QUERY = `
           alt
           previewImage {
             url
-          }
-          ... on MediaVideo {
-            id
-            sources {
-              url
-              mimeType
-              format
-            }
           }
           ... on Video {
             id
@@ -275,14 +255,11 @@ export const shopifyService = {
         GET_PRODUCTS_QUERY,
         { first: limit }
       );
-      if (!data.products.nodes || data.products.nodes.length === 0) {
-        console.warn("Shopify returned 0 products. Falling back to mock events for staging.");
-        return getMockEvents();
-      }
+      if (!data.products?.nodes) return [];
       return data.products.nodes.map(mapShopifyProduct);
-    } catch {
-      // Fallback Mock Data for demo purposes if Shopify is empty/unreachable
-      return getMockEvents();
+    } catch (err) {
+      console.error("Shopify fetch failed:", err);
+      return [];
     }
   },
 
@@ -292,12 +269,11 @@ export const shopifyService = {
         GET_PRODUCT_BY_HANDLE_QUERY,
         { handle }
       );
-      if (!data.product) {
-        return getMockEvents().find(e => e.handle === handle) || null;
-      }
+      if (!data.product) return null;
       return mapShopifyProduct(data.product);
-    } catch {
-      return getMockEvents().find(e => e.handle === handle) || null;
+    } catch (err) {
+      console.error("Shopify fetch product by handle failed:", err);
+      return null;
     }
   },
 
@@ -318,10 +294,6 @@ export const shopifyService = {
     const lines = typeof variantIdOrItems === 'string'
       ? [{ quantity: quantity, merchandiseId: variantIdOrItems }]
       : variantIdOrItems.map(item => ({ quantity: item.quantity, merchandiseId: item.variantId }));
-
-    if (lines.some(l => l.merchandiseId.includes('mock-var'))) {
-      throw new Error('Dies ist ein Demo-Event (Mock-Daten). Bitte lege ein echtes Produkt im Shopify-Admin an, um den realen Shopify-Checkout zu testen.');
-    }
 
     const cleanEmail = email ? email.trim() : '';
     const isValidEmail = Boolean(cleanEmail && cleanEmail.includes('@') && cleanEmail.includes('.'));
@@ -352,105 +324,3 @@ export const shopifyService = {
     return data.cartCreate.cart.checkoutUrl;
   }
 };
-
-// High-quality mockup fallback data for events if Shopify API is in configuration phase
-function getMockEvents(): ShopifyProduct[] {
-  const nextWeek = new Date();
-  nextWeek.setDate(nextWeek.getDate() + 5);
-  
-  const inTwoWeeks = new Date();
-  inTwoWeeks.setDate(inTwoWeeks.getDate() + 12);
-
-  const inThreeWeeks = new Date();
-  inThreeWeeks.setDate(inThreeWeeks.getDate() + 20);
-
-  return [
-    {
-      id: 'gid://shopify/Product/mock-1',
-      title: 'Großes Cardpirates Turnier 2026',
-      handle: 'grand-cardpirates-tournament-2026',
-      description: 'Das ultimative TCG-Event des Jahres. Tritt gegen die besten Cardpirates Europas an, sichere dir exklusive Promokarten und kämpfe um einen riesigen Preispool.',
-      descriptionHtml: '<p>Das ultimative TCG-Event des Jahres. Tritt gegen die besten Cardpirates Europas an, sichere dir exklusive Promokarten und kämpfe um einen riesigen Preispool.</p>',
-      images: {
-        nodes: [
-          {
-            url: (window as any).ShopifyAssets?.event1Url || event1Img,
-            altText: 'Gaming Area'
-          }
-        ]
-      },
-      variants: {
-        nodes: [
-          {
-            id: 'gid://shopify/ProductVariant/mock-var-1',
-            title: 'Privat',
-            price: { amount: '45.00', currencyCode: 'EUR' },
-            availableForSale: true
-          },
-          {
-            id: 'gid://shopify/ProductVariant/mock-var-1-exhibitor',
-            title: 'Aussteller',
-            price: { amount: '120.00', currencyCode: 'EUR' },
-            availableForSale: true
-          }
-        ]
-      },
-      eventDate: { value: nextWeek.toISOString() },
-      eventLocation: { value: 'Halle 4, Köln, Deutschland' }
-    },
-    {
-      id: 'gid://shopify/Product/mock-2',
-      title: 'Cardpirates Community Meetup',
-      handle: 'cardpirates-community-meetup',
-      description: 'Triff die Crew und andere TCG-Sammler bei unserem entspannten Community Meetup. Tausche Karten, fachsimple über die neuesten Sets und verbringe einen coolen Nachmittag unter Gleichgesinnten.',
-      descriptionHtml: '<p>Triff die Crew und andere TCG-Sammler bei unserem entspannten Community Meetup. Tausche Karten, fachsimple über die neuesten Sets und verbringe einen coolen Nachmittag unter Gleichgesinnten.</p>',
-      images: {
-        nodes: [
-          {
-            url: (window as any).ShopifyAssets?.event2Url || event2Img,
-            altText: 'Community Meetup'
-          }
-        ]
-      },
-      variants: {
-        nodes: [
-          {
-            id: 'gid://shopify/ProductVariant/mock-var-2',
-            title: 'Meetup-Ticket',
-            price: { amount: '25.00', currencyCode: 'EUR' },
-            availableForSale: true
-          }
-        ]
-      },
-      eventDate: { value: inTwoWeeks.toISOString() },
-      eventLocation: { value: 'Pirates Hub, Hamburg, Deutschland' }
-    },
-    {
-      id: 'gid://shopify/Product/mock-3',
-      title: 'Cardpirates TCG Trade Night',
-      handle: 'cardpirates-tcg-trade-night',
-      description: 'Bringe deine Ordner mit und mach dich bereit für die ultimative TCG Trade Night. Tausche Pokémon, One Piece und Magic: The Gathering Karten mit Sammlern aus der gesamten Community.',
-      descriptionHtml: '<p>Bringe deine Ordner mit und mach dich bereit für die ultimative TCG Trade Night. Tausche Pokémon, One Piece und Magic: The Gathering Karten mit Sammlern aus der gesamten Community.</p>',
-      images: {
-        nodes: [
-          {
-            url: (window as any).ShopifyAssets?.event3Url || event3Img,
-            altText: 'Trade Night'
-          }
-        ]
-      },
-      variants: {
-        nodes: [
-          {
-            id: 'gid://shopify/ProductVariant/mock-var-3',
-            title: 'Community-Pass',
-            price: { amount: '15.00', currencyCode: 'EUR' },
-            availableForSale: true
-          }
-        ]
-      },
-      eventDate: { value: inThreeWeeks.toISOString() },
-      eventLocation: { value: 'Basecamp, Berlin, Deutschland' }
-    }
-  ];
-}
