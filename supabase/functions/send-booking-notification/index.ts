@@ -21,7 +21,7 @@ serve(async (req) => {
   try {
     const rawApiKey = Deno.env.get("RESEND_API_KEY") || ""
     const RESEND_API_KEY = rawApiKey.replace(/^["']|["']$/g, '').trim()
-    const DEFAULT_ORGANIZER_EMAIL = Deno.env.get("DEFAULT_ORGANIZER_EMAIL") || "carpiratescrewsupport@gmail.com"
+    const DEFAULT_ORGANIZER_EMAIL = Deno.env.get("DEFAULT_ORGANIZER_EMAIL") || "cardpiratescrewsupport@gmail.com"
 
     const payload = await req.json()
     const {
