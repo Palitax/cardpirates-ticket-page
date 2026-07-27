@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import { profileService, supabase, notificationService } from '../services/supabase';
+import { newsletterService } from '../services/newsletterService';
 import { formatPrice } from '../utils/formatters';
 import type { CustomerProfile } from '../services/supabase';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
@@ -39,6 +40,7 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
   // Ticket Selection States
   const [selectedVariantId, setSelectedVariantId] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [subscribeNewsletter, setSubscribeNewsletter] = useState(true);
 
   // Initialize selectedVariantId when event changes
   useEffect(() => {
@@ -143,6 +145,12 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
 
     // Trigger booking notification email to Event Organizer
     const checkoutEmail = profileData.email || email || '';
+
+    // Handle Newsletter Opt-In if checked
+    if (subscribeNewsletter && checkoutEmail) {
+      newsletterService.subscribe(checkoutEmail, 'checkout').catch(err => console.warn(err));
+    }
+
     notificationService.sendBookingNotification({
       ticketId: firstTicketId,
       eventTitle: event.title,
@@ -582,6 +590,19 @@ export default function LoginModal({ isOpen, onClose, event, currentUser, onLogo
                     })()}
                   </div>
                 )}
+
+                {/* Newsletter Opt-In Checkbox */}
+                <label className="flex items-start gap-2.5 p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-xs text-zinc-300 cursor-pointer hover:border-zinc-700 transition-all select-none">
+                  <input
+                    type="checkbox"
+                    checked={subscribeNewsletter}
+                    onChange={(e) => setSubscribeNewsletter(e.target.checked)}
+                    className="mt-0.5 rounded border-zinc-700 text-white focus:ring-0 accent-red-600 shrink-0 cursor-pointer"
+                  />
+                  <span className="leading-snug text-[11px] text-zinc-300">
+                    Ich möchte den Cardpirates Newsletter abonnieren, um exklusive Event-Updates zu erhalten.
+                  </span>
+                </label>
 
                 {/* Direct Action Button */}
                 <div className="pt-2">
