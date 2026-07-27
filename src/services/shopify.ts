@@ -208,7 +208,7 @@ export const shopifyService = {
   async createCheckoutLink(
     variantIdOrItems: string | Array<{ variantId: string; quantity: number }>, 
     email: string, 
-    checkoutData: {
+    _checkoutData?: {
       firstName: string;
       lastName: string;
       address1: string;
@@ -235,17 +235,6 @@ export const shopifyService = {
     if (isValidEmail) {
       input.buyerIdentity = {
         email: cleanEmail,
-        deliveryAddressPreferences: [{
-          deliveryAddress: {
-            firstName: checkoutData.firstName || 'Gast',
-            lastName: checkoutData.lastName || 'Kunde',
-            address1: checkoutData.address1 || 'Hauptstraße 1',
-            city: checkoutData.city || 'Berlin',
-            zip: checkoutData.zip || '10115',
-            country: checkoutData.country || 'DE',
-            company: checkoutData.company || null,
-          }
-        }]
       };
     }
 
