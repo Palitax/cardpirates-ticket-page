@@ -461,7 +461,7 @@ function App() {
           checkoutError={cartCheckoutError}
         />
 
-        <footer className={`relative z-10 py-8 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full ${modalOpen ? 'hidden md:block' : ''}`}>
+        <footer className={`relative z-10 pt-8 pb-28 md:pb-8 px-4 text-center text-xs text-slate-600 border-t border-slate-900/60 max-w-4xl mx-auto w-full ${modalOpen ? 'hidden md:block' : ''}`}>
           &copy; {new Date().getFullYear()} Cardpirates x Rohde Media. All rights reserved. Powered by Shopify Storefront.
         </footer>
       </div>
