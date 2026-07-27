@@ -8,6 +8,7 @@ import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
+import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import { syncService } from '../services/syncService';
 import { formatPrice } from '../utils/formatters';
 
@@ -63,6 +64,7 @@ interface LandingPageProps {
 export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger }: LandingPageProps) {
   const navigate = useNavigate();
   const logoSchriftUrl = (window as any).ShopifyAssets?.logoSchriftUrl || logoSchrift;
+  const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -282,21 +284,21 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           }}
                           className="w-full h-full bg-white text-zinc-800 rounded-b-[24px] overflow-hidden flex flex-col justify-between relative z-10"
                         >
-                          {/* Card Cover image with fading gradient blend */}
+                          {/* Card Cover image/video with fading gradient blend */}
                           <div className="relative h-[130px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
-                            {/* Event Cover Image */}
-                            {event.images.nodes[0]?.url ? (
-                              <img
-                                src={event.images.nodes[0].url}
-                                className="w-full h-full object-cover"
-                                alt=""
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-zinc-900" />
-                            )}
+                            {/* Event Cover Video */}
+                            <video
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              poster={event.images.nodes[0]?.url}
+                              className="w-full h-full object-cover"
+                              src={event.eventVideoUrl?.value || logoAnimVideoUrl}
+                            />
 
-                            {/* Subtle & Light Top Fadeout Overlay blending smoothly into black page background */}
-                            <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-black/30 via-black/10 to-transparent pointer-events-none z-20" />
+                            {/* Top Fadeout Overlay blending smoothly into black page background */}
+                            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none z-20" />
 
                             {/* Bottom Fadeout Overlay blending into white ticket stub */}
                             <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-20" />
