@@ -9,6 +9,7 @@ import DetailPage from './pages/DetailPage';
 import ScannerPage from './pages/ScannerPage';
 import TicketsPage from './pages/TicketsPage';
 import ProfilePage from './pages/ProfilePage';
+import UnsubscribePage from './pages/UnsubscribePage';
 import LoginModal from './components/LoginModal';
 import CartDrawer from './components/CartDrawer';
 import type { CartItem } from './components/CartDrawer';
@@ -390,6 +391,10 @@ function App() {
                   }} 
                 />
               } 
+            />
+            <Route 
+              path="/unsubscribe" 
+              element={<UnsubscribePage />} 
             />
           </Routes>
         </main>
