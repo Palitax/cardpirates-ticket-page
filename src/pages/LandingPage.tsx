@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
+import { syncService } from '../services/syncService';
 
 const ENABLE_QR_CODE = false;
 
@@ -87,7 +88,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
   const [purchasedTickets, setPurchasedTickets] = useState<any[]>([]);
   const [activeQrModal, setActiveQrModal] = useState<{ ticketIds: string[]; title: string; activeIndex: number } | null>(null);
 
-  const fetchPurchasedTickets = () => {
+  const fetchPurchasedTickets = async () => {
     if (currentUser) {
       const key = `purchased_tickets_${currentUser.shopify_customer_id}`;
       const saved = localStorage.getItem(key);
@@ -95,6 +96,8 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
         try {
           const parsed = JSON.parse(saved);
           setPurchasedTickets(parsed);
+          const verified = await syncService.verifyAndSyncUserTickets(currentUser.shopify_customer_id, parsed);
+          setPurchasedTickets(verified);
           return;
         } catch (e) {
           console.error(e);
@@ -281,7 +284,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           className="w-full h-full bg-white text-zinc-800 rounded-b-[24px] overflow-hidden flex flex-col justify-between relative z-10"
                         >
                           {/* Card Cover image with fading gradient blend */}
-                          <div className="relative h-[155px] w-full overflow-hidden shrink-0 bg-black">
+                          <div className="relative h-[130px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
                             <video
                               autoPlay
                               loop
@@ -290,18 +293,18 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                               className="w-full h-full object-cover grayscale brightness-150 contrast-125"
                               src={logoAnimVideoUrl}
                             />
-                            <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/80 to-transparent" />
-                            
-                            {/* Event Title overlayed on image */}
-                            <div className="absolute bottom-2 inset-x-0 px-3 text-center">
-                              <h3 className="text-sm font-extrabold text-zinc-900 drop-shadow-[0_1px_4px_rgba(255,255,255,0.9)] tracking-tight leading-tight">
-                                {event.title}
-                              </h3>
-                            </div>
+                            <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
                           </div>
 
                           {/* Card details */}
-                          <div className="flex-1 p-3.5 flex flex-col justify-between">
+                          <div className="flex-1 p-3.5 pt-1.5 flex flex-col justify-between">
+                            {/* Event Title below cover logo */}
+                            <div className="text-center px-1 pb-2 shrink-0">
+                              <h3 className="text-xs font-black text-zinc-900 tracking-tight leading-snug uppercase">
+                                {event.title}
+                              </h3>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-x-2 gap-y-2 text-left">
                               <div className="min-w-0">
                                 <span className="block text-[8px] text-zinc-400 font-bold uppercase tracking-wider">Ort</span>

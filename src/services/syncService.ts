@@ -10,6 +10,42 @@ export interface ScanResult {
 
 export const syncService = {
   /**
+   * Verifies local customer tickets against the Supabase database.
+   * Filters out any tickets that were deleted from Supabase.
+   */
+  async verifyAndSyncUserTickets(customerId: string, localTickets: any[]): Promise<any[]> {
+    if (!localTickets || localTickets.length === 0) return [];
+    if (!supabase) return localTickets;
+
+    try {
+      const ticketIds = localTickets.map(t => t.id).filter(Boolean);
+      if (ticketIds.length === 0) return localTickets;
+
+      const { data: serverTickets, error } = await supabase
+        .from('tickets')
+        .select('id')
+        .in('id', ticketIds);
+
+      if (error || !serverTickets) {
+        console.warn('Could not verify tickets with Supabase:', error);
+        return localTickets;
+      }
+
+      const validIdSet = new Set(serverTickets.map(t => t.id));
+      const validTickets = localTickets.filter(t => validIdSet.has(t.id));
+
+      if (validTickets.length !== localTickets.length) {
+        localStorage.setItem(`purchased_tickets_${customerId}`, JSON.stringify(validTickets));
+      }
+
+      return validTickets;
+    } catch (err) {
+      console.warn('Error syncing user tickets with database:', err);
+      return localTickets;
+    }
+  },
+
+  /**
    * Downloads all tickets for a specific event from Supabase and caches them in IndexedDB.
    */
   async downloadEventTickets(eventId: string): Promise<{ success: boolean; count: number; error?: string }> {

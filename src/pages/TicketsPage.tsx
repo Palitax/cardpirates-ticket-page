@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Calendar, Ticket, X } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { QRCodeSVG } from 'qrcode.react';
 import { motion } from 'framer-motion';
+import { syncService } from '../services/syncService';
 
 const ENABLE_QR_CODE = false;
 
@@ -27,31 +28,58 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
   const [selectedTicket, setSelectedTicket] = useState<TicketItem | null>(null);
 
   useEffect(() => {
-    if (currentUser) {
+    let isMounted = true;
+
+    async function loadAndVerifyTickets() {
+      if (!currentUser) return;
       const key = `purchased_tickets_${currentUser.shopify_customer_id}`;
       const saved = localStorage.getItem(key);
+      let initialTickets: TicketItem[] = [];
+
       if (saved) {
         try {
-          setTickets(JSON.parse(saved));
+          initialTickets = JSON.parse(saved);
+          if (isMounted) setTickets(initialTickets);
         } catch (e) {
           console.error('Failed to parse tickets', e);
         }
       }
+
+      // Verify tickets against Supabase database to prune deleted tickets
+      if (initialTickets.length > 0) {
+        const verifiedTickets = await syncService.verifyAndSyncUserTickets(
+          currentUser.shopify_customer_id,
+          initialTickets
+        );
+        if (isMounted) {
+          setTickets(verifiedTickets);
+        }
+      }
     }
+
+    loadAndVerifyTickets();
+
+    return () => {
+      isMounted = false;
+    };
   }, [currentUser]);
 
-  // Group tickets into Upcoming and Past (older than 2 days)
-  const now = new Date();
-  const limitDate = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000); // 2 days ago
+  // Group tickets into Upcoming and Past (older than 3 days after event start date)
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+  const now = new Date().getTime();
 
   const upcomingTickets = tickets.filter(ticket => {
     if (!ticket.date) return true; // Default to upcoming if no date
-    return new Date(ticket.date) >= limitDate;
+    const eventTime = new Date(ticket.date).getTime();
+    if (isNaN(eventTime)) return true;
+    return (now - eventTime) <= THREE_DAYS_MS;
   });
 
   const pastTickets = tickets.filter(ticket => {
     if (!ticket.date) return false;
-    return new Date(ticket.date) < limitDate;
+    const eventTime = new Date(ticket.date).getTime();
+    if (isNaN(eventTime)) return false;
+    return (now - eventTime) > THREE_DAYS_MS;
   });
 
   return (
@@ -69,8 +97,7 @@ export default function TicketsPage({ currentUser }: { currentUser: any }) {
       </nav>
 
       <div className="space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight flex items-center gap-2.5">
-          <Ticket size={28} className="text-white" />
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
           Meine Tickets
         </h1>
         <p className="text-xs text-zinc-400">
