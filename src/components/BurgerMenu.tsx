@@ -3,6 +3,7 @@ import { X, Mail, Shield, Scale, Info, FileText, ShoppingBag, LogOut } from 'luc
 import { Button } from '@heroui/react';
 import { useNavigate } from 'react-router-dom';
 import type { CustomerProfile } from '../services/supabase';
+import { newsletterService } from '../services/newsletterService';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 import { WHATNOT_LOGO_BASE64 } from '../assets/whatnotLogoData';
 
@@ -25,11 +26,14 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newsletterEmail.trim()) {
-      setNewsletterSubmitted(true);
-      setNewsletterEmail('');
+      const res = await newsletterService.subscribe(newsletterEmail, 'footer');
+      if (res.success) {
+        setNewsletterSubmitted(true);
+        setNewsletterEmail('');
+      }
     }
   };
   

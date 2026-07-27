@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 const getSupabaseConfig = () => {
   const globalConfig = (window as any).SupabaseConfig || {};
   return {
-    url: globalConfig.url || import.meta.env.VITE_SUPABASE_URL || '',
-    anonKey: globalConfig.anonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+    url: globalConfig.url || import.meta.env.VITE_SUPABASE_URL || 'https://ibkbmqpoyiinavsozjlv.supabase.co',
+    anonKey: globalConfig.anonKey || import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlia2JtcXBveWlpbmF2c296amx2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNTAwODYsImV4cCI6MjEwMDYyNjA4Nn0.M9RMrycwTkFwUwN9AVIkkD5VJJdHRjRtCdmrcMPJ2ug'
   };
 };
 
