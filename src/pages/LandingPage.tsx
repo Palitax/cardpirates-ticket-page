@@ -7,7 +7,6 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import logoAnimVideo from '../assets/cardpirates-logo-kleiner.mp4';
 import logoSchrift from '../assets/cardpirates-schrift-weiss.png';
 import { syncService } from '../services/syncService';
 import { formatPrice } from '../utils/formatters';
@@ -63,7 +62,6 @@ interface LandingPageProps {
 
 export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger }: LandingPageProps) {
   const navigate = useNavigate();
-  const logoAnimVideoUrl = (window as any).ShopifyAssets?.logoAnimVideoUrl || logoAnimVideo;
   const logoSchriftUrl = (window as any).ShopifyAssets?.logoSchriftUrl || logoSchrift;
   const [events, setEvents] = useState<ShopifyProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -286,22 +284,22 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                         >
                           {/* Card Cover image with fading gradient blend */}
                           <div className="relative h-[130px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
-                            {/* Background Cover Video */}
-                            <video
-                              autoPlay
-                              loop
-                              muted
-                              playsInline
-                              poster={event.images.nodes[0]?.url}
-                              className="w-full h-full object-cover grayscale brightness-125 contrast-125 opacity-80"
-                              src={event.eventVideoUrl?.value || logoAnimVideoUrl}
-                            />
+                            {/* Event Cover Image */}
+                            {event.images.nodes[0]?.url ? (
+                              <img
+                                src={event.images.nodes[0].url}
+                                className="w-full h-full object-cover grayscale brightness-110 contrast-125"
+                                alt=""
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-zinc-900" />
+                            )}
 
-                            {/* Clearly visible Top Fadeout Overlay to soften top edge */}
-                            <div className="absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-black via-black/60 to-transparent pointer-events-none z-10" />
+                            {/* Strong Top Fadeout Overlay blending smoothly into black page background */}
+                            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black via-black/80 to-transparent pointer-events-none z-20" />
 
-                            {/* Bottom Fadeout Overlay */}
-                            <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
+                            {/* Bottom Fadeout Overlay blending into white ticket stub */}
+                            <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-20" />
                           </div>
 
                           {/* Card details */}
