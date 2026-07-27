@@ -99,10 +99,66 @@ function App() {
 
   const handleCartCheckout = async () => {
     if (cartItems.length === 0) return;
+
+    if (!currentUser) {
+      setIsCartOpen(false);
+      setModalOpen(true);
+      return;
+    }
+
     setLoadingCartCheckout(true);
     setCartCheckoutError(null);
 
     try {
+      // 1. Generate & Save tickets for user in Supabase & LocalStorage
+      const key = `purchased_tickets_${currentUser.shopify_customer_id}`;
+      const savedTicketsRaw = localStorage.getItem(key);
+      const savedTickets = savedTicketsRaw ? JSON.parse(savedTicketsRaw) : [];
+
+      for (const item of cartItems) {
+        for (let i = 0; i < item.quantity; i++) {
+          const ticketId = crypto.randomUUID();
+
+          if (supabase) {
+            try {
+              const { error: insertErr } = await supabase
+                .from('tickets')
+                .insert({
+                  id: ticketId,
+                  event_id: item.eventId,
+                  holder_name: `${currentUser.first_name || ''} ${currentUser.last_name || ''}`.trim() || 'Gast',
+                  status: 'open'
+                });
+              if (insertErr) {
+                console.error('Failed to insert ticket to Supabase:', insertErr);
+              }
+            } catch (err) {
+              console.warn('Network error writing ticket to Supabase:', err);
+            }
+          }
+
+          const ticketNumber = `CP-${Math.floor(100000 + Math.random() * 900000)}`;
+          const displayVariantTitle = item.variantTitle.toLowerCase().includes('privat') ? 'Einzelticket' : item.variantTitle;
+
+          savedTickets.push({
+            id: ticketId,
+            event_id: item.eventId,
+            title: `${item.eventTitle} - ${displayVariantTitle}`,
+            date: item.date,
+            location: item.location,
+            image: item.image,
+            purchaseDate: new Date().toISOString(),
+            status: 'active',
+            ticketNumber: ticketNumber,
+            firstName: currentUser.first_name,
+            lastName: currentUser.last_name
+          });
+        }
+      }
+
+      localStorage.setItem(key, JSON.stringify(savedTickets));
+
+      // 2. Create Shopify Checkout Link
       const checkoutEmail = currentUser?.email || '';
       const checkoutData = {
         firstName: currentUser?.first_name || '',
@@ -119,6 +175,9 @@ function App() {
         checkoutEmail,
         checkoutData
       );
+
+      // Clear local cart
+      setCartItems([]);
 
       if (checkoutUrl) {
         window.location.href = checkoutUrl;
