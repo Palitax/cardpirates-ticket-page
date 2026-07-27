@@ -3,9 +3,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")
-const DEFAULT_ORGANIZER_EMAIL = Deno.env.get("DEFAULT_ORGANIZER_EMAIL") || "events@cardpirates.de"
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -22,6 +19,10 @@ serve(async (req) => {
   }
 
   try {
+    const rawApiKey = Deno.env.get("RESEND_API_KEY") || ""
+    const RESEND_API_KEY = rawApiKey.replace(/^["']|["']$/g, '').trim()
+    const DEFAULT_ORGANIZER_EMAIL = Deno.env.get("DEFAULT_ORGANIZER_EMAIL") || "events@cardpirates.de"
+
     const payload = await req.json()
     const {
       type = 'booking_notification',
@@ -182,7 +183,9 @@ serve(async (req) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        from: "Cardpirates <onboarding@resend.dev>",
+        from: type === 'newsletter_welcome' 
+          ? "Cardpirates <newsletter@cardpiratescrew.com>" 
+          : "Cardpirates <tickets@cardpiratescrew.com>",
         to: [recipientEmail],
         subject: subject,
         html: emailHtml
@@ -193,7 +196,8 @@ serve(async (req) => {
 
     if (!resendResponse.ok) {
       console.error("Resend API error:", resendData)
-      throw new Error(resendData.message || "Fehler beim Versenden der E-Mail über Resend.")
+      const errDetail = resendData.message || resendData.error?.message || JSON.stringify(resendData)
+      throw new Error(`Resend Error: ${errDetail}`)
     }
 
     return new Response(JSON.stringify({ success: true, resendId: resendData.id }), {
