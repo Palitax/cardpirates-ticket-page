@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, ChevronRight, ShoppingBag, XCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, ShoppingBag, XCircle } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
@@ -71,12 +71,11 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
         <div className="flex items-center gap-2">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-1 text-zinc-400 hover:text-white transition-colors font-bold cursor-pointer"
+            className="flex items-center gap-1.5 text-zinc-400 hover:text-white transition-colors font-bold cursor-pointer"
           >
             <ArrowLeft size={14} />
-            Zeitplan
+            <span>Eventdetails</span>
           </button>
-          <ChevronRight size={12} className="text-zinc-650" />
         </div>
       </nav>
 
