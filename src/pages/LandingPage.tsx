@@ -282,7 +282,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           style={{
                             clipPath: "path('M 0 16 A 16 16 0 0 1 16 0 L 214 0 A 16 16 0 0 1 230 16 L 230 227 A 8 8 0 0 0 230 243 L 230 379 A 16 16 0 0 1 214 395 L 16 395 A 16 16 0 0 1 0 379 L 0 243 A 8 8 0 0 0 0 227 Z')"
                           }}
-                          className="w-full h-full bg-white text-zinc-800 rounded-[24px] overflow-hidden flex flex-col justify-between relative z-10"
+                          className="w-full h-full bg-black rounded-[24px] overflow-hidden flex flex-col justify-between relative z-10"
                         >
                           {/* Card Cover image/video with fading gradient blend */}
                           <div className="relative h-[130px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
@@ -305,7 +305,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           </div>
 
                           {/* Card details */}
-                          <div className="flex-1 p-3.5 pt-1.5 flex flex-col justify-between">
+                          <div className="flex-1 p-3.5 pt-1.5 flex flex-col justify-between bg-white text-zinc-800">
                             {/* Event Title below cover logo */}
                             <div className="text-center px-1 pb-2 shrink-0">
                               <h3 className="text-xs font-black text-zinc-900 tracking-tight leading-snug uppercase">
