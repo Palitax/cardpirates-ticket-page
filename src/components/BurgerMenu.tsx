@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Shield, Scale, Info, FileText, Ticket, ShoppingBag, User, LogOut } from 'lucide-react';
+import { X, Mail, Shield, Scale, Info, FileText, ShoppingBag, LogOut } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { useNavigate } from 'react-router-dom';
 import type { CustomerProfile } from '../services/supabase';
@@ -164,13 +164,24 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                   className="h-6 w-auto object-contain"
                 />
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-900 rounded-lg transition-all cursor-pointer"
-                aria-label="Menü schließen"
-              >
-                <X size={18} />
-              </button>
+              <div className="flex items-center gap-2">
+                {currentUser && (
+                  <button
+                    onClick={onLogout}
+                    className="text-[9px] font-extrabold text-red-400 hover:text-red-300 bg-red-950/40 hover:bg-red-900/50 border border-red-900/60 px-2 py-1.5 rounded-lg uppercase tracking-wider shrink-0 cursor-pointer transition-all flex items-center gap-1 active:scale-95"
+                  >
+                    <LogOut size={10} />
+                    <span>Logout</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="text-zinc-400 hover:text-white p-1.5 hover:bg-zinc-900 rounded-lg transition-all cursor-pointer"
+                  aria-label="Menü schließen"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Drawer Scrollable Content */}
@@ -198,47 +209,36 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                   </div>
                 ) : (
                   /* LOGGED IN USER VIEW - High Visibility Profile & Tickets */
-                  <div className="space-y-2.5 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-900">
-                    {/* User Info Header & Direct Logout */}
-                    <div className="flex items-center justify-between gap-2 text-left pb-1">
-                      <div className="min-w-0">
-                        <h4 className="text-xs font-black text-white truncate">Hallo, {currentUser.first_name}!</h4>
-                        <span className="block text-[8px] text-zinc-500 uppercase tracking-widest font-bold truncate">
-                          {currentUser.user_type === 'business' ? 'Business Account' : 'Private Account'}
-                        </span>
-                      </div>
-                      <button
-                        onClick={onLogout}
-                        className="text-[9px] font-extrabold text-red-400 hover:text-red-300 bg-red-950/30 hover:bg-red-900/40 border border-red-900/50 px-2.5 py-1.5 rounded-lg uppercase tracking-wider shrink-0 cursor-pointer transition-all flex items-center gap-1 active:scale-95"
-                      >
-                        <LogOut size={10} />
-                        <span>Logout</span>
-                      </button>
+                  <div className="space-y-2 bg-zinc-950/60 p-3 rounded-2xl border border-zinc-900">
+                    {/* User Info Header */}
+                    <div className="text-left pb-1">
+                      <h4 className="text-xs font-black text-white truncate">Hallo, {currentUser.first_name}!</h4>
+                      <span className="block text-[8px] text-zinc-500 uppercase tracking-widest font-bold truncate">
+                        {currentUser.user_type === 'business' ? 'Business Account' : 'Private Account'}
+                      </span>
                     </div>
 
-                    {/* Meine Tickets Button (Prominent) */}
+                    {/* Meine Tickets Button (Prominent, No Icon) */}
                     <Button
                       variant="primary"
                       onPress={() => {
                         setIsOpen(false);
                         navigate('/meine-tickets');
                       }}
-                      className="w-full py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-md"
+                      className="w-full py-2.5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs cursor-pointer border border-white transition-all active:scale-[0.98] flex items-center justify-center shadow-md"
                     >
-                      <Ticket size={15} />
                       <span>Meine Tickets</span>
                     </Button>
                     
-                    {/* Profil bearbeiten Button */}
+                    {/* Profil bearbeiten Button (No Icon) */}
                     <Button
                       variant="outline"
                       onPress={() => {
                         setIsOpen(false);
                         navigate('/profil');
                       }}
-                      className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-850 text-white font-extrabold text-xs cursor-pointer border border-zinc-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                      className="w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-850 text-white font-extrabold text-xs cursor-pointer border border-zinc-800 transition-all active:scale-[0.98] flex items-center justify-center"
                     >
-                      <User size={14} />
                       <span>Profil bearbeiten</span>
                     </Button>
                   </div>
@@ -261,7 +261,7 @@ export default function BurgerMenu({ currentUser, onLoginTrigger, onLogout, onPr
                     <svg className="w-4 h-4 fill-white shrink-0 block" viewBox="0 0 127.14 96.36">
                       <path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53A105.73,105.73,0,0,0,32,96.36a77.7,77.7,0,0,0,6.63-10.85,68.43,68.43,0,0,1-10.5-5c1.07-.79,2.12-1.61,3.13-2.47a75.1,75.1,0,0,0,64.84,0c1,.86,2.06,1.68,3.13,2.47a68.43,68.43,0,0,1-10.5,5,77.7,77.7,0,0,0,6.63,10.85,105.73,105.73,0,0,0,31-18.83C129.07,47,122.9,24.16,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.9,46,53.72,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.14,46,96,53,91,65.69,84.69,65.69Z"/>
                     </svg>
-                    <span>Discord Server</span>
+                    <span>Join our Crew</span>
                   </Button>
 
                   {/* Instagram & WhatNot Grid */}
