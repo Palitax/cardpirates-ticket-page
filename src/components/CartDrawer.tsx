@@ -15,6 +15,7 @@ export interface CartItem {
   };
   quantity: number;
   availableForSale: boolean;
+  quantityAvailable?: number | null;
   image?: string;
   date?: string;
   location?: string;
@@ -176,14 +177,26 @@ export default function CartDrawer({
                           <span className="text-xs font-bold text-white px-1 select-none">
                             {item.quantity}
                           </span>
-                          <button
-                            onClick={() => onUpdateQuantity(item.variantId, item.quantity + 1)}
-                            disabled={item.quantity >= 10}
-                            className={`w-5 h-5 flex items-center justify-center font-bold text-xs transition-colors ${item.quantity >= 10 ? 'text-zinc-600 cursor-not-allowed opacity-50' : 'text-zinc-400 hover:text-white cursor-pointer'}`}
-                            title={item.quantity >= 10 ? 'Maximal 10 Tickets pro Event erlaubt' : 'Menge erhöhen'}
-                          >
-                            +
-                          </button>
+                          {(() => {
+                            const maxStock = typeof item.quantityAvailable === 'number' ? Math.min(10, item.quantityAvailable) : 10;
+                            const isAtMax = item.quantity >= maxStock;
+                            return (
+                              <button
+                                onClick={() => onUpdateQuantity(item.variantId, item.quantity + 1)}
+                                disabled={isAtMax}
+                                className={`w-5 h-5 flex items-center justify-center font-bold text-xs transition-colors ${isAtMax ? 'text-zinc-600 cursor-not-allowed opacity-50' : 'text-zinc-400 hover:text-white cursor-pointer'}`}
+                                title={
+                                  typeof item.quantityAvailable === 'number' && item.quantity >= item.quantityAvailable
+                                    ? `Nur noch ${item.quantityAvailable} Tickets verfügbar`
+                                    : isAtMax 
+                                      ? 'Maximal 10 Tickets pro Event erlaubt' 
+                                      : 'Menge erhöhen'
+                                }
+                              >
+                                +
+                              </button>
+                            );
+                          })()}
                         </div>
 
                         {/* Price */}

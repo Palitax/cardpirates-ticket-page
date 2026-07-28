@@ -74,7 +74,9 @@ function App() {
   const handleAddToCart = (item: CartItem) => {
     const existingItem = cartItems.find((i) => i.variantId === item.variantId || i.eventId === item.eventId);
     const existingQuantityInCart = existingItem ? existingItem.quantity : 0;
+    const totalAttempted = existingQuantityInCart + item.quantity;
 
+    // 1. Check User Purchase Limit (Max 10 per event per user)
     const limitCheck = checkTicketPurchaseLimit(
       currentUser?.shopify_customer_id,
       item.eventId,
@@ -88,6 +90,24 @@ function App() {
         message: limitCheck.reason || 'Ticket-Limit erreicht.',
         type: 'error'
       });
+      return;
+    }
+
+    // 2. Check Available Stock Limit (Real-time Shopify quantityAvailable)
+    const availableStock = item.quantityAvailable;
+    if (typeof availableStock === 'number' && totalAttempted > availableStock) {
+      const addableRemaining = Math.max(0, availableStock - existingQuantityInCart);
+      if (addableRemaining <= 0) {
+        setNotification({
+          message: `Es sind nur noch ${availableStock} Tickets für "${item.eventTitle}" verfügbar. Du hast bereits alle verfügbaren Tickets im Warenkorb.`,
+          type: 'error'
+        });
+      } else {
+        setNotification({
+          message: `Es sind nur noch ${availableStock} Tickets für "${item.eventTitle}" verfügbar. (Max. ${addableRemaining} weitere möglich).`,
+          type: 'error'
+        });
+      }
       return;
     }
 
@@ -117,6 +137,7 @@ function App() {
     if (item) {
       const addedDelta = quantity - item.quantity;
       if (addedDelta > 0) {
+        // Check User Purchase Limit (Max 10 per event per user)
         const limitCheck = checkTicketPurchaseLimit(
           currentUser?.shopify_customer_id,
           item.eventId,
@@ -127,6 +148,15 @@ function App() {
         if (!limitCheck.allowed) {
           setNotification({
             message: limitCheck.reason || 'Ticket-Limit erreicht.',
+            type: 'error'
+          });
+          return;
+        }
+
+        // Check Available Stock Limit
+        if (typeof item.quantityAvailable === 'number' && quantity > item.quantityAvailable) {
+          setNotification({
+            message: `Nur noch ${item.quantityAvailable} Tickets für "${item.eventTitle}" verfügbar.`,
             type: 'error'
           });
           return;
@@ -154,7 +184,40 @@ function App() {
     setCartCheckoutError(null);
 
     try {
-      // 0. Handle Newsletter Opt-In if checked
+      // 0. Live Stock Validation against Shopify API
+      let liveProducts: ShopifyProduct[] = [];
+      try {
+        liveProducts = await shopifyService.getEvents(50);
+      } catch (err) {
+        console.warn('Could not fetch live products for stock re-validation:', err);
+      }
+
+      if (liveProducts.length > 0) {
+        for (const cartItem of cartItems) {
+          const freshProduct = liveProducts.find(p => p.id === cartItem.eventId || p.handle === cartItem.eventId || p.title.toLowerCase() === cartItem.eventTitle.toLowerCase());
+          if (freshProduct) {
+            const freshVariant = freshProduct.variants.nodes.find(v => v.id === cartItem.variantId) || freshProduct.variants.nodes[0];
+            const freshAvailable = freshVariant?.quantityAvailable;
+            const freshForSale = freshVariant?.availableForSale;
+
+            if (freshForSale === false || freshAvailable === 0) {
+              setCartItems(prev => prev.filter(i => i.variantId !== cartItem.variantId));
+              setCartCheckoutError(`Das Event "${cartItem.eventTitle}" ist leider in der Zwischenzeit ausverkauft.`);
+              setLoadingCartCheckout(false);
+              return;
+            }
+
+            if (typeof freshAvailable === 'number' && cartItem.quantity > freshAvailable) {
+              setCartItems(prev => prev.map(i => i.variantId === cartItem.variantId ? { ...i, quantity: freshAvailable, quantityAvailable: freshAvailable } : i));
+              setCartCheckoutError(`⚠️ Es sind nur noch ${freshAvailable} Tickets für "${cartItem.eventTitle}" verfügbar. Die Menge in deinem Warenkorb wurde entsprechend angepasst.`);
+              setLoadingCartCheckout(false);
+              return;
+            }
+          }
+        }
+      }
+
+      // 1. Handle Newsletter Opt-In if checked
       const checkoutEmail = currentUser?.email || '';
       if (subscribeNewsletter && checkoutEmail) {
         newsletterService.subscribe(checkoutEmail, 'checkout').catch((e) => console.warn(e));
@@ -318,7 +381,7 @@ function App() {
 
   const handleQuickBuyTrigger = (event: ShopifyProduct) => {
     const defaultVariant = event.variants.nodes[0];
-    if (defaultVariant && defaultVariant.availableForSale !== false) {
+    if (defaultVariant && defaultVariant.availableForSale !== false && defaultVariant.quantityAvailable !== 0) {
       handleAddToCart({
         id: defaultVariant.id,
         eventId: event.id,
@@ -328,6 +391,7 @@ function App() {
         price: defaultVariant.price,
         quantity: 1,
         availableForSale: defaultVariant.availableForSale,
+        quantityAvailable: defaultVariant.quantityAvailable,
         image: event.images.nodes[0]?.url,
         date: event.eventDate?.value,
         location: event.eventLocation?.value,
