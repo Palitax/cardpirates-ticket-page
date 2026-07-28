@@ -26,7 +26,35 @@ serve(async (req) => {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || ""
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_ANON_KEY") || ""
 
-    const payload = await req.json()
+    let payload = await req.json()
+
+    // ----------------------------------------------------------------------
+    // SHOPIFY WEBHOOK AUTO-DETECTION
+    // If payload comes directly from a Shopify Product Webhook (products/create or products/update)
+    // ----------------------------------------------------------------------
+    if (!payload.type && payload.title && payload.status) {
+      if (payload.status !== 'active') {
+        console.log(`Shopify Webhook empfangen für Entwurf '${payload.title}' (Status: ${payload.status}). Kein Versand.`)
+        return new Response(JSON.stringify({ 
+          success: true, 
+          skipped: true, 
+          message: `Produkt '${payload.title}' ist inaktiv/Entwurf. Keine Newsletter-E-Mail gesendet.` 
+        }), { 
+          status: 200, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        })
+      }
+
+      // Convert Shopify product payload to new_event_broadcast
+      const cleanDesc = payload.body_html ? payload.body_html.replace(/<[^>]*>?/gm, '').trim().slice(0, 300) : ''
+      payload = {
+        type: 'new_event_broadcast',
+        eventTitle: payload.title,
+        eventDescription: cleanDesc,
+        eventUrl: `https://cardpiratescrew.com/#/detail/${payload.handle || ''}`
+      }
+    }
+
     const {
       type = 'booking_notification',
       ticketId,
