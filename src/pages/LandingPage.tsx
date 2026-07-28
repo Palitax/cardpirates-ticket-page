@@ -14,7 +14,8 @@ import { formatPrice } from '../utils/formatters';
 
 import { newsletterService } from '../services/newsletterService';
 import TicketInventoryBadge from '../components/TicketInventoryBadge';
-import { getBoughtTicketsCountForEvent, MAX_TICKETS_PER_EVENT } from '../utils/ticketLimits';
+import { getBoughtTicketsCountForEvent, MAX_TICKETS_PER_EVENT, isEventSoldOut } from '../utils/ticketLimits';
+import { Frown } from 'lucide-react';
 
 const ENABLE_QR_CODE = false;
 
@@ -295,7 +296,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                           <div className="relative h-[175px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
                             {/* Inventory Badge Overlay */}
                             {(() => {
-                              const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
+                              const isSoldOut = isEventSoldOut(event, currentUser);
                               const minQuantityAvailable = event.variants.nodes.reduce<number | null>((min, v) => {
                                 if (typeof v.quantityAvailable === 'number') {
                                   return min === null ? v.quantityAvailable : Math.min(min, v.quantityAvailable);
@@ -373,7 +374,19 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                 const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
                                 const totalBought = getBoughtTicketsCountForEvent(currentUser?.shopify_customer_id, event.id, event.title);
                                 const isMaxLimit = totalBought >= MAX_TICKETS_PER_EVENT;
-                                const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
+                                const isSoldOut = isEventSoldOut(event, currentUser);
+
+                                if (isSoldOut && matchingTickets.length === 0) {
+                                  return (
+                                    <button
+                                      disabled
+                                      className="w-full py-2.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-xs cursor-not-allowed opacity-90 flex items-center justify-center gap-1.5 shadow-sm"
+                                    >
+                                      <Frown size={14} className="text-rose-400" />
+                                      <span>Ausverkauft 😢</span>
+                                    </button>
+                                  );
+                                }
 
                                 if (matchingTickets.length > 0) {
                                   return (
@@ -407,7 +420,14 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                         </span>
                                       </div>
 
-                                      {isMaxLimit ? (
+                                      {isSoldOut ? (
+                                        <button
+                                          disabled
+                                          className="w-full py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 font-extrabold text-[10px] cursor-not-allowed opacity-80"
+                                        >
+                                          Ausverkauft 😢
+                                        </button>
+                                      ) : isMaxLimit ? (
                                         <button
                                           disabled
                                           className="w-full py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 font-extrabold text-[10px] cursor-not-allowed opacity-80"

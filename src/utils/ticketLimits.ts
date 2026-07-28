@@ -1,4 +1,43 @@
+import type { ShopifyProduct, ShopifyVariant } from '../services/shopify';
+
 export const MAX_TICKETS_PER_EVENT = 10;
+
+/**
+ * Checks if a specific Shopify variant is sold out.
+ */
+export function isVariantSoldOut(variant: ShopifyVariant | undefined | null): boolean {
+  if (!variant) return true;
+  if (variant.availableForSale === false) return true;
+  if (typeof variant.quantityAvailable === 'number' && variant.quantityAvailable <= 0) return true;
+  if (variant.quantityAvailable === 0) return true;
+  return false;
+}
+
+/**
+ * Checks if an entire Shopify event (or the relevant variant for the user) is sold out.
+ */
+export function isEventSoldOut(event: ShopifyProduct | undefined | null, currentUser?: any | null): boolean {
+  if (!event || !event.variants || !event.variants.nodes || event.variants.nodes.length === 0) {
+    return true;
+  }
+
+  // If user is logged in, check the specific matching variant for their account type
+  if (currentUser) {
+    const isBusiness = currentUser.user_type === 'business';
+    const matchingVariant = event.variants.nodes.find(v => 
+      isBusiness 
+        ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+        : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+    ) || event.variants.nodes[0];
+
+    if (matchingVariant && isVariantSoldOut(matchingVariant)) {
+      return true;
+    }
+  }
+
+  // Check if all variants are sold out
+  return event.variants.nodes.every(v => isVariantSoldOut(v));
+}
 
 /**
  * Gets the total number of tickets a user has already purchased for a specific event.
