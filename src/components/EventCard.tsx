@@ -1,4 +1,4 @@
-import { MapPin, Check, ShoppingBag, XCircle } from 'lucide-react';
+import { MapPin, Check, ShoppingBag, Frown } from 'lucide-react';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
@@ -35,7 +35,7 @@ export default function EventCard({
 
   const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
   const isPurchased = matchingTickets.length > 0;
-  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false);
+  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
 
   return (
     <div className="w-full h-auto aspect-[816/220] min-h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
@@ -132,107 +132,123 @@ export default function EventCard({
             </div>
           ) : null}
 
-          <div className="flex flex-col items-center text-center justify-center gap-3.5 w-full z-10">
-            {!isPurchased && (
-              <div className="flex flex-col items-center justify-center w-full select-none text-center">
-                {event.variants.nodes.length > 1 ? (
-                  currentUser ? (
-                    // LOGGED IN USER: Show only the matching variant for account type
-                    (() => {
-                      const isBusiness = currentUser.user_type === 'business';
-                      const matchingVariant = event.variants.nodes.find(v => 
-                        isBusiness 
-                          ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
-                          : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
-                      ) || event.variants.nodes[0];
-
-                      const displayTitle = matchingVariant.title.toLowerCase().includes('privat')
-                        ? 'Einzelticket'
-                        : matchingVariant.title;
-
-                      return (
-                        <div className="flex flex-col items-center justify-center">
-                          <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">
-                            {displayTitle}
-                          </span>
-                          <span className="text-sm font-extrabold text-white leading-tight mt-0.5">
-                            {formatPrice(matchingVariant.price.amount, matchingVariant.price.currencyCode)}
-                          </span>
-                        </div>
-                      );
-                    })()
-                  ) : (
-                    // NOT LOGGED IN: Show Einzelticket ("ab 45,00€") and Aussteller ("registriere dich für eine Preisübersicht")
-                    (() => {
-                      const privateVariant = event.variants.nodes.find(v => 
-                        v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel')
-                      ) || event.variants.nodes[0];
-
-                      return (
-                        <div className="flex flex-col items-center text-center space-y-1">
-                          <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">
-                            Ticketpreise
-                          </span>
-                          <div className="flex flex-col items-center text-[10px] text-zinc-300 font-semibold leading-tight space-y-1">
-                            <div>
-                              <span className="text-zinc-400 font-bold uppercase">Einzelticket: </span>
-                              <span className="text-white font-extrabold">ab {formatPrice(privateVariant.price.amount, privateVariant.price.currencyCode)}</span>
-                            </div>
-                            <div 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onRegisterTrigger?.();
-                              }}
-                              className="cursor-pointer hover:underline text-[9px] text-zinc-400 hover:text-white"
-                              title="Klicke hier, um dich zu registrieren"
-                            >
-                              <span className="font-bold uppercase text-zinc-400">Aussteller: </span>
-                              <span className="text-zinc-400 underline">registriere dich für eine Preisübersicht</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()
-                  )
-                ) : (
-                  <>
-                    <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Ticketpreis</span>
-                    <span className="text-base font-extrabold text-white leading-none mt-0.5">
-                      {formatPrice(event.variants.nodes[0]?.price.amount, event.variants.nodes[0]?.price.currencyCode)}
-                    </span>
-                  </>
-                )}
+          {/* Sold Out View with Sad Smiley */}
+          {isSoldOut ? (
+            <div className="flex flex-col items-center justify-center text-center space-y-1.5 w-full py-1 select-none z-10">
+              <span className="text-2xl filter drop-shadow">😢</span>
+              <div className="space-y-0.5">
+                <span className="text-[11px] font-black uppercase tracking-wider text-rose-400 block leading-tight">
+                  Ausverkauft
+                </span>
+                <span className="text-[9px] font-bold text-zinc-400 block leading-tight">
+                  Keine Tickets mehr
+                </span>
               </div>
-            )}
-
-            <div onClick={(e) => e.stopPropagation()} className="w-full">
-              {isSoldOut ? (
+              <div onClick={(e) => e.stopPropagation()} className="w-full mt-0.5">
                 <button
                   disabled
-                  className="w-full py-2 rounded-xl bg-zinc-900 text-zinc-500 border border-zinc-800 font-extrabold text-[11px] cursor-not-allowed opacity-60 select-none flex items-center justify-center gap-1.5"
+                  className="w-full py-1.5 px-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-[10px] cursor-not-allowed opacity-90 select-none flex items-center justify-center gap-1 shadow-sm"
                 >
-                  <XCircle size={14} />
-                  <span>Ausverkauft</span>
+                  <Frown size={13} className="shrink-0 text-rose-400" />
+                  <span>Ausverkauft 😢</span>
                 </button>
-              ) : isPurchased ? (
-                <button
-                  onClick={() => onQuickBuy(event)}
-                  className="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-black/20 flex items-center justify-center gap-1.5"
-                >
-                  <ShoppingBag size={14} />
-                  <span>weiteres Ticket</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => onQuickBuy(event)}
-                  className="w-full py-2 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-white/5 border border-white flex items-center justify-center gap-1.5"
-                >
-                  <ShoppingBag size={14} />
-                  <span>In den Warenkorb</span>
-                </button>
-              )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-col items-center text-center justify-center gap-3.5 w-full z-10">
+              {!isPurchased && (
+                <div className="flex flex-col items-center justify-center w-full select-none text-center">
+                  {event.variants.nodes.length > 1 ? (
+                    currentUser ? (
+                      // LOGGED IN USER: Show only the matching variant for account type
+                      (() => {
+                        const isBusiness = currentUser.user_type === 'business';
+                        const matchingVariant = event.variants.nodes.find(v => 
+                          isBusiness 
+                            ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+                            : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+                        ) || event.variants.nodes[0];
+
+                        const displayTitle = matchingVariant.title.toLowerCase().includes('privat')
+                          ? 'Einzelticket'
+                          : matchingVariant.title;
+
+                        return (
+                          <div className="flex flex-col items-center justify-center">
+                            <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">
+                              {displayTitle}
+                            </span>
+                            <span className="text-sm font-extrabold text-white leading-tight mt-0.5">
+                              {formatPrice(matchingVariant.price.amount, matchingVariant.price.currencyCode)}
+                            </span>
+                          </div>
+                        );
+                      })()
+                    ) : (
+                      // NOT LOGGED IN: Show Einzelticket ("ab 45,00€") and Aussteller ("registriere dich für eine Preisübersicht")
+                      (() => {
+                        const privateVariant = event.variants.nodes.find(v => 
+                          v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel')
+                        ) || event.variants.nodes[0];
+
+                        return (
+                          <div className="flex flex-col items-center text-center space-y-1">
+                            <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider block">
+                              Ticketpreise
+                            </span>
+                            <div className="flex flex-col items-center text-[10px] text-zinc-300 font-semibold leading-tight space-y-1">
+                              <div>
+                                <span className="text-zinc-400 font-bold uppercase">Einzelticket: </span>
+                                <span className="text-white font-extrabold">ab {formatPrice(privateVariant.price.amount, privateVariant.price.currencyCode)}</span>
+                              </div>
+                              <div 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onRegisterTrigger?.();
+                                }}
+                                className="cursor-pointer hover:underline text-[9px] text-zinc-400 hover:text-white"
+                                title="Klicke hier, um dich zu registrieren"
+                              >
+                                <span className="font-bold uppercase text-zinc-400">Aussteller: </span>
+                                <span className="text-zinc-400 underline">registriere dich für eine Preisübersicht</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()
+                    )
+                  ) : (
+                    <>
+                      <span className="text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Ticketpreis</span>
+                      <span className="text-base font-extrabold text-white leading-none mt-0.5">
+                        {formatPrice(event.variants.nodes[0]?.price.amount, event.variants.nodes[0]?.price.currencyCode)}
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+
+              <div onClick={(e) => e.stopPropagation()} className="w-full">
+                {isPurchased ? (
+                  <button
+                    onClick={() => onQuickBuy(event)}
+                    className="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-black/20 flex items-center justify-center gap-1.5"
+                  >
+                    <ShoppingBag size={14} />
+                    <span>weiteres Ticket</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onQuickBuy(event)}
+                    className="w-full py-2 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-[11px] transition-all select-none active:scale-[0.98] cursor-pointer shadow-lg shadow-white/5 border border-white flex items-center justify-center gap-1.5"
+                  >
+                    <ShoppingBag size={14} />
+                    <span>In den Warenkorb</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
