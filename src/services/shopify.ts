@@ -33,7 +33,7 @@ async function shopifyFetch<T>(query: string, variables = {}): Promise<T> {
     }
 
     const json = await response.json();
-    if (json.errors) {
+    if (json.errors && !json.data) {
       console.error('Shopify GraphQL Errors:', json.errors);
       throw new Error(json.errors[0].message);
     }
@@ -159,7 +159,6 @@ const GET_PRODUCTS_QUERY = `
               currencyCode
             }
             availableForSale
-            quantityAvailable
           }
         }
         eventDate: metafield(namespace: "custom", key: "event_date") {
@@ -224,7 +223,6 @@ const GET_PRODUCT_BY_HANDLE_QUERY = `
             currencyCode
           }
           availableForSale
-          quantityAvailable
         }
       }
       eventDate: metafield(namespace: "custom", key: "event_date") {
