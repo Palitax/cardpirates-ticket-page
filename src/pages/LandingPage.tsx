@@ -15,7 +15,6 @@ import { formatPrice } from '../utils/formatters';
 import { newsletterService } from '../services/newsletterService';
 import TicketInventoryBadge from '../components/TicketInventoryBadge';
 import { getBoughtTicketsCountForEvent, MAX_TICKETS_PER_EVENT, isEventSoldOut } from '../utils/ticketLimits';
-import { Frown } from 'lucide-react';
 
 const ENABLE_QR_CODE = false;
 
@@ -382,8 +381,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                       disabled
                                       className="w-full py-2.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-xs cursor-not-allowed opacity-90 flex items-center justify-center gap-1.5 shadow-sm"
                                     >
-                                      <Frown size={14} className="text-rose-400" />
-                                      <span>Ausverkauft 😢</span>
+                                      <span>Ausverkauft</span>
                                     </button>
                                   );
                                 }
@@ -425,7 +423,7 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                           disabled
                                           className="w-full py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 font-extrabold text-[10px] cursor-not-allowed opacity-80"
                                         >
-                                          Ausverkauft 😢
+                                          Ausverkauft
                                         </button>
                                       ) : isMaxLimit ? (
                                         <button

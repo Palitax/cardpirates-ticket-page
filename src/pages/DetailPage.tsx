@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, ShoppingBag, Frown, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, ShoppingBag, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
@@ -302,8 +302,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                 disabled
                 className="w-full py-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-sm cursor-not-allowed opacity-90 flex items-center justify-center gap-2 select-none shadow-sm"
               >
-                <Frown size={18} className="text-rose-400" />
-                <span>Ausverkauft 😢</span>
+                <span>Ausverkauft</span>
               </button>
             ) : isMaxLimitReached ? (
               <button
@@ -352,8 +351,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
             disabled
             className="py-3 px-5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-xs cursor-not-allowed opacity-90 flex items-center gap-1.5 shadow-sm"
           >
-            <Frown size={15} className="text-rose-400" />
-            <span>Ausverkauft 😢</span>
+            <span>Ausverkauft</span>
           </button>
         ) : (
           <Button

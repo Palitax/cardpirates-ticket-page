@@ -1,4 +1,4 @@
-import { MapPin, Check, ShoppingBag, Frown } from 'lucide-react';
+import { MapPin, Check, ShoppingBag } from 'lucide-react';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from './CountdownTimer';
 import { useNavigate } from 'react-router-dom';
@@ -133,12 +133,11 @@ export default function EventCard({
             </div>
           ) : null}
 
-          {/* Sold Out View with Sad Smiley */}
+          {/* Sold Out View */}
           {isSoldOut ? (
             <div className="flex flex-col items-center justify-center text-center space-y-1.5 w-full py-1 select-none z-10">
-              <span className="text-2xl filter drop-shadow">😢</span>
-              <div className="space-y-0.5">
-                <span className="text-[11px] font-black uppercase tracking-wider text-rose-400 block leading-tight">
+              <div className="space-y-0.5 my-1">
+                <span className="text-xs font-black uppercase tracking-wider text-rose-400 block leading-tight">
                   Ausverkauft
                 </span>
                 <span className="text-[9px] font-bold text-zinc-400 block leading-tight">
@@ -148,10 +147,9 @@ export default function EventCard({
               <div onClick={(e) => e.stopPropagation()} className="w-full mt-0.5">
                 <button
                   disabled
-                  className="w-full py-1.5 px-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-[10px] cursor-not-allowed opacity-90 select-none flex items-center justify-center gap-1 shadow-sm"
+                  className="w-full py-2 px-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-[10px] cursor-not-allowed opacity-90 select-none flex items-center justify-center gap-1 shadow-sm"
                 >
-                  <Frown size={13} className="shrink-0 text-rose-400" />
-                  <span>Ausverkauft 😢</span>
+                  <span>Ausverkauft</span>
                 </button>
               </div>
             </div>
