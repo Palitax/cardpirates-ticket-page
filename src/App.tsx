@@ -18,6 +18,7 @@ import type { ShopifyProduct } from './services/shopify';
 import type { CustomerProfile } from './services/supabase';
 import { supabase, profileService, notificationService } from './services/supabase';
 import { newsletterService } from './services/newsletterService';
+import { checkTicketPurchaseLimit } from './utils/ticketLimits';
 import logoAnimVideo from './assets/cardpirates-logo-kleiner.mp4';
 import './App.css';
 
@@ -71,6 +72,25 @@ function App() {
   const totalCartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleAddToCart = (item: CartItem) => {
+    const existingItem = cartItems.find((i) => i.variantId === item.variantId || i.eventId === item.eventId);
+    const existingQuantityInCart = existingItem ? existingItem.quantity : 0;
+
+    const limitCheck = checkTicketPurchaseLimit(
+      currentUser?.shopify_customer_id,
+      item.eventId,
+      item.quantity,
+      existingQuantityInCart,
+      item.eventTitle
+    );
+
+    if (!limitCheck.allowed) {
+      setNotification({
+        message: limitCheck.reason || 'Ticket-Limit erreicht.',
+        type: 'error'
+      });
+      return;
+    }
+
     setCartItems((prev) => {
       const existingIndex = prev.findIndex((i) => i.variantId === item.variantId);
       if (existingIndex > -1) {
@@ -92,6 +112,28 @@ function App() {
       handleRemoveCartItem(variantId);
       return;
     }
+
+    const item = cartItems.find(i => i.variantId === variantId);
+    if (item) {
+      const addedDelta = quantity - item.quantity;
+      if (addedDelta > 0) {
+        const limitCheck = checkTicketPurchaseLimit(
+          currentUser?.shopify_customer_id,
+          item.eventId,
+          addedDelta,
+          item.quantity,
+          item.eventTitle
+        );
+        if (!limitCheck.allowed) {
+          setNotification({
+            message: limitCheck.reason || 'Ticket-Limit erreicht.',
+            type: 'error'
+          });
+          return;
+        }
+      }
+    }
+
     setCartItems((prev) => prev.map((item) => (item.variantId === variantId ? { ...item, quantity } : item)));
   };
 

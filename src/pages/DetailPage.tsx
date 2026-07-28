@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, ShoppingBag, XCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, ShoppingBag, XCircle, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
+import TicketInventoryBadge from '../components/TicketInventoryBadge';
+import { getBoughtTicketsCountForEvent, MAX_TICKETS_PER_EVENT } from '../utils/ticketLimits';
 import { Button } from '@heroui/react';
 import { formatPrice } from '../utils/formatters';
 import { WHATNOT_LOGO_BASE64 } from '../assets/whatnotLogoData';
@@ -56,7 +58,17 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
     );
   }
 
-  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false);
+  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
+  const minQuantityAvailable = event.variants.nodes.reduce<number | null>((min, v) => {
+    if (typeof v.quantityAvailable === 'number') {
+      return min === null ? v.quantityAvailable : Math.min(min, v.quantityAvailable);
+    }
+    return min;
+  }, null);
+
+  const alreadyBought = getBoughtTicketsCountForEvent(currentUser?.shopify_customer_id, event.id, event.title);
+  const isMaxLimitReached = alreadyBought >= MAX_TICKETS_PER_EVENT;
+
   const dateValue = event.eventDate?.value;
   const location = event.eventLocation?.value || 'TBA';
   const videoUrl = event.eventVideoUrl?.value;
@@ -180,6 +192,14 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
         {/* Content & Ticket Info Column (Right) */}
         <div className="md:col-span-5 space-y-6">
           <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <TicketInventoryBadge 
+                availableForSale={!isSoldOut} 
+                quantityAvailable={minQuantityAvailable} 
+                size="md"
+              />
+            </div>
+
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
               {event.title}
             </h1>
@@ -215,14 +235,13 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                     ) || event.variants.nodes[0];
 
                     const displayTitle = matchingVariant.title.toLowerCase().includes('privat') ? 'Einzelticket' : matchingVariant.title;
+                    const vSoldOut = matchingVariant.availableForSale === false || matchingVariant.quantityAvailable === 0;
 
                     return (
                       <div className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
                         <div>
                           <span className="text-xs font-bold text-white block">{displayTitle}</span>
-                          <span className={`text-[10px] font-semibold ${matchingVariant.availableForSale === false ? 'text-rose-400' : 'text-zinc-400'}`}>
-                            {matchingVariant.availableForSale === false ? 'Ausverkauft' : 'Sofort verfügbar'}
-                          </span>
+                          <TicketInventoryBadge availableForSale={!vSoldOut} quantityAvailable={matchingVariant.quantityAvailable} size="sm" />
                         </div>
                         <span className="text-sm font-black text-white">
                           {formatPrice(matchingVariant.price.amount, matchingVariant.price.currencyCode)}
@@ -237,14 +256,13 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                       const isPrivat = v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel');
                       const displayTitle = isPrivat ? 'Einzelticket' : v.title;
                       const isAussteller = v.title.toLowerCase().includes('aussteller');
+                      const vSoldOut = v.availableForSale === false || v.quantityAvailable === 0;
 
                       return (
                         <div key={v.id} className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
                           <div>
                             <span className="text-xs font-bold text-white block">{displayTitle}</span>
-                            <span className={`text-[10px] font-semibold ${v.availableForSale === false ? 'text-rose-400' : 'text-zinc-400'}`}>
-                              {v.availableForSale === false ? 'Ausverkauft' : 'Sofort verfügbar'}
-                            </span>
+                            <TicketInventoryBadge availableForSale={!vSoldOut} quantityAvailable={v.quantityAvailable} size="sm" />
                           </div>
                           <span className="text-xs font-bold text-white">
                             {isAussteller ? (
@@ -268,12 +286,30 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                   <span className="text-2xl font-extrabold text-white">
                     {formatPrice(priceAmount, currency)}
                   </span>
-                  <span className={`text-[10px] font-bold border px-2 py-1 rounded-md ${isSoldOut ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-zinc-950 border-zinc-900 text-white'}`}>
-                    {isSoldOut ? 'Ausverkauft' : 'Verfügbar'}
-                  </span>
+                  <TicketInventoryBadge availableForSale={!isSoldOut} quantityAvailable={minQuantityAvailable} size="sm" />
                 </div>
               )}
             </div>
+
+            {/* Ticket Purchase Limit Status Warning */}
+            {alreadyBought > 0 && (
+              <div className={`p-3 rounded-2xl text-xs flex items-center gap-2.5 border ${
+                isMaxLimitReached 
+                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-300' 
+                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+              }`}>
+                {isMaxLimitReached ? (
+                  <ShieldAlert size={16} className="shrink-0 text-rose-400" />
+                ) : (
+                  <AlertTriangle size={16} className="shrink-0 text-amber-400" />
+                )}
+                <span>
+                  {isMaxLimitReached 
+                    ? `Maximales Limit (10 Tickets) für dieses Event erreicht.` 
+                    : `Du besitzt bereits ${alreadyBought} von max. 10 Tickets für dieses Event.`}
+                </span>
+              </div>
+            )}
 
             {isSoldOut ? (
               <button
@@ -282,6 +318,14 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
               >
                 <XCircle size={16} />
                 <span>Ausverkauft</span>
+              </button>
+            ) : isMaxLimitReached ? (
+              <button
+                disabled
+                className="w-full py-4 rounded-xl bg-rose-950/40 text-rose-400 font-extrabold text-sm border border-rose-900/50 cursor-not-allowed flex items-center justify-center gap-2 select-none"
+              >
+                <ShieldAlert size={16} />
+                <span>Ticket-Limit (10/10) erreicht</span>
               </button>
             ) : (
               <Button

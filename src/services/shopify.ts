@@ -58,6 +58,7 @@ export interface ShopifyVariant {
     currencyCode: string;
   };
   availableForSale: boolean;
+  quantityAvailable?: number | null;
 }
 
 export interface ShopifyProduct {
@@ -158,6 +159,7 @@ const GET_PRODUCTS_QUERY = `
               currencyCode
             }
             availableForSale
+            quantityAvailable
           }
         }
         eventDate: metafield(namespace: "custom", key: "event_date") {
@@ -222,6 +224,7 @@ const GET_PRODUCT_BY_HANDLE_QUERY = `
             currencyCode
           }
           availableForSale
+          quantityAvailable
         }
       }
       eventDate: metafield(namespace: "custom", key: "event_date") {

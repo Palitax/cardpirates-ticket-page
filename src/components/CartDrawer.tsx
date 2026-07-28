@@ -178,7 +178,9 @@ export default function CartDrawer({
                           </span>
                           <button
                             onClick={() => onUpdateQuantity(item.variantId, item.quantity + 1)}
-                            className="w-5 h-5 flex items-center justify-center text-zinc-400 hover:text-white font-bold text-xs transition-colors cursor-pointer"
+                            disabled={item.quantity >= 10}
+                            className={`w-5 h-5 flex items-center justify-center font-bold text-xs transition-colors ${item.quantity >= 10 ? 'text-zinc-600 cursor-not-allowed opacity-50' : 'text-zinc-400 hover:text-white cursor-pointer'}`}
+                            title={item.quantity >= 10 ? 'Maximal 10 Tickets pro Event erlaubt' : 'Menge erhöhen'}
                           >
                             +
                           </button>

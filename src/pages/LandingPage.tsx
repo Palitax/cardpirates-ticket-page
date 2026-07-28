@@ -13,6 +13,8 @@ import { syncService } from '../services/syncService';
 import { formatPrice } from '../utils/formatters';
 
 import { newsletterService } from '../services/newsletterService';
+import TicketInventoryBadge from '../components/TicketInventoryBadge';
+import { getBoughtTicketsCountForEvent, MAX_TICKETS_PER_EVENT } from '../utils/ticketLimits';
 
 const ENABLE_QR_CODE = false;
 
@@ -291,6 +293,22 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                         >
                           {/* Card Cover image/video with fading gradient blend */}
                           <div className="relative h-[175px] w-full overflow-hidden shrink-0 bg-black flex items-center justify-center">
+                            {/* Inventory Badge Overlay */}
+                            {(() => {
+                              const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
+                              const minQuantityAvailable = event.variants.nodes.reduce<number | null>((min, v) => {
+                                if (typeof v.quantityAvailable === 'number') {
+                                  return min === null ? v.quantityAvailable : Math.min(min, v.quantityAvailable);
+                                }
+                                return min;
+                              }, null);
+                              return (
+                                <div className="absolute top-3 left-3 z-30 pointer-events-none">
+                                  <TicketInventoryBadge availableForSale={!isSoldOut} quantityAvailable={minQuantityAvailable} size="sm" />
+                                </div>
+                              );
+                            })()}
+
                             {/* Event Cover Video */}
                             <video
                               autoPlay
@@ -353,6 +371,10 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                               )}
                               {(() => {
                                 const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
+                                const totalBought = getBoughtTicketsCountForEvent(currentUser?.shopify_customer_id, event.id, event.title);
+                                const isMaxLimit = totalBought >= MAX_TICKETS_PER_EVENT;
+                                const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
+
                                 if (matchingTickets.length > 0) {
                                   return (
                                     <div className="flex flex-col items-center gap-2 select-none mb-1 text-center shrink-0 w-full px-2">
@@ -385,19 +407,51 @@ export default function LandingPage({ onQuickBuy, currentUser, onRegisterTrigger
                                         </span>
                                       </div>
 
-                                      <Button
-                                        variant="outline"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          onQuickBuy(event);
-                                        }}
-                                        className="w-full py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-black font-extrabold text-[11px] active:scale-98 transition-all flex items-center justify-center cursor-pointer border border-zinc-300"
-                                      >
-                                        weiteres Ticket kaufen
-                                      </Button>
+                                      {isMaxLimit ? (
+                                        <button
+                                          disabled
+                                          className="w-full py-1.5 rounded-full bg-rose-50 border border-rose-200 text-rose-600 font-extrabold text-[10px] cursor-not-allowed opacity-80"
+                                        >
+                                          Limit (10/10) erreicht
+                                        </button>
+                                      ) : (
+                                        <Button
+                                          variant="outline"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            onQuickBuy(event);
+                                          }}
+                                          className="w-full py-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-black font-extrabold text-[11px] active:scale-98 transition-all flex items-center justify-center cursor-pointer border border-zinc-300"
+                                        >
+                                          weiteres Ticket kaufen
+                                        </Button>
+                                      )}
                                     </div>
                                   );
                                 }
+
+                                if (isSoldOut) {
+                                  return (
+                                    <button
+                                      disabled
+                                      className="w-full py-2.5 rounded-full bg-zinc-200 text-zinc-500 font-extrabold text-xs cursor-not-allowed border border-zinc-300"
+                                    >
+                                      Ausverkauft
+                                    </button>
+                                  );
+                                }
+
+                                if (isMaxLimit) {
+                                  return (
+                                    <button
+                                      disabled
+                                      className="w-full py-2.5 rounded-full bg-rose-100 text-rose-700 font-extrabold text-xs cursor-not-allowed border border-rose-300"
+                                    >
+                                      Limit (10/10) erreicht
+                                    </button>
+                                  );
+                                }
+
                                 const isMultiVariant = event.variants.nodes.length > 1;
                                 const selectedVariant = currentUser ? (
                                   (() => {
