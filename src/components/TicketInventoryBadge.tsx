@@ -6,13 +6,15 @@ interface TicketInventoryBadgeProps {
   quantityAvailable?: number | null;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  hideSoldOutBadge?: boolean;
 }
 
 export const TicketInventoryBadge: React.FC<TicketInventoryBadgeProps> = ({
   availableForSale,
   quantityAvailable,
   className = '',
-  size = 'md'
+  size = 'md',
+  hideSoldOutBadge = true,
 }) => {
   // Size classes
   const sizeClasses = {
@@ -29,6 +31,7 @@ export const TicketInventoryBadge: React.FC<TicketInventoryBadgeProps> = ({
 
   // 1. SOLD OUT STATE (availableForSale is false OR quantityAvailable is 0)
   if (!availableForSale || quantityAvailable === 0) {
+    if (hideSoldOutBadge) return null;
     return (
       <span className={`inline-flex items-center font-extrabold uppercase tracking-wider rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 shadow-sm ${sizeClasses} ${className}`}>
         <XCircle size={iconSizes} className="shrink-0 text-rose-400" />
