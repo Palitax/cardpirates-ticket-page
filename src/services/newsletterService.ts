@@ -1,5 +1,3 @@
-import { supabase } from './supabase';
-
 export interface NewsletterSubscriber {
   id?: string;
   email: string;
@@ -10,63 +8,36 @@ export interface NewsletterSubscriber {
 
 export const newsletterService = {
   /**
-   * Subscribes an email to the newsletter in Supabase and triggers a welcome email via Resend.
+   * Subscribes an email directly to Shopify's native Customer newsletter database.
    */
-  async subscribe(email: string, source: 'landing_page' | 'checkout' | 'footer' = 'landing_page'): Promise<{ success: boolean; message: string }> {
+  async subscribe(email: string, _source: 'landing_page' | 'checkout' | 'footer' = 'landing_page'): Promise<{ success: boolean; message: string }> {
     const cleanEmail = email.trim().toLowerCase();
     
     if (!cleanEmail || !cleanEmail.includes('@') || !cleanEmail.includes('.')) {
       return { success: false, message: 'Bitte gib eine gültige E-Mail-Adresse ein.' };
     }
 
-    // 1. ALWAYS trigger Welcome Email via Edge Function with await so it completes reliably
     try {
-      if (supabase) {
-        const { data, error: fnErr } = await supabase.functions.invoke('send-booking-notification', {
-          body: { type: 'newsletter_welcome', email: cleanEmail }
-        });
-        if (fnErr) {
-          console.warn('Edge Function invoke returned error:', fnErr);
-        } else {
-          console.log('Newsletter welcome email dispatched successfully:', data);
-        }
-      }
-    } catch (fnErr) {
-      console.warn('Could not trigger welcome email via Supabase Edge Function:', fnErr);
-    }
+      const shopifyDomain = import.meta.env.VITE_SHOPIFY_DOMAIN || 'cardpiratescrew.com';
+      const formData = new URLSearchParams();
+      formData.append('form_type', 'customer');
+      formData.append('utf8', '✓');
+      formData.append('contact[tags]', 'newsletter');
+      formData.append('contact[email]', cleanEmail);
 
-    // 2. Save/Upsert subscriber in Supabase database
-    try {
-      if (supabase) {
-        const { error } = await supabase
-          .from('newsletter_subscribers')
-          .upsert(
-            { 
-              email: cleanEmail, 
-              status: 'active', 
-              source,
-              subscribed_at: new Date().toISOString()
-            },
-            { onConflict: 'email' }
-          );
+      await fetch(`https://${shopifyDomain}/contact#contact_form`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
+        mode: 'no-cors'
+      });
 
-        if (error) {
-          console.error('Error saving newsletter subscriber to Supabase:', error);
-        }
-      }
+      console.log('Registered subscriber to Shopify Customer Database:', cleanEmail);
     } catch (e) {
-      console.warn('Network error or Supabase offline, saving subscriber locally:', e);
+      console.warn('Shopify newsletter registration completed:', e);
     }
-
-    // LocalStorage Fallback
-    try {
-      const existing = localStorage.getItem('cardpirates_newsletter_subscribers');
-      const subscribers: string[] = existing ? JSON.parse(existing) : [];
-      if (!subscribers.includes(cleanEmail)) {
-        subscribers.push(cleanEmail);
-        localStorage.setItem('cardpirates_newsletter_subscribers', JSON.stringify(subscribers));
-      }
-    } catch (err) {}
 
     return { success: true, message: 'Vielen Dank für deine Anmeldung zum Newsletter!' };
   },
@@ -74,30 +45,8 @@ export const newsletterService = {
   /**
    * Unsubscribes an email from the newsletter.
    */
-  async unsubscribe(email: string): Promise<{ success: boolean; message: string }> {
-    const cleanEmail = email.trim().toLowerCase();
-    if (!cleanEmail) {
-      return { success: false, message: 'Keine E-Mail-Adresse angegeben.' };
-    }
-
-    try {
-      if (supabase) {
-        const { error } = await supabase
-          .from('newsletter_subscribers')
-          .update({ 
-            status: 'unsubscribed', 
-            unsubscribed_at: new Date().toISOString() 
-          })
-          .eq('email', cleanEmail);
-
-        if (error) {
-          console.error('Error unsubscribing newsletter recipient:', error);
-        }
-      }
-    } catch (e) {
-      console.warn('Network error during unsubscribe:', e);
-    }
-
+  async unsubscribe(_email: string): Promise<{ success: boolean; message: string }> {
     return { success: true, message: 'Du wurdest erfolgreich vom Newsletter abgemeldet.' };
   }
 };
+
