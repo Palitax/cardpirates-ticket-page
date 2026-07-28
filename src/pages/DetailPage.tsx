@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Calendar, ShoppingBag, XCircle, AlertTriangle, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, ShoppingBag, Frown, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
@@ -58,7 +58,16 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
     );
   }
 
-  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
+  const isBusinessUser = currentUser?.user_type === 'business';
+  const activeVariant = event.variants.nodes.find(v => 
+    isBusinessUser 
+      ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+      : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+  ) || event.variants.nodes[0];
+
+  const isCurrentVariantSoldOut = activeVariant ? (activeVariant.availableForSale === false || activeVariant.quantityAvailable === 0 || (typeof activeVariant.quantityAvailable === 'number' && activeVariant.quantityAvailable <= 0)) : false;
+  const isAllVariantsSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0 || (typeof v.quantityAvailable === 'number' && v.quantityAvailable <= 0));
+  const isSoldOut = isAllVariantsSoldOut || isCurrentVariantSoldOut;
   const minQuantityAvailable = event.variants.nodes.reduce<number | null>((min, v) => {
     if (typeof v.quantityAvailable === 'number') {
       return min === null ? v.quantityAvailable : Math.min(min, v.quantityAvailable);
@@ -189,28 +198,27 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
           </div>
         </div>
 
-        {/* Content & Ticket Info Column (Right) */}
+        {/* Right Column: Title, Metadata & Purchase Box */}
         <div className="md:col-span-5 space-y-6">
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <TicketInventoryBadge 
-                availableForSale={!isSoldOut} 
-                quantityAvailable={minQuantityAvailable} 
-                size="md"
-              />
+            <div className="flex items-center justify-between gap-2">
+              <span className="inline-block px-3 py-1 bg-white/10 border border-white/15 rounded-full text-[10px] font-bold text-white uppercase tracking-widest">
+                Crew-Event
+              </span>
+              <TicketInventoryBadge availableForSale={!isSoldOut} quantityAvailable={minQuantityAvailable} size="sm" />
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-tight">
               {event.title}
             </h1>
-            
-            <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
-              <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl font-semibold">
-                <Calendar size={13} className="text-white" />
-                <span>{dateValue ? new Date(dateValue).toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' }) : 'TBA'}</span>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400 pt-2">
+              <div className="flex items-center gap-1.5">
+                <Calendar size={14} />
+                <span>{dateValue ? new Date(dateValue).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'TBA'}</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl font-semibold">
-                <MapPin size={13} className="text-white" />
+              <div className="flex items-center gap-1.5">
+                <MapPin size={14} />
                 <span>{location}</span>
               </div>
             </div>
@@ -227,24 +235,17 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                 currentUser ? (
                   // LOGGED IN: Show matching variant for account type
                   (() => {
-                    const isBusiness = currentUser.user_type === 'business';
-                    const matchingVariant = event.variants.nodes.find(v => 
-                      isBusiness 
-                        ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
-                        : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
-                    ) || event.variants.nodes[0];
-
-                    const displayTitle = matchingVariant.title.toLowerCase().includes('privat') ? 'Einzelticket' : matchingVariant.title;
-                    const vSoldOut = matchingVariant.availableForSale === false || matchingVariant.quantityAvailable === 0;
+                    const displayTitle = activeVariant.title.toLowerCase().includes('privat') ? 'Einzelticket' : activeVariant.title;
+                    const vSoldOut = activeVariant.availableForSale === false || activeVariant.quantityAvailable === 0 || (typeof activeVariant.quantityAvailable === 'number' && activeVariant.quantityAvailable <= 0);
 
                     return (
                       <div className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
                         <div>
                           <span className="text-xs font-bold text-white block">{displayTitle}</span>
-                          <TicketInventoryBadge availableForSale={!vSoldOut} quantityAvailable={matchingVariant.quantityAvailable} size="sm" />
+                          <TicketInventoryBadge availableForSale={!vSoldOut} quantityAvailable={activeVariant.quantityAvailable} size="sm" />
                         </div>
                         <span className="text-sm font-black text-white">
-                          {formatPrice(matchingVariant.price.amount, matchingVariant.price.currencyCode)}
+                          {formatPrice(activeVariant.price.amount, activeVariant.price.currencyCode)}
                         </span>
                       </div>
                     );
@@ -256,7 +257,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                       const isPrivat = v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel');
                       const displayTitle = isPrivat ? 'Einzelticket' : v.title;
                       const isAussteller = v.title.toLowerCase().includes('aussteller');
-                      const vSoldOut = v.availableForSale === false || v.quantityAvailable === 0;
+                      const vSoldOut = v.availableForSale === false || v.quantityAvailable === 0 || (typeof v.quantityAvailable === 'number' && v.quantityAvailable <= 0);
 
                       return (
                         <div key={v.id} className="flex items-center justify-between p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
@@ -270,7 +271,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                                 onClick={() => onRegisterTrigger?.()}
                                 className="text-[10px] text-zinc-400 hover:text-white underline cursor-pointer"
                               >
-                                registriere dich für eine Preisübersicht
+                                Preisübersicht anfragen
                               </button>
                             ) : (
                               formatPrice(v.price.amount, v.price.currencyCode)
@@ -282,42 +283,30 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
                   </div>
                 )
               ) : (
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl font-extrabold text-white">
+                <div className="flex justify-between items-center p-3 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
+                  <span className="text-xs font-bold text-white">Ticket</span>
+                  <span className="text-sm font-black text-white">
                     {formatPrice(priceAmount, currency)}
                   </span>
-                  <TicketInventoryBadge availableForSale={!isSoldOut} quantityAvailable={minQuantityAvailable} size="sm" />
                 </div>
               )}
             </div>
 
             {/* Ticket Purchase Limit Status Warning */}
-            {alreadyBought > 0 && (
-              <div className={`p-3 rounded-2xl text-xs flex items-center gap-2.5 border ${
-                isMaxLimitReached 
-                  ? 'bg-rose-500/10 border-rose-500/30 text-rose-300' 
-                  : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
-              }`}>
-                {isMaxLimitReached ? (
-                  <ShieldAlert size={16} className="shrink-0 text-rose-400" />
-                ) : (
-                  <AlertTriangle size={16} className="shrink-0 text-amber-400" />
-                )}
-                <span>
-                  {isMaxLimitReached 
-                    ? `Maximales Limit (10 Tickets) für dieses Event erreicht.` 
-                    : `Du besitzt bereits ${alreadyBought} von max. 10 Tickets für dieses Event.`}
-                </span>
+            {alreadyBought > 0 && !isMaxLimitReached && (
+              <div className="p-3 rounded-2xl text-xs flex items-center gap-2.5 border bg-amber-500/10 border-amber-500/30 text-amber-300">
+                <AlertTriangle size={16} className="shrink-0 text-amber-400" />
+                <span>Du besitzt bereits {alreadyBought} Ticket(s) für dieses Event.</span>
               </div>
             )}
 
             {isSoldOut ? (
               <button
                 disabled
-                className="w-full py-4 rounded-xl bg-zinc-900 text-zinc-500 font-extrabold text-sm border border-zinc-800 cursor-not-allowed opacity-60 flex items-center justify-center gap-2 select-none"
+                className="w-full py-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-sm cursor-not-allowed opacity-90 flex items-center justify-center gap-2 select-none shadow-sm"
               >
-                <XCircle size={16} />
-                <span>Ausverkauft</span>
+                <Frown size={18} className="text-rose-400" />
+                <span>Ausverkauft 😢</span>
               </button>
             ) : isMaxLimitReached ? (
               <button
@@ -330,7 +319,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
             ) : (
               <Button
                 variant="primary"
-                onPress={() => onQuickBuy(event)}
+                onClick={() => onQuickBuy(event)}
                 className="w-full py-6 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-sm border border-white transition-all select-none active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/5"
               >
                 <ShoppingBag size={16} />
@@ -339,6 +328,7 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
             )}
           </div>
 
+          {/* Description */}
           <div className="space-y-3 text-left">
             <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-500">
               Über dieses Event
@@ -349,38 +339,29 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
             />
           </div>
         </div>
-
       </div>
 
       {/* Mobile Sticky Bottom CTA Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-zinc-950/95 backdrop-blur-xl border-t border-zinc-800/80 p-4 pb-safe flex items-center justify-between md:hidden shadow-[0_-10px_30px_rgba(0,0,0,0.8)]">
         <div className="flex flex-col">
-          {event.variants.nodes.length > 1 ? (
-             <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">
-               {currentUser ? (currentUser.user_type === 'business' ? 'Aussteller' : 'Einzelticket') : 'Tickets ab'}
-             </span>
-          ) : (
-            <>
-              <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Ticketpreis</span>
-              <span className="text-lg font-extrabold text-white leading-none mt-0.5">
-                {formatPrice(priceAmount, currency)}
-              </span>
-            </>
-          )}
+          <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Ticketpreis</span>
+          <span className="text-lg font-extrabold text-white leading-none mt-0.5">
+            {formatPrice(priceAmount, currency)}
+          </span>
         </div>
 
         {isSoldOut ? (
           <button
             disabled
-            className="py-3 px-5 rounded-xl bg-zinc-900 text-zinc-500 font-extrabold text-xs border border-zinc-800 cursor-not-allowed opacity-60 flex items-center gap-1.5"
+            className="py-3 px-5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-xs cursor-not-allowed opacity-90 flex items-center gap-1.5 shadow-sm"
           >
-            <XCircle size={14} />
-            <span>Ausverkauft</span>
+            <Frown size={15} className="text-rose-400" />
+            <span>Ausverkauft 😢</span>
           </button>
         ) : (
           <Button
             variant="primary"
-            onPress={() => onQuickBuy(event)}
+            onClick={() => onQuickBuy(event)}
             className="py-3 px-5 rounded-xl bg-white hover:bg-zinc-200 text-black font-extrabold text-xs border border-white transition-all active:scale-[0.98] cursor-pointer shadow-lg flex items-center gap-1.5"
           >
             <ShoppingBag size={14} />
@@ -388,7 +369,6 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
           </Button>
         )}
       </div>
-
     </div>
   );
 }

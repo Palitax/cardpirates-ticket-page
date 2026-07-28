@@ -35,7 +35,17 @@ export default function EventCard({
 
   const matchingTickets = purchasedTickets.filter(t => t.event_id === event.id || t.id === event.id);
   const isPurchased = matchingTickets.length > 0;
-  const isSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0);
+
+  const isBusinessUser = currentUser?.user_type === 'business';
+  const activeVariant = event.variants.nodes.find(v => 
+    isBusinessUser 
+      ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+      : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+  ) || event.variants.nodes[0];
+
+  const isCurrentVariantSoldOut = activeVariant ? (activeVariant.availableForSale === false || activeVariant.quantityAvailable === 0 || (typeof activeVariant.quantityAvailable === 'number' && activeVariant.quantityAvailable <= 0)) : false;
+  const isAllVariantsSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0 || (typeof v.quantityAvailable === 'number' && v.quantityAvailable <= 0));
+  const isSoldOut = isAllVariantsSoldOut || isCurrentVariantSoldOut;
 
   return (
     <div className="w-full h-auto aspect-[816/220] min-h-[220px] transition-all duration-350 hover:scale-[1.012] active:scale-[0.995] animate-ticket-glow hover:!filter hover:!drop-shadow-[0_0_30px_rgba(255,255,255,0.45)]">
