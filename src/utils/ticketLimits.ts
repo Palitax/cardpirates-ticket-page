@@ -14,25 +14,24 @@ export function isVariantSoldOut(variant: ShopifyVariant | undefined | null): bo
 }
 
 /**
- * Checks if an entire Shopify event (or the relevant variant for the user) is sold out.
+ * Checks if an entire Shopify event (or the relevant variant for the user/guest) is sold out.
  */
 export function isEventSoldOut(event: ShopifyProduct | undefined | null, currentUser?: any | null): boolean {
   if (!event || !event.variants || !event.variants.nodes || event.variants.nodes.length === 0) {
     return true;
   }
 
-  // If user is logged in, check the specific matching variant for their account type
-  if (currentUser) {
-    const isBusiness = currentUser.user_type === 'business';
-    const matchingVariant = event.variants.nodes.find(v => 
-      isBusiness 
-        ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
-        : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
-    ) || event.variants.nodes[0];
+  const isBusiness = currentUser?.user_type === 'business';
+  
+  // Find the variant for this view (business vs normal user / guest)
+  const targetVariant = event.variants.nodes.find(v => 
+    isBusiness 
+      ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+      : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+  ) || event.variants.nodes[0];
 
-    if (matchingVariant && isVariantSoldOut(matchingVariant)) {
-      return true;
-    }
+  if (targetVariant && isVariantSoldOut(targetVariant)) {
+    return true;
   }
 
   // Check if all variants are sold out
