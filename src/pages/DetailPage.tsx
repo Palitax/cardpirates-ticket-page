@@ -5,7 +5,7 @@ import { shopifyService } from '../services/shopify';
 import type { ShopifyProduct } from '../services/shopify';
 import CountdownTimer from '../components/CountdownTimer';
 import TicketInventoryBadge from '../components/TicketInventoryBadge';
-import { getBoughtTicketsCountForEvent, MAX_TICKETS_PER_EVENT } from '../utils/ticketLimits';
+import { getBoughtTicketsCountForEvent, MAX_TICKETS_PER_EVENT, isEventSoldOut } from '../utils/ticketLimits';
 import { Button } from '@heroui/react';
 import { formatPrice } from '../utils/formatters';
 import { WHATNOT_LOGO_BASE64 } from '../assets/whatnotLogoData';
@@ -58,16 +58,13 @@ export default function DetailPage({ onQuickBuy, currentUser, onRegisterTrigger 
     );
   }
 
+  const isSoldOut = isEventSoldOut(event, currentUser);
   const isBusinessUser = currentUser?.user_type === 'business';
   const activeVariant = event.variants.nodes.find(v => 
     isBusinessUser 
       ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
       : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
   ) || event.variants.nodes[0];
-
-  const isCurrentVariantSoldOut = activeVariant ? (activeVariant.availableForSale === false || activeVariant.quantityAvailable === 0 || (typeof activeVariant.quantityAvailable === 'number' && activeVariant.quantityAvailable <= 0)) : false;
-  const isAllVariantsSoldOut = event.variants.nodes.length > 0 && event.variants.nodes.every(v => v.availableForSale === false || v.quantityAvailable === 0 || (typeof v.quantityAvailable === 'number' && v.quantityAvailable <= 0));
-  const isSoldOut = isAllVariantsSoldOut || isCurrentVariantSoldOut;
   const minQuantityAvailable = event.variants.nodes.reduce<number | null>((min, v) => {
     if (typeof v.quantityAvailable === 'number') {
       return min === null ? v.quantityAvailable : Math.min(min, v.quantityAvailable);
