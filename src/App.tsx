@@ -1,3 +1,4 @@
+export const BUILD_TIMESTAMP = '2026-07-28T13:31:00Z';
 import { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { X } from 'lucide-react';
