@@ -380,18 +380,23 @@ function App() {
   };
 
   const handleQuickBuyTrigger = (event: ShopifyProduct) => {
-    const defaultVariant = event.variants.nodes[0];
-    if (defaultVariant && defaultVariant.availableForSale !== false && defaultVariant.quantityAvailable !== 0) {
+    const isBusiness = currentUser?.user_type === 'business';
+    const targetVariant = event.variants.nodes.find(v => 
+      isBusiness 
+        ? (v.title.toLowerCase().includes('aussteller') || v.title.toLowerCase().includes('business'))
+        : (v.title.toLowerCase().includes('privat') || v.title.toLowerCase().includes('einzel'))
+    ) || event.variants.nodes[0];
+
+    if (targetVariant && targetVariant.availableForSale !== false) {
       handleAddToCart({
-        id: defaultVariant.id,
+        id: targetVariant.id,
         eventId: event.id,
         eventTitle: event.title,
-        variantId: defaultVariant.id,
-        variantTitle: defaultVariant.title,
-        price: defaultVariant.price,
+        variantId: targetVariant.id,
+        variantTitle: targetVariant.title,
+        price: targetVariant.price,
         quantity: 1,
-        availableForSale: defaultVariant.availableForSale,
-        quantityAvailable: defaultVariant.quantityAvailable,
+        availableForSale: targetVariant.availableForSale,
         image: event.images.nodes[0]?.url,
         date: event.eventDate?.value,
         location: event.eventLocation?.value,
